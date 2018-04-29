@@ -59,9 +59,13 @@ class Ui_RadioTelescopeControl(object):
         self.label_3 = QtWidgets.QLabel(self.frame_2)
         self.label_3.setObjectName("label_3")
         self.formLayout_2.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.label_3)
-        self.connectRadioT = QtWidgets.QPushButton(self.frame_2)
-        self.connectRadioT.setObjectName("connectRadioT")
-        self.formLayout_2.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.connectRadioT)
+        self.connectRadioTBtn = QtWidgets.QPushButton(self.frame_2)
+        self.connectRadioTBtn.setEnabled(True)
+        self.connectRadioTBtn.setAutoDefault(False)
+        self.connectRadioTBtn.setDefault(False)
+        self.connectRadioTBtn.setFlat(False)
+        self.connectRadioTBtn.setObjectName("connectRadioTBtn")
+        self.formLayout_2.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.connectRadioTBtn)
         self.gridLayout.addWidget(self.frame_2, 0, 0, 1, 1)
         self.gridLayout_4.addWidget(self.groupBox, 0, 0, 1, 1)
         self.groupBox_2 = QtWidgets.QGroupBox(self.tab)
@@ -102,11 +106,11 @@ class Ui_RadioTelescopeControl(object):
         self.label = QtWidgets.QLabel(self.stackedWidgetPage1)
         self.label.setObjectName("label")
         self.formLayout.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.label)
-        self.connectStellarium = QtWidgets.QPushButton(self.stackedWidgetPage1)
-        self.connectStellarium.setAcceptDrops(False)
-        self.connectStellarium.setCheckable(False)
-        self.connectStellarium.setObjectName("connectStellarium")
-        self.formLayout.setWidget(6, QtWidgets.QFormLayout.LabelRole, self.connectStellarium)
+        self.connectStellariumBtn = QtWidgets.QPushButton(self.stackedWidgetPage1)
+        self.connectStellariumBtn.setAcceptDrops(False)
+        self.connectStellariumBtn.setCheckable(False)
+        self.connectStellariumBtn.setObjectName("connectStellariumBtn")
+        self.formLayout.setWidget(6, QtWidgets.QFormLayout.LabelRole, self.connectStellariumBtn)
         self.stackedWidget.addWidget(self.stackedWidgetPage1)
         self.stackedWidgetPage2 = QtWidgets.QWidget()
         self.stackedWidgetPage2.setObjectName("stackedWidgetPage2")
@@ -170,9 +174,9 @@ class Ui_RadioTelescopeControl(object):
         self.altTextInd.setObjectName("altTextInd")
         self.horizontalLayout_5.addWidget(self.altTextInd)
         self.formLayout_3.setLayout(2, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_5)
-        self.locatChange = QtWidgets.QPushButton(self.groupBox_3)
-        self.locatChange.setObjectName("locatChange")
-        self.formLayout_3.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.locatChange)
+        self.locatChangeBtn = QtWidgets.QPushButton(self.groupBox_3)
+        self.locatChangeBtn.setObjectName("locatChangeBtn")
+        self.formLayout_3.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.locatChangeBtn)
         spacerItem4 = QtWidgets.QSpacerItem(40, 10, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.formLayout_3.setItem(3, QtWidgets.QFormLayout.SpanningRole, spacerItem4)
         self.gridLayout_4.addWidget(self.groupBox_3, 1, 0, 1, 1)
@@ -183,9 +187,9 @@ class Ui_RadioTelescopeControl(object):
         self.label_8 = QtWidgets.QLabel(self.groupBox_4)
         self.label_8.setObjectName("label_8")
         self.formLayout_4.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_8)
-        self.pushButton = QtWidgets.QPushButton(self.groupBox_4)
-        self.pushButton.setObjectName("pushButton")
-        self.formLayout_4.setWidget(6, QtWidgets.QFormLayout.LabelRole, self.pushButton)
+        self.stopMovingBtn = QtWidgets.QPushButton(self.groupBox_4)
+        self.stopMovingBtn.setObjectName("stopMovingBtn")
+        self.formLayout_4.setWidget(6, QtWidgets.QFormLayout.LabelRole, self.stopMovingBtn)
         self.onTargetProgress = QtWidgets.QProgressBar(self.groupBox_4)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -273,44 +277,67 @@ class Ui_RadioTelescopeControl(object):
         _translate = QtCore.QCoreApplication.translate
         RadioTelescopeControl.setWindowTitle(_translate("RadioTelescopeControl", "Radio Telescope Control"))
         self.groupBox.setTitle(_translate("RadioTelescopeControl", "Radio Telescope"))
-        self.label_4.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Dish Position</span></p></body></html>"))
-        self.label_5.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" font-weight:600;\">RA:</span></p></body></html>"))
-        self.raPosInd.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" color:#ff0000;\">0h 0m 0s</span></p></body></html>"))
-        self.label_6.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" font-weight:600;\">DEC:</span></p></body></html>"))
-        self.decPosInd.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" color:#ff0000;\">0</span><span style=\" color:#ff0000; vertical-align:super;\">o</span><span style=\" color:#ff0000;\"> 0\' 0\'\'</span></p></body></html>"))
+        self.label_4.setText(_translate("RadioTelescopeControl",
+                                        "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Dish Position</span></p></body></html>"))
+        self.label_5.setText(_translate("RadioTelescopeControl",
+                                        "<html><head/><body><p><span style=\" font-weight:600;\">RA:</span></p></body></html>"))
+        self.raPosInd.setText(_translate("RadioTelescopeControl",
+                                         "<html><head/><body><p><span style=\" color:#ff0000;\">0h 0m 0s</span></p></body></html>"))
+        self.label_6.setText(_translate("RadioTelescopeControl",
+                                        "<html><head/><body><p><span style=\" font-weight:600;\">DEC:</span></p></body></html>"))
+        self.decPosInd.setText(_translate("RadioTelescopeControl",
+                                          "<html><head/><body><p><span style=\" color:#ff0000;\">0</span><span style=\" color:#ff0000; vertical-align:super;\">o</span><span style=\" color:#ff0000;\"> 0\' 0\'\'</span></p></body></html>"))
         self.label_3.setText(_translate("RadioTelescopeControl", "TCP Connection"))
-        self.connectRadioT.setText(_translate("RadioTelescopeControl", "Connect"))
+        self.connectRadioTBtn.setText(_translate("RadioTelescopeControl", "Connect"))
         self.groupBox_2.setTitle(_translate("RadioTelescopeControl", "Stellarium"))
-        self.stellarConStatText.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" font-weight:600;\">Status:</span></p></body></html>"))
-        self.label_7.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" color:#ff0000;\">Disconnected</span></p></body></html>"))
+        self.stellarConStatText.setText(_translate("RadioTelescopeControl",
+                                                   "<html><head/><body><p><span style=\" font-weight:600;\">Status:</span></p></body></html>"))
+        self.label_7.setText(_translate("RadioTelescopeControl",
+                                        "<html><head/><body><p><span style=\" color:#ff0000;\">Disconnected</span></p></body></html>"))
         self.label_2.setText(_translate("RadioTelescopeControl", "Slew Command"))
         self.stellariumOperationSelect.setItemText(0, _translate("RadioTelescopeControl", "Transit"))
         self.stellariumOperationSelect.setItemText(1, _translate("RadioTelescopeControl", "Aim and track"))
         self.label.setText(_translate("RadioTelescopeControl", "TCP Server"))
-        self.connectStellarium.setText(_translate("RadioTelescopeControl", "Enable"))
-        self.label_13.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Selected Object</span></p></body></html>"))
-        self.label_15.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" font-weight:600;\">RA:</span></p></body></html>"))
+        self.connectStellariumBtn.setText(_translate("RadioTelescopeControl", "Enable"))
+        self.label_13.setText(_translate("RadioTelescopeControl",
+                                         "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Selected Object</span></p></body></html>"))
+        self.label_15.setText(_translate("RadioTelescopeControl",
+                                         "<html><head/><body><p><span style=\" font-weight:600;\">RA:</span></p></body></html>"))
         self.raPosInd_2.setText(_translate("RadioTelescopeControl", "0h 0m 0s"))
-        self.label_16.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" font-weight:600;\">DEC:</span></p></body></html>"))
-        self.decPosInd_2.setText(_translate("RadioTelescopeControl", "<html><head/><body><p>0<span style=\" vertical-align:super;\">o</span> 0\' 0\'\'</p></body></html>"))
+        self.label_16.setText(_translate("RadioTelescopeControl",
+                                         "<html><head/><body><p><span style=\" font-weight:600;\">DEC:</span></p></body></html>"))
+        self.decPosInd_2.setText(_translate("RadioTelescopeControl",
+                                            "<html><head/><body><p>0<span style=\" vertical-align:super;\">o</span> 0\' 0\'\'</p></body></html>"))
         self.groupBox_3.setTitle(_translate("RadioTelescopeControl", "Location"))
-        self.label_12.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" font-weight:600;\">Lat:</span></p></body></html>"))
-        self.latTextInd.setText(_translate("RadioTelescopeControl", "<html><head/><body><p align=\"center\">0<span style=\" vertical-align:super;\">o</span> 0\' 0.00\'\'</p></body></html>"))
-        self.label_10.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" font-weight:600;\">Lon:</span></p></body></html>"))
-        self.lonTextInd.setText(_translate("RadioTelescopeControl", "<html><head/><body><p align=\"center\">0<span style=\" vertical-align:super;\">o</span> 0\' 0.00\'\'</p></body></html>"))
-        self.label_14.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" font-weight:600;\">Alt:</span></p></body></html>"))
-        self.altTextInd.setText(_translate("RadioTelescopeControl", "<html><head/><body><p align=\"center\">0m</p></body></html>"))
-        self.locatChange.setText(_translate("RadioTelescopeControl", "Change"))
+        self.label_12.setText(_translate("RadioTelescopeControl",
+                                         "<html><head/><body><p><span style=\" font-weight:600;\">Lat:</span></p></body></html>"))
+        self.latTextInd.setText(_translate("RadioTelescopeControl",
+                                           "<html><head/><body><p align=\"center\">0<span style=\" vertical-align:super;\">o</span> 0\' 0.00\'\'</p></body></html>"))
+        self.label_10.setText(_translate("RadioTelescopeControl",
+                                         "<html><head/><body><p><span style=\" font-weight:600;\">Lon:</span></p></body></html>"))
+        self.lonTextInd.setText(_translate("RadioTelescopeControl",
+                                           "<html><head/><body><p align=\"center\">0<span style=\" vertical-align:super;\">o</span> 0\' 0.00\'\'</p></body></html>"))
+        self.label_14.setText(_translate("RadioTelescopeControl",
+                                         "<html><head/><body><p><span style=\" font-weight:600;\">Alt:</span></p></body></html>"))
+        self.altTextInd.setText(
+            _translate("RadioTelescopeControl", "<html><head/><body><p align=\"center\">0m</p></body></html>"))
+        self.locatChangeBtn.setText(_translate("RadioTelescopeControl", "Change"))
         self.groupBox_4.setTitle(_translate("RadioTelescopeControl", "State"))
-        self.label_8.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" font-weight:600;\">Tracking:</span></p></body></html>"))
-        self.pushButton.setText(_translate("RadioTelescopeControl", "Stop"))
-        self.label_11.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" font-weight:600;\">Moving:</span></p></body></html>"))
-        self.movTextInd.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" color:#ff0000;\">No</span></p></body></html>"))
-        self.trackTextInd.setText(_translate("RadioTelescopeControl", "<html><head/><body><p><span style=\" color:#ff0000;\">No</span></p></body></html>"))
+        self.label_8.setText(_translate("RadioTelescopeControl",
+                                        "<html><head/><body><p><span style=\" font-weight:600;\">Tracking:</span></p></body></html>"))
+        self.stopMovingBtn.setText(_translate("RadioTelescopeControl", "Stop"))
+        self.label_11.setText(_translate("RadioTelescopeControl",
+                                         "<html><head/><body><p><span style=\" font-weight:600;\">Moving:</span></p></body></html>"))
+        self.movTextInd.setText(_translate("RadioTelescopeControl",
+                                           "<html><head/><body><p><span style=\" color:#ff0000;\">No</span></p></body></html>"))
+        self.trackTextInd.setText(_translate("RadioTelescopeControl",
+                                             "<html><head/><body><p><span style=\" color:#ff0000;\">No</span></p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("RadioTelescopeControl", "Connection"))
-        self.tabWidget.setTabToolTip(self.tabWidget.indexOf(self.tab), _translate("RadioTelescopeControl", "Connection control"))
+        self.tabWidget.setTabToolTip(self.tabWidget.indexOf(self.tab),
+                                     _translate("RadioTelescopeControl", "Connection control"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("RadioTelescopeControl", "Receiver"))
-        self.tabWidget.setTabToolTip(self.tabWidget.indexOf(self.tab_2), _translate("RadioTelescopeControl", "Receiver control"))
+        self.tabWidget.setTabToolTip(self.tabWidget.indexOf(self.tab_2),
+                                     _translate("RadioTelescopeControl", "Receiver control"))
         self.menuThis_is_a_menu.setTitle(_translate("RadioTelescopeControl", "File"))
         self.menuTools.setTitle(_translate("RadioTelescopeControl", "Tools"))
         self.menuAbout.setTitle(_translate("RadioTelescopeControl", "About"))
@@ -332,12 +359,15 @@ class Ui_RadioTelescopeControl(object):
         self.actionSave.setStatusTip(_translate("RadioTelescopeControl", "Save the current program settings"))
         self.actionSave.setShortcut(_translate("RadioTelescopeControl", "Ctrl+S"))
         self.actionCalibration.setText(_translate("RadioTelescopeControl", "Calibration"))
-        self.actionCalibration.setStatusTip(_translate("RadioTelescopeControl", "Calibrate the radio telescope\'s dish positioning"))
+        self.actionCalibration.setStatusTip(
+            _translate("RadioTelescopeControl", "Calibrate the radio telescope\'s dish positioning"))
         self.actionLocation.setText(_translate("RadioTelescopeControl", "Location"))
-        self.actionLocation.setStatusTip(_translate("RadioTelescopeControl", "Change the location and location settings"))
+        self.actionLocation.setStatusTip(
+            _translate("RadioTelescopeControl", "Change the location and location settings"))
         self.actionLocation.setShortcut(_translate("RadioTelescopeControl", "Ctrl+L"))
         self.actionManual_Control.setText(_translate("RadioTelescopeControl", "Manual Control"))
-        self.actionManual_Control.setStatusTip(_translate("RadioTelescopeControl", "Manually control the dish\'s position"))
+        self.actionManual_Control.setStatusTip(
+            _translate("RadioTelescopeControl", "Manually control the dish\'s position"))
         self.actionManual_Control.setShortcut(_translate("RadioTelescopeControl", "Ctrl+M"))
         
     def close_application(self, object):

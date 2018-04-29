@@ -3,8 +3,19 @@ import configData
 import logData
 import TCPClient
 import sys
+from functools import partial
 
 if __name__ == '__main__':
+    app = UI.QtWidgets.QApplication(sys.argv)  # Create a Qt application instance
+    RadioTelescopeControl = UI.QtWidgets.QMainWindow()  # Create the main window of th GUI
+    TCPSettings = UI.QtWidgets.QMainWindow()  # Create window for the TCP settings dialog
+
+    # Create the contents of the windows
+    ui = UI.Ui_RadioTelescopeControl()
+    ui.setupUi(RadioTelescopeControl)
+    uiT = UI.Ui_TCPSettings()
+    uiT.setupUi(TCPSettings)
+
     # Exception handling section for the log file code
     try:
         logdata = logData.logData(__name__)
@@ -23,7 +34,7 @@ if __name__ == '__main__':
 
     # Exception handling code for the TCP initial setup
     try:
-        tcpClient = TCPClient.TCPClient(cfgData)
+        tcpClient = TCPClient.TCPClient(cfgData, ui)
     except:
         print("There is a problem with the TCP handling. See log file for the traceback of the exception.\n")
         logdata.log("EXCEPT", "There is a problem with the TCP handling. Program terminates.", __name__)
@@ -31,20 +42,12 @@ if __name__ == '__main__':
 
     s_latlon = cfgData.getLatLon()  # First element is latitude and second element is longitude
     s_alt = cfgData.getAltitude()  # Get the altitude from the settings file
+    hostport = [cfgData.getHost(), cfgData.getPort()]  # Get the saved host address or name and port of the server
 
-    app = UI.QtWidgets.QApplication(sys.argv)  # Create a Qt application instance
-    RadioTelescopeControl = UI.QtWidgets.QMainWindow()  # Create the main window of th GUI
-    TCPSettings = UI.QtWidgets.QMainWindow()  # Create window for the TCP settings dialog
-
-    # Create the contents of the windows
-    ui = UI.Ui_RadioTelescopeControl()
-    ui.setupUi(RadioTelescopeControl)
-    uiT = UI.Ui_TCPSettings()
-    uiT.setupUi(TCPSettings)
 
     # Give functionality to the buttons and add the necessary texts to fields
     ui.actionSettings.triggered.connect(TCPSettings.show)
-    #ui.connectRadioT.clicked.connect(tcpClient.)
+    ui.connectRadioTBtn.clicked.connect(tcpClient.connectButton)
     tcpClient.sendRequest("There")
     ui.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
                           "vertical-align:super;\">o</span></p></body></html>" %s_latlon[1])
