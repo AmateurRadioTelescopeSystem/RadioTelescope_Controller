@@ -284,4 +284,6 @@ fabric.properties
 # Sonarlint plugin
 .idea/sonarlint
 
+*.log
+
 # End of https://www.gitignore.io/api/c,c++,linux,python,windows

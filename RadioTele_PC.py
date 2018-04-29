@@ -44,6 +44,8 @@ if __name__ == '__main__':
 
     # Give functionality to the buttons and add the necessary texts to fields
     ui.actionSettings.triggered.connect(TCPSettings.show)
+    #ui.connectRadioT.clicked.connect(tcpClient.)
+    tcpClient.sendRequest("There")
     ui.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
                           "vertical-align:super;\">o</span></p></body></html>" %s_latlon[1])
     ui.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
