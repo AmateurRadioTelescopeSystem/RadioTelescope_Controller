@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
+import sys
 
 class Ui_RadioTelescopeControl(object):
     def __init__(self):
