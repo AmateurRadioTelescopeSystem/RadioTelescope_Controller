@@ -238,7 +238,7 @@ class Ui_RadioTelescopeControl(object):
         self.actionAbout.setObjectName("actionAbout")
         self.actionExit = QtWidgets.QAction(RadioTelescopeControl)
         self.actionExit.setObjectName("actionExit")
-        self.actionExit.triggered.connect(close_application)
+        self.actionExit.triggered.connect(partial(self.close_application, object = RadioTelescopeControl))
         self.actionSave = QtWidgets.QAction(RadioTelescopeControl)
         self.actionSave.setObjectName("actionSave")
         self.actionCalibration = QtWidgets.QAction(RadioTelescopeControl)
@@ -339,8 +339,8 @@ class Ui_RadioTelescopeControl(object):
         self.actionManual_Control.setStatusTip(_translate("RadioTelescopeControl", "Manually control the dish\'s position"))
         self.actionManual_Control.setShortcut(_translate("RadioTelescopeControl", "Ctrl+M"))
         
-    def close_application(self):
-        choice = QtWidgets.QMessageBox.question(RadioTelescopeControl, 'Exit', "Are you sure?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+    def close_application(self, object):
+        choice = QtWidgets.QMessageBox.question(object, 'Exit', "Are you sure?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if choice == QtWidgets.QMessageBox.Yes:
             sys.exit()
         else:
@@ -383,24 +383,3 @@ class Ui_TCPSettings(object):
         _translate = QtCore.QCoreApplication.translate
         TCPSettings.setWindowTitle(_translate("TCPSettings", "TCP Settings"))
         self.toolBar.setWindowTitle(_translate("TCPSettings", "toolBar"))
-        
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    RadioTelescopeControl = QtWidgets.QMainWindow()
-    TCPSettings = QtWidgets.QMainWindow()
-    
-    ui = Ui_RadioTelescopeControl()
-    ui.setupUi(RadioTelescopeControl)
-    
-    uiT = Ui_TCPSettings()
-    uiT.setupUi(TCPSettings)
-    
-    
-    ui.connectStellarium.clicked.connect(ui.btnFunc)
-    ui.actionSettings.triggered.connect(TCPSettings.show)
-    ui.actionExit.triggered.connect(partial(close_application, object = RadioTelescopeControl))
-    
-    RadioTelescopeControl.show()
-    sys.exit(app.exec_())
-
