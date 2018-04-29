@@ -1,6 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
-import socket
 
 class Ui_RadioTelescopeControl(object):
     def __init__(self):
@@ -239,6 +238,7 @@ class Ui_RadioTelescopeControl(object):
         self.actionAbout.setObjectName("actionAbout")
         self.actionExit = QtWidgets.QAction(RadioTelescopeControl)
         self.actionExit.setObjectName("actionExit")
+        self.actionExit.triggered.connect(close_application)
         self.actionSave = QtWidgets.QAction(RadioTelescopeControl)
         self.actionSave.setObjectName("actionSave")
         self.actionCalibration = QtWidgets.QAction(RadioTelescopeControl)
@@ -338,29 +338,13 @@ class Ui_RadioTelescopeControl(object):
         self.actionManual_Control.setText(_translate("RadioTelescopeControl", "Manual Control"))
         self.actionManual_Control.setStatusTip(_translate("RadioTelescopeControl", "Manually control the dish\'s position"))
         self.actionManual_Control.setShortcut(_translate("RadioTelescopeControl", "Ctrl+M"))
-
-    def tcpCon(self):
-        self.connected = False
-        serverAddress = ('127.0.0.1', 10001)
-        self.label.setText("Connecting....")
-
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            sock.bind(serverAddress)
-        except sock.error:
-            print ("Can not bind to port.")
-        sock.settimeout(20)
-        sock.listen(1) #Set the socket to listen
         
-        
-        self.connection, self.clientAddress = sock.accept()
-        if self.connection != None:
-            self.connected = True
-            self.label.setText("Connected")
-            self.connectStellarium.setText("Disable")
-            
-    def btnFunc(self):
-        self.connectStellarium.setText("Disable")
+    def close_application(self):
+        choice = QtWidgets.QMessageBox.question(RadioTelescopeControl, 'Exit', "Are you sure?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if choice == QtWidgets.QMessageBox.Yes:
+            sys.exit()
+        else:
+            pass
         
 class Ui_TCPSettings(object):
     def setupUi(self, TCPSettings):
@@ -399,21 +383,6 @@ class Ui_TCPSettings(object):
         _translate = QtCore.QCoreApplication.translate
         TCPSettings.setWindowTitle(_translate("TCPSettings", "TCP Settings"))
         self.toolBar.setWindowTitle(_translate("TCPSettings", "toolBar"))
-
-'''
-def windShow(window):
-    app = QtWidgets.QApplication(sys.argv)
-    window.show()
-    sys.exit(app.exec_())
-'''
-
-def close_application(object):
-    choice = QtWidgets.QMessageBox.question(object, 'Exit', "Are you sure?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-    if choice == QtWidgets.QMessageBox.Yes:
-        print("App exited.")
-        sys.exit()
-    else:
-        pass
         
 if __name__ == "__main__":
     import sys
@@ -427,9 +396,6 @@ if __name__ == "__main__":
     uiT = Ui_TCPSettings()
     uiT.setupUi(TCPSettings)
     
-    #ui.locatChange.clicked.connect(partial(windShow, window = TCPSettings))
-    #ui.label_4.setText("Dish Pos")
-    #TCPSettings.show()
     
     ui.connectStellarium.clicked.connect(ui.btnFunc)
     ui.actionSettings.triggered.connect(TCPSettings.show)
