@@ -1,8 +1,6 @@
 from PyQt5 import QtCore
 import logData
 import socket
-import struct
-import time
 import threading
 import queue
 
