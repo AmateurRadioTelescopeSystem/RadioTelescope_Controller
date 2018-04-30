@@ -1,5 +1,8 @@
+#!/usr/bin/env python3.5
+
+from PyQt5 import QtWidgets
 from functools import partial
-import UInterface as UI
+import UInterface
 import configData
 import logData
 import TCPClient
@@ -9,11 +12,11 @@ import sys
 if __name__ == '__main__':
     logdata = logData.logData(__name__)  # Create the logger for the program
 
-    app = UI.QtWidgets.QApplication(sys.argv)  # Create a Qt application instance
-    RadioTelescopeControl = UI.QtWidgets.QMainWindow()  # Create the main window of th GUI
+    app = QtWidgets.QApplication(sys.argv)  # Create a Qt application instance
+    RadioTelescopeControl = QtWidgets.QMainWindow()  # Create the main window of th GUI
 
     # Create the contents of the windows
-    ui = UI.Ui_RadioTelescopeControl()
+    ui = UInterface.Ui_RadioTelescopeControl()
     ui.setupUi(RadioTelescopeControl)
 
     # Exception handling code for the XML file process
