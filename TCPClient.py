@@ -21,6 +21,8 @@ class TCPClient(object):
             else:
                 self.logd.log("WARNING", "Autoconnection with client was impossible.", "constructor")
                 self.connectButton(False, "Connect")
+        else:
+            self.connectButton(False, "Connect")
 
 
     def createSocket(self):
