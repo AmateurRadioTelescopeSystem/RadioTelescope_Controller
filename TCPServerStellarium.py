@@ -13,10 +13,10 @@ class TCPStellarium(object):
 
         self.mainUi = mainUi  # Create a variable for the UI control
         self.btnStr = "Enable"  # String to hold the TCP connection button message
+        self.host = cfgData.getStellHost()  # Get the TCP connection host
+        self.port = cfgData.getStellPort()  # Get the TCP connection port
         autocon = cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
         if autocon == "yes":
-            self.host = cfgData.getStellHost()
-            self.port = cfgData.getStellPort()
             self.sock = self.createSocket()  # Create a socket upon the class instantiation
             if self.acceptConnection()[1]:
                 self.logd.log("INFO", "Server successfully started.", "constructor")
@@ -31,7 +31,7 @@ class TCPStellarium(object):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket
         sock.bind((self.host, int(self.port)))  # Bind to the socket
         sock.listen(1)  # Set the listening to one connection
-        # sock.settimeout(20)  # Set the timeout for the socket
+        sock.settimeout(20)  # Set the timeout for the socket
         self.sock_exst = True
         return sock  # Return the socket object
 
