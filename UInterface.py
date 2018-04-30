@@ -1,4 +1,10 @@
+# -*- coding: utf-8 -*-
+
+# The GUI code is automatically generated from the PyQt5 package
+# by running the pyuic5 command on the ui file from QtDesigner
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+from TCPSettings import Ui_TCPSettings
 from functools import partial
 import sys
 
@@ -6,10 +12,16 @@ class Ui_RadioTelescopeControl(object):
     def __init__(self):
         QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create("Fusion"))
 
+        # Create the window for the TCP settings
+        self.tcpWindow = QtWidgets.QMainWindow()
+        self.uiTCP = Ui_TCPSettings()
+        self.uiTCP.setupUi(self.tcpWindow)
+
     def setupUi(self, RadioTelescopeControl):
         RadioTelescopeControl.setWindowIcon(QtGui.QIcon('radiotelescope.png'))
         RadioTelescopeControl.setObjectName("RadioTelescopeControl")
-        RadioTelescopeControl.resize(429, 416)
+        RadioTelescopeControl.setWindowModality(QtCore.Qt.NonModal)
+        RadioTelescopeControl.resize(366, 436)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         RadioTelescopeControl.setFont(font)
@@ -55,12 +67,28 @@ class Ui_RadioTelescopeControl(object):
         self.horizontalLayout.addWidget(self.decPosInd)
         self.formLayout_2.setLayout(2, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout)
         spacerItem = QtWidgets.QSpacerItem(40, 10, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.formLayout_2.setItem(3, QtWidgets.QFormLayout.SpanningRole, spacerItem)
-        self.label_3 = QtWidgets.QLabel(self.frame_2)
-        self.label_3.setObjectName("label_3")
-        self.formLayout_2.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.label_3)
+        self.formLayout_2.setItem(3, QtWidgets.QFormLayout.LabelRole, spacerItem)
+        self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
+        self.tcpConRTChkBox = QtWidgets.QCheckBox(self.frame_2)
+        self.tcpConRTChkBox.setText("")
+        self.tcpConRTChkBox.setObjectName("tcpConRTChkBox")
+
+        self.tcpConRTChkBox.stateChanged.connect(self.checkBoxTCPRT)
+
+        self.horizontalLayout_9.addWidget(self.tcpConRTChkBox)
+        self.tcpConRTLabel = QtWidgets.QLabel(self.frame_2)
+        self.tcpConRTLabel.setEnabled(False)
+        self.tcpConRTLabel.setObjectName("tcpConRTLabel")
+        self.horizontalLayout_9.addWidget(self.tcpConRTLabel)
+        self.formLayout_2.setLayout(4, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_9)
         self.connectRadioTBtn = QtWidgets.QPushButton(self.frame_2)
-        self.connectRadioTBtn.setEnabled(True)
+        self.connectRadioTBtn.setEnabled(False)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.connectRadioTBtn.sizePolicy().hasHeightForWidth())
+        self.connectRadioTBtn.setSizePolicy(sizePolicy)
         self.connectRadioTBtn.setAutoDefault(False)
         self.connectRadioTBtn.setDefault(False)
         self.connectRadioTBtn.setFlat(False)
@@ -85,9 +113,9 @@ class Ui_RadioTelescopeControl(object):
         self.stellarConStatText = QtWidgets.QLabel(self.stackedWidgetPage1)
         self.stellarConStatText.setObjectName("stellarConStatText")
         self.horizontalLayout_8.addWidget(self.stellarConStatText)
-        self.label_7 = QtWidgets.QLabel(self.stackedWidgetPage1)
-        self.label_7.setObjectName("label_7")
-        self.horizontalLayout_8.addWidget(self.label_7)
+        self.stellConStatText = QtWidgets.QLabel(self.stackedWidgetPage1)
+        self.stellConStatText.setObjectName("stellConStatText")
+        self.horizontalLayout_8.addWidget(self.stellConStatText)
         self.formLayout.setLayout(1, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_8)
         spacerItem2 = QtWidgets.QSpacerItem(40, 2, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.formLayout.setItem(2, QtWidgets.QFormLayout.LabelRole, spacerItem2)
@@ -103,10 +131,22 @@ class Ui_RadioTelescopeControl(object):
         self.stellariumOperationSelect.addItem("")
         self.stellariumOperationSelect.addItem("")
         self.formLayout.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.stellariumOperationSelect)
-        self.label = QtWidgets.QLabel(self.stackedWidgetPage1)
-        self.label.setObjectName("label")
-        self.formLayout.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.label)
+        self.horizontalLayout_10 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_10.setObjectName("horizontalLayout_10")
+        self.tcpStelServChkBox = QtWidgets.QCheckBox(self.stackedWidgetPage1)
+        self.tcpStelServChkBox.setText("")
+        self.tcpStelServChkBox.setObjectName("tcpStelServChkBox")
+
+        self.tcpStelServChkBox.stateChanged.connect(self.checkBoxTCPStel)
+
+        self.horizontalLayout_10.addWidget(self.tcpStelServChkBox)
+        self.tcpStelServLabel = QtWidgets.QLabel(self.stackedWidgetPage1)
+        self.tcpStelServLabel.setEnabled(False)
+        self.tcpStelServLabel.setObjectName("tcpStelServLabel")
+        self.horizontalLayout_10.addWidget(self.tcpStelServLabel)
+        self.formLayout.setLayout(5, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_10)
         self.connectStellariumBtn = QtWidgets.QPushButton(self.stackedWidgetPage1)
+        self.connectStellariumBtn.setEnabled(False)
         self.connectStellariumBtn.setAcceptDrops(False)
         self.connectStellariumBtn.setCheckable(False)
         self.connectStellariumBtn.setObjectName("connectStellariumBtn")
@@ -219,7 +259,7 @@ class Ui_RadioTelescopeControl(object):
         self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 2, 1)
         RadioTelescopeControl.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(RadioTelescopeControl)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 355, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 366, 21))
         self.menubar.setObjectName("menubar")
         self.menuThis_is_a_menu = QtWidgets.QMenu(self.menubar)
         self.menuThis_is_a_menu.setObjectName("menuThis_is_a_menu")
@@ -237,13 +277,18 @@ class Ui_RadioTelescopeControl(object):
         self.actionOpen.setObjectName("actionOpen")
         self.actionSettings = QtWidgets.QAction(RadioTelescopeControl)
         self.actionSettings.setObjectName("actionSettings")
+
+        self.actionSettings.triggered.connect(self.tcpWindow.show)
+
         self.actionLicense = QtWidgets.QAction(RadioTelescopeControl)
         self.actionLicense.setObjectName("actionLicense")
         self.actionAbout = QtWidgets.QAction(RadioTelescopeControl)
         self.actionAbout.setObjectName("actionAbout")
         self.actionExit = QtWidgets.QAction(RadioTelescopeControl)
         self.actionExit.setObjectName("actionExit")
+
         self.actionExit.triggered.connect(partial(self.close_application, object = RadioTelescopeControl))
+
         self.actionSave = QtWidgets.QAction(RadioTelescopeControl)
         self.actionSave.setObjectName("actionSave")
         self.actionCalibration = QtWidgets.QAction(RadioTelescopeControl)
@@ -287,17 +332,17 @@ class Ui_RadioTelescopeControl(object):
                                         "<html><head/><body><p><span style=\" font-weight:600;\">DEC:</span></p></body></html>"))
         self.decPosInd.setText(_translate("RadioTelescopeControl",
                                           "<html><head/><body><p><span style=\" color:#ff0000;\">0</span><span style=\" color:#ff0000; vertical-align:super;\">o</span><span style=\" color:#ff0000;\"> 0\' 0\'\'</span></p></body></html>"))
-        self.label_3.setText(_translate("RadioTelescopeControl", "TCP Connection"))
+        self.tcpConRTLabel.setText(_translate("RadioTelescopeControl", "TCP Connection"))
         self.connectRadioTBtn.setText(_translate("RadioTelescopeControl", "Connect"))
         self.groupBox_2.setTitle(_translate("RadioTelescopeControl", "Stellarium"))
         self.stellarConStatText.setText(_translate("RadioTelescopeControl",
                                                    "<html><head/><body><p><span style=\" font-weight:600;\">Status:</span></p></body></html>"))
-        self.label_7.setText(_translate("RadioTelescopeControl",
-                                        "<html><head/><body><p><span style=\" color:#ff0000;\">Disconnected</span></p></body></html>"))
+        self.stellConStatText.setText(_translate("RadioTelescopeControl",
+                                                 "<html><head/><body><p><span style=\" color:#ff0000;\">Disconnected</span></p></body></html>"))
         self.label_2.setText(_translate("RadioTelescopeControl", "Slew Command"))
         self.stellariumOperationSelect.setItemText(0, _translate("RadioTelescopeControl", "Transit"))
         self.stellariumOperationSelect.setItemText(1, _translate("RadioTelescopeControl", "Aim and track"))
-        self.label.setText(_translate("RadioTelescopeControl", "TCP Server"))
+        self.tcpStelServLabel.setText(_translate("RadioTelescopeControl", "TCP Server"))
         self.connectStellariumBtn.setText(_translate("RadioTelescopeControl", "Enable"))
         self.label_13.setText(_translate("RadioTelescopeControl",
                                          "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Selected Object</span></p></body></html>"))
@@ -369,48 +414,28 @@ class Ui_RadioTelescopeControl(object):
         self.actionManual_Control.setStatusTip(
             _translate("RadioTelescopeControl", "Manually control the dish\'s position"))
         self.actionManual_Control.setShortcut(_translate("RadioTelescopeControl", "Ctrl+M"))
+
+    # Function called every time the corresponding checkbox is selected
+    def checkBoxTCPRT(self, state):
+        if state == QtCore.Qt.Checked:
+            self.tcpConRTLabel.setEnabled(True)  # Enable the label
+            self.connectRadioTBtn.setEnabled(True)  # And also enable the button selection
+        else:
+            self.tcpConRTLabel.setEnabled(False)  # Disable the label
+            self.connectRadioTBtn.setEnabled(False)  # And also disable the button selection
+
+    # Function called every time the corresponding checkbox is selected
+    def checkBoxTCPStel(self, state):
+        if state == QtCore.Qt.Checked:
+            self.tcpStelServLabel.setEnabled(True)
+            self.connectStellariumBtn.setEnabled(True)
+        else:
+            self.tcpStelServLabel.setEnabled(False)
+            self.connectStellariumBtn.setEnabled(False)
         
     def close_application(self, object):
         choice = QtWidgets.QMessageBox.question(object, 'Exit', "Are you sure?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if choice == QtWidgets.QMessageBox.Yes:
-            sys.exit()
+            sys.exit()  # If user selects "Yes", then exit from the application
         else:
-            pass
-        
-class Ui_TCPSettings(object):
-    def setupUi(self, TCPSettings):
-        TCPSettings.setWindowIcon(QtGui.QIcon('Net.png'))
-        TCPSettings.setObjectName("TCPSettings")
-        TCPSettings.resize(240, 320)
-        self.centralwidget = QtWidgets.QWidget(TCPSettings)
-        self.centralwidget.setObjectName("centralwidget")
-        TCPSettings.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(TCPSettings)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 240, 21))
-        self.menubar.setObjectName("menubar")
-        TCPSettings.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(TCPSettings)
-        self.statusbar.setObjectName("statusbar")
-        TCPSettings.setStatusBar(self.statusbar)
-        
-        extractAction = QtWidgets.QAction(QtGui.QIcon('TCP.png'), 'Python', TCPSettings)
-        
-        self.toolBar = QtWidgets.QToolBar(TCPSettings)
-        self.toolBar.setEnabled(True)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.toolBar.sizePolicy().hasHeightForWidth())
-        self.toolBar.setSizePolicy(sizePolicy)
-        self.toolBar.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
-        self.toolBar.setObjectName("toolBar")
-        self.toolBar.addAction(extractAction) #Create a toolbar
-        TCPSettings.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
-
-        self.retranslateUi(TCPSettings)
-        QtCore.QMetaObject.connectSlotsByName(TCPSettings)
-
-    def retranslateUi(self, TCPSettings):
-        _translate = QtCore.QCoreApplication.translate
-        TCPSettings.setWindowTitle(_translate("TCPSettings", "TCP Settings"))
-        self.toolBar.setWindowTitle(_translate("TCPSettings", "toolBar"))
+            pass  # If user selects "No" then do not exit
