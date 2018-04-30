@@ -56,6 +56,7 @@ class confData(object):
     def setAltitude(self, altitude):
         self.setConfig("location", "altitude", str(altitude))
 
+    # TCP client data
     def getHost(self):
         return self.getConfig("TCP", "host")
 
@@ -77,6 +78,30 @@ class confData(object):
 
     def TCPAutoConnDisable(self):
         self.root.find("TCP").set("autoconnect", "no")
+        self.tree.write(self.filename)
+
+    # TCP server data
+    def getStellHost(self):
+        return self.getConfig("TCPStell", "host")
+
+    def setStellHost(self, host):
+        self.setConfig("TCPStell", "host", host)
+
+    def getStellPort(self):
+        return self.getConfig("TCPStell", "port")
+
+    def setStellPort(self, port):
+        self.setConfig("TCPStell", "port", str(port))
+
+    def getTCPStellAutoConnStatus(self):
+        return self.root.find("TCPStell").get("autoconnect")
+
+    def TCPStellAutoConnEnable(self):
+        self.root.find("TCPStell").set("autoconnect", "yes")
+        self.tree.write(self.filename)
+
+    def TCPStellAutoConnDisable(self):
+        self.root.find("TCPStell").set("autoconnect", "no")
         self.tree.write(self.filename)
 
     def getObject(self):

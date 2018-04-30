@@ -4,6 +4,7 @@ import socket
 import threading
 import queue
 
+
 class TCPStellarium(object):
     def __init__(self, cfgData, mainUi):
         self.logd = logData.logData(__name__)
@@ -12,26 +13,25 @@ class TCPStellarium(object):
 
         self.mainUi = mainUi  # Create a variable for the UI control
         self.btnStr = "Enable"  # String to hold the TCP connection button message
-        '''autocon = cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
+        autocon = cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
         if autocon == "yes":
             self.host = cfgData.getStellHost()
             self.port = cfgData.getStellPort()
             self.sock = self.createSocket()  # Create a socket upon the class instantiation
             if self.acceptConnection()[1]:
-                self.logd.log("INFO", "Server successfully started." % (self.host, self.port), "constructor")
-                self.connectButton(False, "Disable")
+                self.logd.log("INFO", "Server successfully started.", "constructor")
+                self.connectButton(False, "Disable", "Green")
             else:
                 self.logd.log("WARNING", "Server auto start failed.", "constructor")
-                self.connectButton(False, "Enable")
+                self.connectButton(False, "Enable", "Red")
         else:
-            self.connectButton(False, "Enable")
-        '''
+            self.connectButton(False, "Enable", "Red")
 
     def createSocket(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket
-        sock.bind(("127.0.0.1", int(10002)))  # Bind to the socket
+        sock.bind((self.host, int(self.port)))  # Bind to the socket
         sock.listen(1)  # Set the listening to one connection
-        sock.settimeout(20)  # Set the timeout for the socket
+        # sock.settimeout(20)  # Set the timeout for the socket
         self.sock_exst = True
         return sock  # Return the socket object
 
@@ -77,7 +77,7 @@ class TCPStellarium(object):
             except:
                 self.logd.log("EXCEPT", "There was an issue sending the response to the client", "sendResponse")
 
-    def connectButton(self, actualPress, state = "Enable"):
+    def connectButton(self, actualPress, state = "Enable", clchange = "Red"):
         if actualPress:
             if self.btnStr == "Disable":
                 self.releaseClient()
@@ -85,12 +85,16 @@ class TCPStellarium(object):
 
                 self.btnStr = "Enable"
                 self.mainUi.connectStellariumBtn.setText(self.btnStr)  # Change user's selection
+                self.mainUi.stellConStatText.setText(
+                    "<html><head/><body><p><span style=\" color:#ff0000;\">Disconnected</span></p></body></html>")
             elif self.btnStr == "Enable":
-                if self.acceptConnection():
+                if self.acceptConnection()[1]:
                     self.logd.log("INFO", "Successfully established connection with Stellarium client.", "connectButton")
                     self.btnStr = "Disable"
                     self.mainUi.connectStellariumBtn.setText(self.btnStr)  # Change user's selection
                     self.mainUi.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
+                    self.mainUi.stellConStatText.setText("<html><head/><body><p><span style=\" "
+                                                         "color:#00ff00;\">Connected</span></p></body></html>")
         else:
             if state == "Enable":
                 self.btnStr = state
@@ -100,5 +104,9 @@ class TCPStellarium(object):
                 self.btnStr = state
                 self.mainUi.connectStellariumBtn.setText(self.btnStr)
                 self.mainUi.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
-
-
+            if clchange == "Red":
+                self.mainUi.stellConStatText.setText(
+                    "<html><head/><body><p><span style=\" color:#ff0000;\">Disconnected</span></p></body></html>")
+            elif clchange == "Green":
+                self.mainUi.stellConStatText.setText(
+                    "<html><head/><body><p><span style=\" color:#00ff00;\">Connected</span></p></body></html>")
