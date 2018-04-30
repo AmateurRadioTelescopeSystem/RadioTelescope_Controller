@@ -4,13 +4,12 @@ import socket
 
 class TCPClient(object):
     def __init__(self, cfgData, mainUi):
-        self.conf = cfgData
         self.logd = logData.logData(__name__)
         self.sock_exst = False  # Indicate that a socket does not object exist
         self.sock_connected = False  # Indicate that there is currently no connection
-        self.sock = self.createSocket()
-        self.mainUi = mainUi
-        self.btnStr = "Disconnect"
+        self.sock = self.createSocket()  # Create a socket upon the class instantiation
+        self.mainUi = mainUi  # Create a variable for the UI control
+        self.btnStr = "Disconnect"  # String to hold the TCP connection button message
         autocon = cfgData.getTCPAutoConnStatus()  # See if auto-connection at startup is enabled
         if autocon == "yes":
             self.host = cfgData.getHost()
@@ -27,13 +26,13 @@ class TCPClient(object):
         return sock
 
     def connect(self, host, port):
-        if self.sock_exst == False:
+        if not self.sock_exst:
             self.sock = self.createSocket()
         try:
             self.sock.connect((host, int(port)))
             self.sock_connected = True
             self.btnStr = "Disconnect"
-        except:
+        except (OSError, InterruptedError):
             self.sock_connected = False
             self.btnStr = "Connect"
         self.mainUi.connectRadioTBtn.setText(self.btnStr)
@@ -57,7 +56,7 @@ class TCPClient(object):
                 self.sock.send(request.encode('utf-8'))
                 response = self.sock.recv(1024).decode('utf-8')
                 return response
-            except:
+            except (OSError, InterruptedError):
                 return "No answer"
         else:
             return "No answer"
@@ -69,7 +68,7 @@ class TCPClient(object):
                 response = self.sock.recv(1024).decode('utf-8')
                 self.sock.settimeout(20)  # Reset the socket timeout before exiting
                 return response
-            except:
+            except (OSError, InterruptedError):
                 self.sock.settimeout(20)  # Reset the socket timeout before exiting
                 return "No answer"  # Indicate that nothing was received
 
