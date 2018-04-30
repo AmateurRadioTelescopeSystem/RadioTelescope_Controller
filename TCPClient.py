@@ -1,3 +1,4 @@
+from PyQt5 import QtCore
 import logData
 import socket
 
@@ -16,8 +17,11 @@ class TCPClient(object):
             self.port = cfgData.getPort()
             if self.connect(self.host, self.port):
                 self.logd.log("INFO", "Client successfully connected to %s:%s." % (self.host, self.port), "constructor")
-                self.btnStr = "Disconnect"
-                self.mainUi.connectRadioTBtn.setText(self.btnStr)
+                self.connectButton(False, "Disconnect")
+            else:
+                self.logd.log("WARNING", "Autoconnection with client was impossible.", "constructor")
+                self.connectButton(False, "Connect")
+
 
     def createSocket(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket object
@@ -31,11 +35,10 @@ class TCPClient(object):
         try:
             self.sock.connect((host, int(port)))
             self.sock_connected = True
-            self.btnStr = "Disconnect"
+            self.connectButton(False, "Disconnect")
         except (OSError, InterruptedError):
             self.sock_connected = False
-            self.btnStr = "Connect"
-        self.mainUi.connectRadioTBtn.setText(self.btnStr)
+            self.connectButton(False, "Connect")
         return self.sock_connected
 
     def disconnect(self):
@@ -46,8 +49,7 @@ class TCPClient(object):
         else:
             self.sock_exst = False  # A new socket is needed to successfully connect to a server after a lost connection
             self.sock_connected = False  # Indicate a disconnected socket
-        self.btnStr = "Connect"
-        self.mainUi.connectRadioTBtn.setText(self.btnStr)
+            self.connectButton(False, "Connect")
         return self.sock_connected
 
     def sendRequest(self, request):
@@ -72,23 +74,35 @@ class TCPClient(object):
                 self.sock.settimeout(20)  # Reset the socket timeout before exiting
                 return "No answer"  # Indicate that nothing was received
 
-    def connectButton(self):
-        if self.btnStr == "Disconnect":
-            if self.sendRequest("Terminate") == "Bye":
-                self.logd.log("INFO", "Successfully disconnected from server.", "connectButton")
-            else:
-                self.logd.log("WARNING",
-                              "There was a problem contacting the server, although the connection was closed.",
-                              "connectButton")
-            self.disconnect()  # Close the connection
-            self.btnStr = "Connect"
-            self.mainUi.connectRadioTBtn.setText(self.btnStr)  # Change user's selection
-        elif self.btnStr == "Connect":
-            if self.connect(self.host, self.port):
-                self.logd.log("INFO", "Client successfully connected to %s:%s." % (self.host, self.port), "connectButton")
-                self.btnStr = "Disconnect"
-                self.mainUi.connectRadioTBtn.setText(self.btnStr)
-            else:
-                self.logd.log("WARNING", "Problem establishing connection with %s:%s." % (self.host, self.port), "connectButton")
+    def connectButton(self, actualPress, state = "Connect"):
+        if actualPress:
+            if self.btnStr == "Disconnect":
+                if self.sendRequest("Terminate") == "Bye":
+                    self.logd.log("INFO", "Successfully disconnected from server.", "connectButton")
+                else:
+                    self.logd.log("WARNING",
+                                  "There was a problem contacting the server, although the connection was closed.",
+                                  "connectButton")
+                self.disconnect()  # Close the connection
                 self.btnStr = "Connect"
+                self.mainUi.connectRadioTBtn.setText(self.btnStr)  # Change user's selection
+            elif self.btnStr == "Connect":
+                if self.connect(self.host, self.port):
+                    self.logd.log("INFO", "Client successfully connected to %s:%s." % (self.host, self.port), "connectButton")
+                    self.btnStr = "Disconnect"
+                    self.mainUi.connectRadioTBtn.setText(self.btnStr)
+                    self.mainUi.tcpConRTChkBox.toggle()
+                    self.mainUi.tcpConRTChkBox.setCheckState(QtCore.Qt.Unchecked)
+                else:
+                    self.logd.log("WARNING", "Problem establishing connection with %s:%s." % (self.host, self.port), "connectButton")
+                    self.btnStr = "Connect"
+                    self.mainUi.connectRadioTBtn.setText(self.btnStr)
+        else:
+            if state == "Connect":
+                self.btnStr = state
                 self.mainUi.connectRadioTBtn.setText(self.btnStr)
+                self.mainUi.tcpConRTChkBox.setCheckState(QtCore.Qt.Checked)
+            elif state == "Disconnect":
+                self.btnStr = state
+                self.mainUi.connectRadioTBtn.setText(self.btnStr)
+                self.mainUi.tcpConRTChkBox.setCheckState(QtCore.Qt.Unchecked)
