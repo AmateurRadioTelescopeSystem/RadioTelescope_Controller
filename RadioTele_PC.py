@@ -3,6 +3,7 @@ import UInterface as UI
 import configData
 import logData
 import TCPClient
+import TCPServerStellarium
 import sys
 
 if __name__ == '__main__':
@@ -23,11 +24,19 @@ if __name__ == '__main__':
         logdata.log("EXCEPT", "There is a problem with the XML file handling. Program terminates.", __name__)
         exit(1)  # Terminate the script
 
-    # Exception handling code for the TCP initial setup
+    # Exception handling code for the TCP server initial setup
+    try:
+        tcpServer = TCPServerStellarium.TCPStellarium(cfgData, ui)
+    except:
+        print("There is a problem with the TCP server handling. See log file for the traceback of the exception.\n")
+        logdata.log("EXCEPT", "There is a problem with the TCP handling. Program terminates.", __name__)
+        exit(1)  # Terminate the script
+
+    # Exception handling code for the TCP client initial setup
     try:
         tcpClient = TCPClient.TCPClient(cfgData, ui)
     except:
-        print("There is a problem with the TCP handling. See log file for the traceback of the exception.\n")
+        print("There is a problem with the TCP client handling. See log file for the traceback of the exception.\n")
         logdata.log("EXCEPT", "There is a problem with the TCP handling. Program terminates.", __name__)
         exit(1)  # Terminate the script
 
@@ -37,6 +46,7 @@ if __name__ == '__main__':
 
     # Give functionality to the buttons and add the necessary texts to fields
     ui.connectRadioTBtn.clicked.connect(partial(tcpClient.connectButton, actualPress = True))
+    ui.connectStellariumBtn.clicked.connect(partial(tcpServer.connectButton, actualPress = True))
     ui.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
                           "vertical-align:super;\">o</span></p></body></html>" % s_latlon[1])
     ui.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
