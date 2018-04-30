@@ -73,9 +73,6 @@ class Ui_RadioTelescopeControl(object):
         self.tcpConRTChkBox = QtWidgets.QCheckBox(self.frame_2)
         self.tcpConRTChkBox.setText("")
         self.tcpConRTChkBox.setObjectName("tcpConRTChkBox")
-
-        self.tcpConRTChkBox.stateChanged.connect(self.checkBoxTCPRT)
-
         self.horizontalLayout_9.addWidget(self.tcpConRTChkBox)
         self.tcpConRTLabel = QtWidgets.QLabel(self.frame_2)
         self.tcpConRTLabel.setEnabled(False)
@@ -136,9 +133,6 @@ class Ui_RadioTelescopeControl(object):
         self.tcpStelServChkBox = QtWidgets.QCheckBox(self.stackedWidgetPage1)
         self.tcpStelServChkBox.setText("")
         self.tcpStelServChkBox.setObjectName("tcpStelServChkBox")
-
-        self.tcpStelServChkBox.stateChanged.connect(self.checkBoxTCPStel)
-
         self.horizontalLayout_10.addWidget(self.tcpStelServChkBox)
         self.tcpStelServLabel = QtWidgets.QLabel(self.stackedWidgetPage1)
         self.tcpStelServLabel.setEnabled(False)
@@ -277,18 +271,12 @@ class Ui_RadioTelescopeControl(object):
         self.actionOpen.setObjectName("actionOpen")
         self.actionSettings = QtWidgets.QAction(RadioTelescopeControl)
         self.actionSettings.setObjectName("actionSettings")
-
-        self.actionSettings.triggered.connect(self.tcpWindow.show)
-
         self.actionLicense = QtWidgets.QAction(RadioTelescopeControl)
         self.actionLicense.setObjectName("actionLicense")
         self.actionAbout = QtWidgets.QAction(RadioTelescopeControl)
         self.actionAbout.setObjectName("actionAbout")
         self.actionExit = QtWidgets.QAction(RadioTelescopeControl)
         self.actionExit.setObjectName("actionExit")
-
-        self.actionExit.triggered.connect(partial(self.close_application, object = RadioTelescopeControl))
-
         self.actionSave = QtWidgets.QAction(RadioTelescopeControl)
         self.actionSave.setObjectName("actionSave")
         self.actionCalibration = QtWidgets.QAction(RadioTelescopeControl)
@@ -312,6 +300,12 @@ class Ui_RadioTelescopeControl(object):
         self.menubar.addAction(self.menuTCP.menuAction())
         self.menubar.addAction(self.menuTools.menuAction())
         self.menubar.addAction(self.menuAbout.menuAction())
+
+        # Make all the necessary connections
+        self.tcpConRTChkBox.stateChanged.connect(self.checkBoxTCPRT)
+        self.tcpStelServChkBox.stateChanged.connect(self.checkBoxTCPStel)
+        self.actionSettings.triggered.connect(self.tcpWindow.show)
+        self.actionExit.triggered.connect(partial(self.close_application, object=RadioTelescopeControl))
 
         self.retranslateUi(RadioTelescopeControl)
         self.tabWidget.setCurrentIndex(0)
