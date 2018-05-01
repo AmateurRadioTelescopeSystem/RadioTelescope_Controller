@@ -8,8 +8,10 @@ from TCPSettings import Ui_TCPSettings
 from functools import partial
 import sys
 
-class Ui_RadioTelescopeControl(object):
+
+class Ui_RadioTelescopeControl(QtCore.QObject):
     def __init__(self):
+        super(Ui_RadioTelescopeControl, self).__init__()
         QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create("Fusion"))
 
         # Create the window for the TCP settings
@@ -472,6 +474,41 @@ class Ui_RadioTelescopeControl(object):
         else:
             self.tcpStelServLabel.setEnabled(False)
             self.connectStellariumBtn.setEnabled(False)
+
+    @QtCore.pyqtSlot(str)
+    def stellTCPGUIHandle(self, data:str):
+        if data == "Waiting":
+            self.connectStellariumBtn.setText("Stop")  # Change user's selection
+            self.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
+            self.stellConStatText.setText("<html><head/><body><p><span style=\" "
+                                             "color:#ffb400;\">Waiting...</span></p></body></html>")
+            self.nextPageLabel.setEnabled(False)  # Disable the next page label
+            self.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
+        elif data == "Connected":
+            self.connectStellariumBtn.setText("Disable")  # Change user's selection
+            self.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
+            self.stellConStatText.setText("<html><head/><body><p><span style=\" "
+                                             "color:#00ff00;\">Connected</span></p></body></html>")
+            self.nextPageLabel.setEnabled(True)  # Enable the label to indicate functionality
+            self.stellNextPageBtn.setEnabled(True)  # Enable next page transition, since we have a connection
+            self.stackedWidget.setCurrentIndex(1)
+        elif data == "Disconnected":
+            self.connectStellariumBtn.setText("Enable")
+            self.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
+            self.stellConStatText.setText("<html><head/><body><p><span style=\" "
+                                             "color:#ff0000;\">Disconnected</span></p></body></html>")
+            self.nextPageLabel.setEnabled(False)  # Disable the next page label
+            self.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
+            self.stackedWidget.setCurrentIndex(0)
+
+    @QtCore.pyqtSlot(float, float)
+    def stellDataShow(self, ra: float, dec: float):
+        self.raPosInd_2.setText("%.5fh" % ra)  # Update the corresponding field
+        self.decPosInd_2.setText("%.5f" % dec + u"\u00b0")  # Update the corresponding field
+
+    def slotTest(self, data:int):
+        print("Ew got the signal")
+        print(data)
         
     def close_application(self, object):
         choice = QtWidgets.QMessageBox.question(object, 'Exit', "Are you sure?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
