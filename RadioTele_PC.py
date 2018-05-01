@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.5
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from functools import partial
 import UInterface
 import configData
@@ -8,6 +8,8 @@ import logData
 import TCPClient
 import TCPServerStellarium
 import sys
+import StellariumThread
+
 
 if __name__ == '__main__':
     logdata = logData.logData(__name__)  # Create the logger for the program
@@ -43,13 +45,19 @@ if __name__ == '__main__':
         logdata.log("EXCEPT", "There is a problem with the TCP handling. Program terminates.", __name__)
         exit(1)  # Terminate the script
 
+    tcpStellThread = StellariumThread.StellThread(tcpServer, ui)  # Create a thread for the Stellarium server
+
     s_latlon = cfgData.getLatLon()  # First element is latitude and second element is longitude
     s_alt = cfgData.getAltitude()  # Get the altitude from the settings file
     hostport = [cfgData.getHost(), cfgData.getPort()]  # Get the saved host address or name and port of the server
+    autocon = cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
+
+    if autocon == "yes":
+        tcpStellThread.start()  # Start the server
 
     # Give functionality to the buttons and add the necessary texts to fields
     ui.connectRadioTBtn.clicked.connect(partial(tcpClient.connectButton, actualPress = True))
-    ui.connectStellariumBtn.clicked.connect(partial(tcpServer.connectButton, actualPress = True))
+    ui.connectStellariumBtn.clicked.connect(partial(tcpServer.connectButton, thread = tcpStellThread))
     ui.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
                           "vertical-align:super;\">o</span></p></body></html>" % s_latlon[1])
     ui.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
