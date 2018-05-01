@@ -21,7 +21,7 @@ class Ui_RadioTelescopeControl(object):
         RadioTelescopeControl.setWindowIcon(QtGui.QIcon('radiotelescope.png'))
         RadioTelescopeControl.setObjectName("RadioTelescopeControl")
         RadioTelescopeControl.setWindowModality(QtCore.Qt.NonModal)
-        RadioTelescopeControl.resize(366, 436)
+        RadioTelescopeControl.resize(373, 468)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         RadioTelescopeControl.setFont(font)
@@ -103,6 +103,7 @@ class Ui_RadioTelescopeControl(object):
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox_2)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.stackedWidget = QtWidgets.QStackedWidget(self.groupBox_2)
+        self.stackedWidget.setEnabled(True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -153,10 +154,12 @@ class Ui_RadioTelescopeControl(object):
         self.connectStellariumBtn.setCheckable(False)
         self.connectStellariumBtn.setObjectName("connectStellariumBtn")
         self.formLayout.setWidget(6, QtWidgets.QFormLayout.LabelRole, self.connectStellariumBtn)
-        self.label = QtWidgets.QLabel(self.stackedWidgetPage1)
-        self.label.setObjectName("label")
-        self.formLayout.setWidget(7, QtWidgets.QFormLayout.LabelRole, self.label)
+        self.nextPageLabel = QtWidgets.QLabel(self.stackedWidgetPage1)
+        self.nextPageLabel.setEnabled(False)
+        self.nextPageLabel.setObjectName("nextPageLabel")
+        self.formLayout.setWidget(7, QtWidgets.QFormLayout.LabelRole, self.nextPageLabel)
         self.stellNextPageBtn = QtWidgets.QToolButton(self.stackedWidgetPage1)
+        self.stellNextPageBtn.setEnabled(False)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -196,9 +199,9 @@ class Ui_RadioTelescopeControl(object):
         self.formLayout_5.setLayout(3, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_7)
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.formLayout_5.setItem(4, QtWidgets.QFormLayout.SpanningRole, spacerItem3)
-        self.label_3 = QtWidgets.QLabel(self.stackedWidgetPage2)
-        self.label_3.setObjectName("label_3")
-        self.formLayout_5.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.label_3)
+        self.previousPageLabel = QtWidgets.QLabel(self.stackedWidgetPage2)
+        self.previousPageLabel.setObjectName("previousPageLabel")
+        self.formLayout_5.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.previousPageLabel)
         self.stellPrevPageBtn = QtWidgets.QToolButton(self.stackedWidgetPage2)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -337,10 +340,14 @@ class Ui_RadioTelescopeControl(object):
         self.menubar.addAction(self.menuAbout.menuAction())
 
         # Make all the necessary connections
-        self.tcpConRTChkBox.stateChanged.connect(self.checkBoxTCPRT)
-        self.tcpStelServChkBox.stateChanged.connect(self.checkBoxTCPStel)
-        self.actionSettings.triggered.connect(self.tcpWindow.show)
+        self.tcpConRTChkBox.stateChanged.connect(self.checkBoxTCPRT)  # Assign functionality to the checkbox
+        self.tcpStelServChkBox.stateChanged.connect(self.checkBoxTCPStel)  # Assign functionality to the checkbox
+        self.actionSettings.triggered.connect(self.tcpWindow.show)  # Show the TCP settings window
         self.actionExit.triggered.connect(partial(self.close_application, object=RadioTelescopeControl))
+
+        # Change between widgets
+        self.stellNextPageBtn.clicked.connect(lambda : self.stackedWidget.setCurrentIndex(1))
+        self.stellPrevPageBtn.clicked.connect(lambda : self.stackedWidget.setCurrentIndex(0))
 
         self.retranslateUi(RadioTelescopeControl)
         self.tabWidget.setCurrentIndex(0)
@@ -373,7 +380,7 @@ class Ui_RadioTelescopeControl(object):
         self.stellariumOperationSelect.setItemText(1, _translate("RadioTelescopeControl", "Aim and track"))
         self.tcpStelServLabel.setText(_translate("RadioTelescopeControl", "TCP Server"))
         self.connectStellariumBtn.setText(_translate("RadioTelescopeControl", "Enable"))
-        self.label.setText(_translate("RadioTelescopeControl", "Next Page"))
+        self.nextPageLabel.setText(_translate("RadioTelescopeControl", "Next Page"))
         self.stellNextPageBtn.setText(_translate("RadioTelescopeControl", "..."))
         self.label_13.setText(_translate("RadioTelescopeControl",
                                          "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Selected Object</span></p></body></html>"))
@@ -384,7 +391,7 @@ class Ui_RadioTelescopeControl(object):
                                          "<html><head/><body><p><span style=\" font-weight:600;\">DEC:</span></p></body></html>"))
         self.decPosInd_2.setText(_translate("RadioTelescopeControl",
                                             "<html><head/><body><p>0<span style=\" vertical-align:super;\">o</span> 0\' 0\'\'</p></body></html>"))
-        self.label_3.setText(_translate("RadioTelescopeControl", "Previous Page"))
+        self.previousPageLabel.setText(_translate("RadioTelescopeControl", "Previous Page"))
         self.stellPrevPageBtn.setText(_translate("RadioTelescopeControl", "..."))
         self.groupBox_3.setTitle(_translate("RadioTelescopeControl", "Location"))
         self.label_12.setText(_translate("RadioTelescopeControl",
@@ -469,6 +476,6 @@ class Ui_RadioTelescopeControl(object):
     def close_application(self, object):
         choice = QtWidgets.QMessageBox.question(object, 'Exit', "Are you sure?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if choice == QtWidgets.QMessageBox.Yes:
-            sys.exit()  # If user selects "Yes", then exit from the application
+            QtCore.QCoreApplication.instance().quit()  # If user selects "Yes", then exit from the application
         else:
             pass  # If user selects "No" then do not exit
