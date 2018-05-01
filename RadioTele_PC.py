@@ -45,7 +45,9 @@ if __name__ == '__main__':
         logdata.log("EXCEPT", "There is a problem with the TCP handling. Program terminates.", __name__)
         exit(1)  # Terminate the script
 
-    tcpStellThread = StellariumThread.StellThread(tcpServer, tcpClient, ui)  # Create a thread for the Stellarium server
+    tcpStellThread = StellariumThread.StellThread(tcpServer, tcpClient)  # Create a thread for the Stellarium server
+    tcpStellThread.conStatSig.connect(ui.stellTCPGUIHandle)  # Connect the signal to the corresponding function
+    tcpStellThread.dataShowSig.connect(ui.stellDataShow)  # Connect the signal to the corresponding function
 
     s_latlon = cfgData.getLatLon()  # First element is latitude and second element is longitude
     s_alt = cfgData.getAltitude()  # Get the altitude from the settings file
