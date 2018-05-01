@@ -3,25 +3,25 @@ from PyQt5 import QtCore
 
 
 class StellThread(QtCore.QThread):
-    def __init__(self, tcpStell, tcpClient, uiControl, parent = None):
-        super(StellThread, self).__init__(parent)  # Get the parent
+    # Create the signals to be used for data handling
+    conStatSig = QtCore.pyqtSignal(str, name='conStellStat')  # Stellarium connection status indication signal
+    dataShowSig = QtCore.pyqtSignal(float, float)  # Coordinates show in the GUI
+
+    def __init__(self, tcpStell, tcpClient, parent = None):
+        super(StellThread, self).__init__(parent)  # Get the parent of the class
         self.tcp = tcpStell  # TCP handling object
         self.tcpClient = tcpClient  # TCP client object for radio telescope communication
-        self.ui = uiControl  # GUI manipulation object
         self.dataHandle = StellariumDataHandling.StellariumData()  # Data conversion object
+
         self.clinetDiscon = True  # Client disconnection indicator
         self.stopExec = False  # Stop thread execution indicator
-        # self.conStatSig = QtCore.pyqtSignal(name='stellTCPConStat')
 
     def run(self):
         self.stopExec = False  # Initialize it in every thread run to avoid problems
         while not self.stopExec:
             if self.clinetDiscon:
                 # Indicate that we are waiting for a connection once we start the program
-                self.ui.connectStellariumBtn.setText("Stop")  # Change user's selection
-                self.ui.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
-                self.ui.stellConStatText.setText("<html><head/><body><p><span style=\" "
-                                                 "color:#ffb400;\">Waiting...</span></p></body></html>")
+                self.conStatSig.emit("Waiting")  # Send the signal to indicate that we are waiting for connection
 
                 self.tcp.acceptConnection()  # Wait for a connection to come
                 if self.stopExec:
@@ -29,13 +29,7 @@ class StellThread(QtCore.QThread):
 
                 # If we have a connection, then we proceed and indicate that to the user
                 self.clinetDiscon = False  # If we reach this point, then we have a connected client
-                self.ui.connectStellariumBtn.setText("Disable")  # Change user's selection
-                self.ui.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
-                self.ui.stellConStatText.setText("<html><head/><body><p><span style=\" "
-                                                 "color:#00ff00;\">Connected</span></p></body></html>")
-                self.ui.nextPageLabel.setEnabled(True)  # Enable the label to indicate functionality
-                self.ui.stellNextPageBtn.setEnabled(True)  # Enable next page transition, since we have a connection
-                self.ui.stackedWidget.setCurrentIndex(1)
+                self.conStatSig.emit("Connected")  # Send the signal to indicate connection
 
             elif not self.stopExec:
                 recData = self.tcp.receive()  # Start receiving the data from the client
@@ -43,25 +37,14 @@ class StellThread(QtCore.QThread):
                 # If we receive zero length data, then that means the connection is broken
                 if len(recData) != 0:
                     recData = self.dataHandle.decodeStell(recData)
-                    self.ui.raPosInd_2.setText("%.5fh" %float(recData[0]))  # Update the corresponding field
-                    self.ui.decPosInd_2.setText("%.5f" %float(recData[1]) + u"\u00b0")  # Update the corresponding field
+                    self.dataShowSig.emit(recData[0], recData[1])  # Send the data to be shown on the GUI widget
                 elif not self.stopExec:
                     self.tcp.releaseClient()  # Close all sockets since client is gone
                     self.clinetDiscon = True  # Tell that the client has disconnected
                     self.stopExec = False  # Continue in the loop since quit is not yet called
-                    self.ui.nextPageLabel.setEnabled(False)  # Disable the next page label
-                    self.ui.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
 
     def quit(self):
         self.stopExec = True  # Raise the execution stop flag
         self.clinetDiscon = True  # Indicate a disconnected client
         self.tcp.releaseClient()  # Whenever this function is called we need to close the connection
-
-        # Set the button to the default state
-        self.ui.connectStellariumBtn.setText("Enable")
-        self.ui.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
-        self.ui.stellConStatText.setText("<html><head/><body><p><span style=\" "
-                                         "color:#ff0000;\">Disconnected</span></p></body></html>")
-        self.ui.nextPageLabel.setEnabled(False)  # Disable the next page label
-        self.ui.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
-        #self.ui.stackedWidget.setCurrentIndex(0)
+        self.conStatSig.emit("Disconnected")  # Send the signal to indicate disconnection
