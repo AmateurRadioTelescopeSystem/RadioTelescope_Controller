@@ -3,8 +3,9 @@ import logData
 import socket
 
 
-class TCPClient(object):
+class TCPClient(QtCore.QObject):
     def __init__(self, cfgData, mainUi):
+        super(TCPClient, self).__init__()
         self.logd = logData.logData(__name__)
         self.sock_exst = False  # Indicate that a socket does not object exist
         self.sock_connected = False  # Indicate that there is currently no connection
@@ -88,6 +89,8 @@ class TCPClient(object):
                 self.disconnect()  # Close the connection
                 self.btnStr = "Connect"
                 self.mainUi.connectRadioTBtn.setText(self.btnStr)  # Change user's selection
+                self.mainUi.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
+                                             "color:#ff0000;\">Disconnected</span></p></body></html>")
             elif self.btnStr == "Connect":
                 if self.connect(self.host, self.port):
                     self.logd.log("INFO", "Client successfully connected to %s:%s." % (self.host, self.port), "connectButton")
@@ -95,16 +98,31 @@ class TCPClient(object):
                     self.mainUi.connectRadioTBtn.setText(self.btnStr)
                     self.mainUi.tcpConRTChkBox.toggle()
                     self.mainUi.tcpConRTChkBox.setCheckState(QtCore.Qt.Unchecked)
+                    self.mainUi.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
+                                             "color:#00ff00;\">Connected</span></p></body></html>")
                 else:
                     self.logd.log("WARNING", "Problem establishing connection with %s:%s." % (self.host, self.port), "connectButton")
                     self.btnStr = "Connect"
                     self.mainUi.connectRadioTBtn.setText(self.btnStr)
+                    self.mainUi.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
+                                                          "color:#ff0000;\">Disconnected</span></p></body></html>")
         else:
             if state == "Connect":
                 self.btnStr = state
                 self.mainUi.connectRadioTBtn.setText(self.btnStr)
                 self.mainUi.tcpConRTChkBox.setCheckState(QtCore.Qt.Checked)
+                self.mainUi.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
+                                                      "color:#ff0000;\">Disconnected</span></p></body></html>")
             elif state == "Disconnect":
                 self.btnStr = state
                 self.mainUi.connectRadioTBtn.setText(self.btnStr)
                 self.mainUi.tcpConRTChkBox.setCheckState(QtCore.Qt.Unchecked)
+                self.mainUi.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
+                                                      "color:#00ff00;\">Connected</span></p></body></html>")
+
+    @QtCore.pyqtSlot(list, name='clientCommandSendStell')
+    def stellCommSend(self, radec: list):
+        if self.mainUi.stellariumOperationSelect.currentText() == "Transit":
+            self.sendRequest("TRNST %f %f" % (radec[0], radec[1]))
+        elif self.mainUi.stellariumOperationSelect.currentText() == "Aim and track":
+            self.sendRequest("TRK %f %f" % (radec[0], radec[1]))
