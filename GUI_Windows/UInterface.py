@@ -138,9 +138,6 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         spacerItem1 = QtWidgets.QSpacerItem(40, 2, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.formLayout.setItem(2, QtWidgets.QFormLayout.LabelRole, spacerItem1)
         self.label_2 = QtWidgets.QLabel(self.stackedWidgetPage1)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.formLayout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.label_2)
         self.stellariumOperationSelect = QtWidgets.QComboBox(self.stackedWidgetPage1)
@@ -402,11 +399,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                                          "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Selected Object</span></p></body></html>"))
         self.label_15.setText(_translate("RadioTelescopeControl",
                                          "<html><head/><body><p><span style=\" font-weight:600;\">RA:</span></p></body></html>"))
-        self.raPosInd_2.setText(_translate("RadioTelescopeControl", "0h 0m 0s"))
+        self.raPosInd_2.setText(_translate("RadioTelescopeControl", "<html><head/><body><p>-</p></body></html>"))
         self.label_16.setText(_translate("RadioTelescopeControl",
                                          "<html><head/><body><p><span style=\" font-weight:600;\">DEC:</span></p></body></html>"))
-        self.decPosInd_2.setText(_translate("RadioTelescopeControl",
-                                            "<html><head/><body><p>0<span style=\" vertical-align:super;\">o</span> 0\' 0\'\'</p></body></html>"))
+        self.decPosInd_2.setText(_translate("RadioTelescopeControl", "<html><head/><body><p>-</p></body></html>"))
         self.previousPageLabel.setText(_translate("RadioTelescopeControl", "Previous Page"))
         self.stellPrevPageBtn.setText(_translate("RadioTelescopeControl", "..."))
         self.groupBox_3.setTitle(_translate("RadioTelescopeControl", "Location"))
