@@ -1,4 +1,5 @@
 import StellariumDataHandling
+import TCPServerStellarium
 from PyQt5 import QtCore
 
 
@@ -8,9 +9,9 @@ class StellThread(QtCore.QThread):
     dataShowSig = QtCore.pyqtSignal(float, float, name='dataStellShow')  # Coordinates show in the GUI
     sendClientConn = QtCore.pyqtSignal(list, name='clientCommandSendStell')  # Send the command to the radio telescope
 
-    def __init__(self, tcpStell, parent = None):
+    def __init__(self, cfgData, parent = None):
         super(StellThread, self).__init__(parent)  # Get the parent of the class
-        self.tcp = tcpStell  # TCP handling object
+        self.tcp = TCPServerStellarium.TCPStellarium(cfgData)  # TCP handling object
         self.dataHandle = StellariumDataHandling.StellariumData()  # Data conversion object
 
         self.clinetDiscon = True  # Client disconnection indicator
