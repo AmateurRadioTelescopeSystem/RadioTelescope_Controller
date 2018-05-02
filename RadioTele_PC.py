@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     # Exception handling code for the TCP server initial setup
     try:
-        tcpServer = TCPServerStellarium.TCPStellarium(cfgData, ui)
+        tcpServer = TCPServerStellarium.TCPStellarium(cfgData)
     except:
         print("There is a problem with the TCP server handling. See log file for the traceback of the exception.\n")
         logdata.log("EXCEPT", "There is a problem with the TCP handling. Program terminates.", __name__)
@@ -45,9 +45,10 @@ if __name__ == '__main__':
         logdata.log("EXCEPT", "There is a problem with the TCP handling. Program terminates.", __name__)
         exit(1)  # Terminate the script
 
-    tcpStellThread = StellariumThread.StellThread(tcpServer, tcpClient)  # Create a thread for the Stellarium server
+    tcpStellThread = StellariumThread.StellThread(tcpServer)  # Create a thread for the Stellarium server
     tcpStellThread.conStatSig.connect(ui.stellTCPGUIHandle)  # Connect the signal to the corresponding function
     tcpStellThread.dataShowSig.connect(ui.stellDataShow)  # Connect the signal to the corresponding function
+    tcpStellThread.sendClientConn.connect(tcpClient.stellCommSend)  # Signal for sending the command string to RPi
 
     s_latlon = cfgData.getLatLon()  # First element is latitude and second element is longitude
     s_alt = cfgData.getAltitude()  # Get the altitude from the settings file
@@ -65,6 +66,7 @@ if __name__ == '__main__':
     ui.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
                           "vertical-align:super;\">o</span></p></body></html>" % s_latlon[0])
     ui.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % s_alt)
+    print(ui.stellariumOperationSelect.currentText())
 
     RadioTelescopeControl.show()  # Render and show the GUI main window
     sys.exit(app.exec_())  # Execute the app until exit is selected
