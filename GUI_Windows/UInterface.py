@@ -207,10 +207,19 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.horizontalLayout_7.addWidget(self.decPosInd_2)
         self.formLayout_5.setLayout(3, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_7)
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.formLayout_5.setItem(4, QtWidgets.QFormLayout.SpanningRole, spacerItem3)
+        self.formLayout_5.setItem(4, QtWidgets.QFormLayout.LabelRole, spacerItem3)
+        self.horizontalLayout_12 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_12.setObjectName("horizontalLayout_12")
+        self.label = QtWidgets.QLabel(self.stackedWidgetPage2)
+        self.label.setObjectName("label")
+        self.horizontalLayout_12.addWidget(self.label)
+        self.commandStellIndLabel = QtWidgets.QLabel(self.stackedWidgetPage2)
+        self.commandStellIndLabel.setObjectName("commandStellIndLabel")
+        self.horizontalLayout_12.addWidget(self.commandStellIndLabel)
+        self.formLayout_5.setLayout(5, QtWidgets.QFormLayout.SpanningRole, self.horizontalLayout_12)
         self.previousPageLabel = QtWidgets.QLabel(self.stackedWidgetPage2)
         self.previousPageLabel.setObjectName("previousPageLabel")
-        self.formLayout_5.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.previousPageLabel)
+        self.formLayout_5.setWidget(6, QtWidgets.QFormLayout.LabelRole, self.previousPageLabel)
         self.stellPrevPageBtn = QtWidgets.QToolButton(self.stackedWidgetPage2)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -220,7 +229,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.stellPrevPageBtn.setAutoRaise(True)
         self.stellPrevPageBtn.setArrowType(QtCore.Qt.LeftArrow)
         self.stellPrevPageBtn.setObjectName("stellPrevPageBtn")
-        self.formLayout_5.setWidget(5, QtWidgets.QFormLayout.FieldRole, self.stellPrevPageBtn)
+        self.formLayout_5.setWidget(6, QtWidgets.QFormLayout.FieldRole, self.stellPrevPageBtn)
         self.stackedWidget.addWidget(self.stackedWidgetPage2)
         self.gridLayout_2.addWidget(self.stackedWidget, 0, 0, 1, 1)
         self.gridLayout_4.addWidget(self.groupBox_2, 0, 1, 1, 1)
@@ -357,6 +366,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         # Change between widgets
         self.stellNextPageBtn.clicked.connect(lambda : self.stackedWidget.setCurrentIndex(1))
         self.stellPrevPageBtn.clicked.connect(lambda : self.stackedWidget.setCurrentIndex(0))
+        self.stellariumOperationSelect.currentIndexChanged.connect(self.commandListText)
 
         self.retranslateUi(RadioTelescopeControl)
         self.tabWidget.setCurrentIndex(0)
@@ -403,6 +413,9 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.label_16.setText(_translate("RadioTelescopeControl",
                                          "<html><head/><body><p><span style=\" font-weight:600;\">DEC:</span></p></body></html>"))
         self.decPosInd_2.setText(_translate("RadioTelescopeControl", "<html><head/><body><p>-</p></body></html>"))
+        self.label.setText(_translate("RadioTelescopeControl",
+                                      "<html><head/><body><p><span style=\" font-weight:600;\">Command:</span></p></body></html>"))
+        self.commandStellIndLabel.setText(_translate("RadioTelescopeControl", "-"))
         self.previousPageLabel.setText(_translate("RadioTelescopeControl", "Previous Page"))
         self.stellPrevPageBtn.setText(_translate("RadioTelescopeControl", "..."))
         self.groupBox_3.setTitle(_translate("RadioTelescopeControl", "Location"))
@@ -485,6 +498,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.tcpStelServLabel.setEnabled(False)
             self.connectStellariumBtn.setEnabled(False)
 
+    # Set the label of the command on change
+    def commandListText(self):
+        self.commandStellIndLabel.setText(self.stellariumOperationSelect.currentText())
+
     @QtCore.pyqtSlot(str)
     def stellTCPGUIHandle(self, data:str):
         if data == "Waiting":
@@ -494,6 +511,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                                              "color:#ffb400;\">Waiting...</span></p></body></html>")
             self.nextPageLabel.setEnabled(False)  # Disable the next page label
             self.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
+            self.stackedWidget.setCurrentIndex(0)
         elif data == "Connected":
             self.connectStellariumBtn.setText("Disable")  # Change user's selection
             self.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
@@ -510,6 +528,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.nextPageLabel.setEnabled(False)  # Disable the next page label
             self.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
             self.stackedWidget.setCurrentIndex(0)
+        self.commandStellIndLabel.setText(self.stellariumOperationSelect.currentText())
 
     @QtCore.pyqtSlot(float, float, name='dataStellShow')
     def stellDataShow(self, ra: float, dec: float):

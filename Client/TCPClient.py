@@ -66,7 +66,7 @@ class TCPClient(QtCore.QObject):
     def stellCommSend(self, radec: list, thread=None):
         if thread is not None:
             if self.mainUi.stellariumOperationSelect.currentText() == "Transit":
-                self.threadData = "TRNST %f %f" % (radec[0], radec[1])
+                self.threadData = "TRNST_RA_%.5f_DEC_%.5f" % (radec[0], radec[1])
                 self.threadSendReq = True
             elif self.mainUi.stellariumOperationSelect.currentText() == "Aim and track":
                 self.threadData = "TRK %f %f" % (radec[0], radec[1])

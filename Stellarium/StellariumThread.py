@@ -1,6 +1,7 @@
 from Stellarium import StellariumDataHandling
 from Stellarium import TCPServerStellarium
 from PyQt5 import QtCore
+import logData
 
 
 class StellThread(QtCore.QThread):
@@ -13,14 +14,13 @@ class StellThread(QtCore.QThread):
         super(StellThread, self).__init__(parent)  # Get the parent of the class
         self.tcp = TCPServerStellarium.TCPStellarium(cfgData)  # TCP handling object
         self.dataHandle = StellariumDataHandling.StellariumData()  # Data conversion object
+        self.logD = logData.logData(__name__)  # Create the logger
 
         self.clinetDiscon = True  # Client disconnection indicator
         self.stopExec = False  # Stop thread execution indicator
 
     def run(self):
         self.stopExec = False  # Initialize it in every thread run to avoid problems
-        print("Stell Thread")
-        print(self.currentThreadId())
         while not self.stopExec:
             if self.clinetDiscon:
                 # Indicate that we are waiting for a connection once we start the program
@@ -39,6 +39,7 @@ class StellThread(QtCore.QThread):
                 try:
                     recData = self.tcp.receive()  # Start receiving the data from the client
                 except (OSError, ConnectionResetError):
+                    self.logD.log("EXCEPT", "Stellarium server thread stopped.", "run")
                     self.quit()  # Call quit to be sure that we close properly
                     break
 
