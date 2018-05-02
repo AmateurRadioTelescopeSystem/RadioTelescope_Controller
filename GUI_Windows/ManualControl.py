@@ -15,6 +15,7 @@ class Ui_ManualControl(object):
         self.setupUi(self.manContWindow)
 
     def setupUi(self, ManualControl):
+        ManualControl.setWindowIcon(QtGui.QIcon('GUI_Windows/manControl.png'))
         ManualControl.setObjectName("ManualControl")
         ManualControl.setWindowModality(QtCore.Qt.ApplicationModal)
         ManualControl.resize(244, 234)
