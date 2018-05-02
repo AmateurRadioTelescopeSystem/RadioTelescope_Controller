@@ -1,16 +1,14 @@
 import logData
 import socket
-import queue
 
 
 class TCPStellarium(object):
-    def __init__(self, cfgData, mainUi):
+    def __init__(self, cfgData):
         self.logd = logData.logData(__name__)
         self.sock_exst = False  # Indicate that a socket does not object exist
         self.sock_connected = False  # Indicate that there is currently no connection
         self.client_connected = False  # Indicate whether a client is connected or not
 
-        self.mainUi = mainUi  # Create a variable for the UI control
         self.btnStr = "Enable"  # String to hold the TCP connection button message
         self.cfgD = cfgData  # Hold the config data object
 
@@ -41,7 +39,7 @@ class TCPStellarium(object):
         if self.client_connected:
             try:
                 return self.client.recv(1024)
-            except:
+            except ConnectionResetError:
                 self.logd.log("EXCEPT", "A connected client abruptly disconnected.", "receive")
                 self.client_connected = False
                 return ""
@@ -63,7 +61,7 @@ class TCPStellarium(object):
         return self.client_connected
 
     def sendResponse(self, response):
-        if self.client_connected:
+        if self.client_connected and self.sock_exst:
             try:
                 self.client.send(response)
                 return response
@@ -74,5 +72,7 @@ class TCPStellarium(object):
         if thread is not None:
             if thread.isRunning():
                 thread.quit()  # Quit the currently running thread
+                self.logd.log("INFO", "The thread for the server was closed", "connectButton")
             else:
+                self.logd.log("INFO", "Started a thread for the server", "connectButton")
                 thread.start()  # Initiate the server to its thread
