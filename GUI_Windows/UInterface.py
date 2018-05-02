@@ -6,6 +6,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
 from GUI_Windows import TCPSettings
+from GUI_Windows import ManualControl
 
 
 class Ui_RadioTelescopeControl(QtCore.QObject):
@@ -15,6 +16,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         super(Ui_RadioTelescopeControl, self).__init__()
         # Create all other windows, except from the main one
         self.uiTCP = TCPSettings.Ui_TCPSettings()  # Create the TCP settings pop-up window
+        self.uiManCont = ManualControl.Ui_ManualControl()  # Create the manual control pop-up window
 
         # Create the main GUI window
         self.mainWin = QtWidgets.QMainWindow()  # Create the main window of th GUI
@@ -372,6 +374,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tcpConRTChkBox.stateChanged.connect(self.checkBoxTCPRT)  # Assign functionality to the checkbox
         self.tcpStelServChkBox.stateChanged.connect(self.checkBoxTCPStel)  # Assign functionality to the checkbox
         self.actionSettings.triggered.connect(self.uiTCP.windShow)  # Show the TCP settings window
+        self.actionManual_Control.triggered.connect(self.uiManCont.windShow)  # Show the manual control window
         self.actionExit.triggered.connect(partial(self.close_application, objec=RadioTelescopeControl))
         self.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=RadioTelescopeControl))
 
