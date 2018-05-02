@@ -4,20 +4,21 @@
 # by running the pyuic5 command on the ui file from QtDesigner
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from TCPSettings import Ui_TCPSettings
 from functools import partial
-import sys
+import TCPSettings
 
 
 class Ui_RadioTelescopeControl(QtCore.QObject):
     def __init__(self):
         super(Ui_RadioTelescopeControl, self).__init__()
-        QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create("Fusion"))
+        # Create all other windows, except from the main one
+        self.uiTCP = TCPSettings.Ui_TCPSettings()  # Create the TCP settings pop-up window
 
-        # Create the window for the TCP settings
-        self.tcpWindow = QtWidgets.QMainWindow()
-        self.uiTCP = Ui_TCPSettings()
-        self.uiTCP.setupUi(self.tcpWindow)
+        # Create the main GUI window
+        self.mainWin = QtWidgets.QMainWindow()  # Create the main window of th GUI
+        self.setupUi(self.mainWin)  # Call the function to make all the connections for the GUI things
+
+        QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create("Fusion"))  # Change the style of the GUI
 
     def setupUi(self, RadioTelescopeControl):
         RadioTelescopeControl.setWindowIcon(QtGui.QIcon('radiotelescope.png'))
@@ -353,7 +354,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         # Make all the necessary connections
         self.tcpConRTChkBox.stateChanged.connect(self.checkBoxTCPRT)  # Assign functionality to the checkbox
         self.tcpStelServChkBox.stateChanged.connect(self.checkBoxTCPStel)  # Assign functionality to the checkbox
-        self.actionSettings.triggered.connect(self.tcpWindow.show)  # Show the TCP settings window
+        self.actionSettings.triggered.connect(self.uiTCP.windShow)  # Show the TCP settings window
         self.actionExit.triggered.connect(partial(self.close_application, object=RadioTelescopeControl))
 
         # Change between widgets
@@ -519,10 +520,26 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.raPosInd_2.setText("%.5fh" % ra)  # Update the corresponding field
         self.decPosInd_2.setText("%.5f" % dec + u"\u00b0")  # Update the corresponding field
 
-    def slotTest(self, data:int):
-        print("Ew got the signal")
-        print(data)
-        
+    @QtCore.pyqtSlot(str, name='conClientStat')
+    def clientTCPGUIHandle(self, data: str):
+        if data == "Connecting":
+            self.connectRadioTBtn.setText("Stop")  # Change user's selection
+            self.tcpConRTChkBox.setCheckState(QtCore.Qt.Unchecked)
+            self.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
+                                             "color:#ffb400;\">Connecting...</span></p></body></html>")
+        elif data == "Connected":
+            self.connectRadioTBtn.setText("Disconnect")
+            self.tcpConRTChkBox.setCheckState(QtCore.Qt.Unchecked)
+            self.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
+                                                  "color:#00ff00;\">Connected</span></p></body></html>")
+        elif data == "Disconnected":
+            self.connectRadioTBtn.setText("Connect")  # Change user's selection
+            self.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
+                                                  "color:#ff0000;\">Disconnected</span></p></body></html>")
+
+    def show_pplication(self):
+        self.mainWin.show()
+
     def close_application(self, object):
         choice = QtWidgets.QMessageBox.question(object, 'Exit', "Are you sure?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if choice == QtWidgets.QMessageBox.Yes:
