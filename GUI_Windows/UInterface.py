@@ -26,7 +26,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         RadioTelescopeControl.setWindowIcon(QtGui.QIcon('radiotelescope.png'))
         RadioTelescopeControl.setObjectName("RadioTelescopeControl")
         RadioTelescopeControl.setWindowModality(QtCore.Qt.NonModal)
-        RadioTelescopeControl.resize(373, 468)
+        RadioTelescopeControl.resize(385, 473)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         RadioTelescopeControl.setFont(font)
@@ -59,9 +59,18 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.rpiConStatTextInd.setObjectName("rpiConStatTextInd")
         self.horizontalLayout_11.addWidget(self.rpiConStatTextInd)
         self.formLayout_2.setLayout(0, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_11)
+        self.horizontalLayout_13 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_13.setObjectName("horizontalLayout_13")
+        self.servRpiConText = QtWidgets.QLabel(self.frame_2)
+        self.servRpiConText.setObjectName("servRpiConText")
+        self.horizontalLayout_13.addWidget(self.servRpiConText)
+        self.servForRpiConTextInd = QtWidgets.QLabel(self.frame_2)
+        self.servForRpiConTextInd.setObjectName("servForRpiConTextInd")
+        self.horizontalLayout_13.addWidget(self.servForRpiConTextInd)
+        self.formLayout_2.setLayout(1, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_13)
         self.label_4 = QtWidgets.QLabel(self.frame_2)
         self.label_4.setObjectName("label_4")
-        self.formLayout_2.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_4)
+        self.formLayout_2.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.label_4)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.label_5 = QtWidgets.QLabel(self.frame_2)
@@ -70,7 +79,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.raPosInd = QtWidgets.QLabel(self.frame_2)
         self.raPosInd.setObjectName("raPosInd")
         self.horizontalLayout_2.addWidget(self.raPosInd)
-        self.formLayout_2.setLayout(2, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_2)
+        self.formLayout_2.setLayout(3, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.label_6 = QtWidgets.QLabel(self.frame_2)
@@ -79,9 +88,9 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.decPosInd = QtWidgets.QLabel(self.frame_2)
         self.decPosInd.setObjectName("decPosInd")
         self.horizontalLayout.addWidget(self.decPosInd)
-        self.formLayout_2.setLayout(3, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout)
+        self.formLayout_2.setLayout(4, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout)
         spacerItem = QtWidgets.QSpacerItem(40, 10, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.formLayout_2.setItem(4, QtWidgets.QFormLayout.LabelRole, spacerItem)
+        self.formLayout_2.setItem(5, QtWidgets.QFormLayout.LabelRole, spacerItem)
         self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_9.setObjectName("horizontalLayout_9")
         self.tcpConRTChkBox = QtWidgets.QCheckBox(self.frame_2)
@@ -92,7 +101,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tcpConRTLabel.setEnabled(False)
         self.tcpConRTLabel.setObjectName("tcpConRTLabel")
         self.horizontalLayout_9.addWidget(self.tcpConRTLabel)
-        self.formLayout_2.setLayout(5, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_9)
+        self.formLayout_2.setLayout(6, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_9)
         self.connectRadioTBtn = QtWidgets.QPushButton(self.frame_2)
         self.connectRadioTBtn.setEnabled(False)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -104,7 +113,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.connectRadioTBtn.setDefault(False)
         self.connectRadioTBtn.setFlat(False)
         self.connectRadioTBtn.setObjectName("connectRadioTBtn")
-        self.formLayout_2.setWidget(6, QtWidgets.QFormLayout.LabelRole, self.connectRadioTBtn)
+        self.formLayout_2.setWidget(7, QtWidgets.QFormLayout.LabelRole, self.connectRadioTBtn)
         self.gridLayout.addWidget(self.frame_2, 0, 0, 1, 1)
         self.gridLayout_4.addWidget(self.groupBox, 0, 0, 1, 1)
         self.groupBox_2 = QtWidgets.QGroupBox(self.tab)
@@ -381,9 +390,13 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         RadioTelescopeControl.setWindowTitle(_translate("RadioTelescopeControl", "Radio Telescope Control"))
         self.groupBox.setTitle(_translate("RadioTelescopeControl", "Radio Telescope"))
         self.rpiConnText.setText(_translate("RadioTelescopeControl",
-                                            "<html><head/><body><p><span style=\" font-weight:600;\">Status:</span></p></body></html>"))
+                                            "<html><head/><body><p><span style=\" font-weight:600;\">Client:</span></p></body></html>"))
         self.rpiConStatTextInd.setText(_translate("RadioTelescopeControl",
                                                   "<html><head/><body><p><span style=\" color:#ff0000;\">Disconnected</span></p></body></html>"))
+        self.servRpiConText.setText(_translate("RadioTelescopeControl",
+                                               "<html><head/><body><p><span style=\" font-weight:600;\">Server:</span></p></body></html>"))
+        self.servForRpiConTextInd.setText(_translate("RadioTelescopeControl",
+                                                     "<html><head/><body><p><span style=\" color:#ff0000;\">Disconnected</span></p></body></html>"))
         self.label_4.setText(_translate("RadioTelescopeControl",
                                         "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Dish Position</span></p></body></html>"))
         self.label_5.setText(_translate("RadioTelescopeControl",
@@ -514,6 +527,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         else:
             pass
 
+    # Signal handler for GUI formatting used for the stellarium connection
     @QtCore.pyqtSlot(str)
     def stellTCPGUIHandle(self, data:str):
         if data == "Waiting":
@@ -542,11 +556,13 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.stackedWidget.setCurrentIndex(0)
         self.commandStellIndLabel.setText(self.stellariumOperationSelect.currentText())
 
+    # Signal handler to show the received data fro Stellarium on the GUI
     @QtCore.pyqtSlot(float, float, name='dataStellShow')
     def stellDataShow(self, ra: float, dec: float):
         self.raPosInd_2.setText("%.5fh" % ra)  # Update the corresponding field
         self.decPosInd_2.setText("%.5f" % dec + u"\u00b0")  # Update the corresponding field
 
+    # Signal handler to show the status of the TCP client connected to RPi
     @QtCore.pyqtSlot(str, name='conClientStat')
     def clientTCPGUIHandle(self, data: str):
         if data == "Connecting":
@@ -563,6 +579,19 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.connectRadioTBtn.setText("Connect")  # Change user's selection
             self.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
                                                   "color:#ff0000;\">Disconnected</span></p></body></html>")
+
+    # Signal handler to show the status of the RPi server on the GUI
+    @QtCore.pyqtSlot(str)
+    def rpiTCPGUIHandle(self, data: str):
+        if data == "Waiting":
+            self.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
+                                          "color:#ffb400;\">Waiting...</span></p></body></html>")
+        elif data == "Connected":
+            self.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
+                                          "color:#00ff00;\">Connected</span></p></body></html>")
+        elif data == "Disconnected":
+            self.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
+                                          "color:#ff0000;\">Disconnected</span></p></body></html>")
 
     # Show the main GUI
     def show_application(self):

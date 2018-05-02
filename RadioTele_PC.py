@@ -5,6 +5,7 @@ from functools import partial
 from GUI_Windows import UInterface
 from Stellarium import StellariumThread
 from Client import ClientThread
+from Server import RPiServerThread
 import configData
 import logData
 import sys
@@ -28,6 +29,9 @@ if __name__ == '__main__':
     tcpClienThread = ClientThread.ClientThread(cfgData, ui)
     tcpClienThread.conStatSig.connect(ui.clientTCPGUIHandle)  # Connect the signal to the corresponding function
 
+    tcpServerThread = RPiServerThread.RPiServerThread(cfgData)
+    tcpServerThread.conStatSigR.connect(ui.rpiTCPGUIHandle)
+
     tcpStellThread = StellariumThread.StellThread(cfgData)  # Create a thread for the Stellarium server
     tcpStellThread.conStatSig.connect(ui.stellTCPGUIHandle)  # Connect the signal to the corresponding function
     tcpStellThread.dataShowSig.connect(ui.stellDataShow)  # Connect the signal to the corresponding function
@@ -45,6 +49,7 @@ if __name__ == '__main__':
         tcpStellThread.start()  # Start the server thread, since auto start is enabled
     if autoconServer == "yes":
         tcpClienThread.start()  # Start the server thread, since auto start is enabled
+        tcpServerThread.start()
 
     # Give functionality to the buttons and add the necessary texts to fields
     ui.connectRadioTBtn.clicked.connect(partial(tcpClienThread.tcp.connectButtonR, thread=tcpClienThread))
