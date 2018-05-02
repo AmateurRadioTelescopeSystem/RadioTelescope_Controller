@@ -1,5 +1,5 @@
 from PyQt5 import QtCore
-import TCPClient
+import Client.TCPClient as TCPClient
 
 
 class ClientThread(QtCore.QThread):

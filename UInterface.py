@@ -5,7 +5,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
-import TCPSettings
+import GUI_Windows.TCPSettings as TCPSettings
 
 
 class Ui_RadioTelescopeControl(QtCore.QObject):
@@ -537,7 +537,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
                                                   "color:#ff0000;\">Disconnected</span></p></body></html>")
 
-    def show_pplication(self):
+    def show_application(self):
         self.mainWin.show()
 
     def close_application(self, object):

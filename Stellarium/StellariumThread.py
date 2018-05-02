@@ -1,5 +1,5 @@
-import StellariumDataHandling
-import TCPServerStellarium
+import Stellarium.StellariumDataHandling as StellariumDataHandling
+import Stellarium.TCPServerStellarium as TCPServerStellarium
 from PyQt5 import QtCore
 
 

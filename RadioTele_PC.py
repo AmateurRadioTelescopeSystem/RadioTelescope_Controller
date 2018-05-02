@@ -6,8 +6,8 @@ import UInterface
 import configData
 import logData
 import sys
-import StellariumThread
-import ClientThread
+import Stellarium.StellariumThread as StellariumThread
+import Client.ClientThread as ClientThread
 
 
 if __name__ == '__main__':
@@ -54,5 +54,5 @@ if __name__ == '__main__':
                           "vertical-align:super;\">o</span></p></body></html>" % s_latlon[0])
     ui.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % s_alt)
 
-    ui.show_pplication()  # Render and show the GUI main window
+    ui.show_application()  # Render and show the GUI main window
     sys.exit(app.exec_())  # Execute the app until exit is selected
