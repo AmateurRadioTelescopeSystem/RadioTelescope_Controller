@@ -3,11 +3,11 @@
 from PyQt5 import QtWidgets
 from functools import partial
 from GUI_Windows import UInterface
+from Stellarium import StellariumThread
+from Client import ClientThread
 import configData
 import logData
 import sys
-import Stellarium.StellariumThread as StellariumThread
-import Client.ClientThread as ClientThread
 
 
 if __name__ == '__main__':

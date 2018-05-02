@@ -5,7 +5,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
-import GUI_Windows.TCPSettings as TCPSettings
+from GUI_Windows import TCPSettings
 
 
 class Ui_RadioTelescopeControl(QtCore.QObject):
