@@ -1,6 +1,5 @@
 from PyQt5 import QtCore
 import TCPClient
-import time
 
 
 class ClientThread(QtCore.QThread):
