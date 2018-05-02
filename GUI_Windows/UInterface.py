@@ -9,6 +9,8 @@ from GUI_Windows import TCPSettings
 
 
 class Ui_RadioTelescopeControl(QtCore.QObject):
+    stopMovingRTSig = QtCore.pyqtSignal(name='stopRadioTele')
+
     def __init__(self):
         super(Ui_RadioTelescopeControl, self).__init__()
         # Create all other windows, except from the main one
@@ -361,7 +363,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tcpConRTChkBox.stateChanged.connect(self.checkBoxTCPRT)  # Assign functionality to the checkbox
         self.tcpStelServChkBox.stateChanged.connect(self.checkBoxTCPStel)  # Assign functionality to the checkbox
         self.actionSettings.triggered.connect(self.uiTCP.windShow)  # Show the TCP settings window
-        self.actionExit.triggered.connect(partial(self.close_application, object=RadioTelescopeControl))
+        self.actionExit.triggered.connect(partial(self.close_application, objec=RadioTelescopeControl))
+        self.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=RadioTelescopeControl))
 
         # Change between widgets
         self.stellNextPageBtn.clicked.connect(lambda : self.stackedWidget.setCurrentIndex(1))
@@ -502,6 +505,15 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     def commandListText(self):
         self.commandStellIndLabel.setText(self.stellariumOperationSelect.currentText())
 
+    # Handle the motion stop request
+    def stopMotion(self, objec):
+        choice = QtWidgets.QMessageBox.warning(objec, 'Stop Radio telescope', "Stop the currently moving dish?",
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if choice == QtWidgets.QMessageBox.Yes:
+            self.stopMovingRTSig.emit()
+        else:
+            pass
+
     @QtCore.pyqtSlot(str)
     def stellTCPGUIHandle(self, data:str):
         if data == "Waiting":
@@ -552,11 +564,13 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
                                                   "color:#ff0000;\">Disconnected</span></p></body></html>")
 
+    # Show the main GUI
     def show_application(self):
         self.mainWin.show()
 
-    def close_application(self, object):
-        choice = QtWidgets.QMessageBox.question(object, 'Exit', "Are you sure?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+    # Ask before exiting the GUI
+    def close_application(self, objec):
+        choice = QtWidgets.QMessageBox.question(objec, 'Exit', "Are you sure?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if choice == QtWidgets.QMessageBox.Yes:
             QtCore.QCoreApplication.instance().quit()  # If user selects "Yes", then exit from the application
         else:

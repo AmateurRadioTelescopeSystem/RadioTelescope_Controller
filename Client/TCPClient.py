@@ -74,3 +74,10 @@ class TCPClient(QtCore.QObject):
 
             if not thread.isRunning():
                 thread.start()  # Start the thread with the current conditions
+
+    @QtCore.pyqtSlot(name='stopRadioTele')
+    def stopMovingRT(self, thread=None):
+        self.threadData = "STOP"
+        self.threadSendReq = True
+        if not thread.isRunning():
+            thread.start()  # Start the thread with the current conditions

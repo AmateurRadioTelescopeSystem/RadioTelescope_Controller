@@ -34,6 +34,7 @@ if __name__ == '__main__':
     tcpStellThread.sendClientConn.connect(partial(tcpClienThread.tcp.stellCommSend, thread=tcpClienThread))  # Signal for sending the command string to RPi
 
     #tcpClienThread.dataShowSig.connect(ui.stellDataShow)  # Connect the signal to the corresponding function
+    ui.stopMovingRTSig.connect(partial(tcpClienThread.tcp.stopMovingRT, thread=tcpClienThread))
 
     s_latlon = cfgData.getLatLon()  # First element is latitude and second element is longitude
     s_alt = cfgData.getAltitude()  # Get the altitude from the settings file
