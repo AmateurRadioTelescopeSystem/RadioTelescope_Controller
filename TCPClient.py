@@ -7,122 +7,70 @@ class TCPClient(QtCore.QObject):
     def __init__(self, cfgData, mainUi):
         super(TCPClient, self).__init__()
         self.logd = logData.logData(__name__)
+        self.cfgData = cfgData
         self.sock_exst = False  # Indicate that a socket does not object exist
         self.sock_connected = False  # Indicate that there is currently no connection
-        self.sock = self.createSocket()  # Create a socket upon the class instantiation
+        self.threadSendReq = False
+        self.threadData = ""
+        self.stopExec = False
         self.mainUi = mainUi  # Create a variable for the UI control
-        self.btnStr = "Disconnect"  # String to hold the TCP connection button message
-        autocon = cfgData.getTCPAutoConnStatus()  # See if auto-connection at startup is enabled
-        if autocon == "yes":
-            self.host = cfgData.getHost()
-            self.port = cfgData.getPort()
-            if self.connect(self.host, self.port):
-                self.logd.log("INFO", "Client successfully connected to %s:%s." % (self.host, self.port), "constructor")
-                self.connectButton(False, "Disconnect")
-            else:
-                self.logd.log("WARNING", "Autoconnection with client was impossible.", "constructor")
-                self.connectButton(False, "Connect")
-        else:
-            self.connectButton(False, "Connect")
-
 
     def createSocket(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket object
-        sock.settimeout(20)  # Set the timeout to 20 seconds
+        #sock.settimeout(20)  # Set the timeout to 20 seconds
         self.sock_exst = True  # Indicate that a socket object exists
         return sock
 
-    def connect(self, host, port):
+    def connect(self):
+        host = self.cfgData.getHost()
+        port = self.cfgData.getPort()
         if not self.sock_exst:
             self.sock = self.createSocket()
         try:
             self.sock.connect((host, int(port)))
             self.sock_connected = True
-            self.connectButton(False, "Disconnect")
         except (OSError, InterruptedError):
             self.sock_connected = False
-            self.connectButton(False, "Connect")
         return self.sock_connected
 
-    def disconnect(self):
-        if self.sock_exst and self.sock_connected:
+    def closeConnection(self):
+        if self.sock_exst or self.sock_connected:
             self.sock.close()
             self.sock_exst = False
             self.sock_connected = False
         else:
             self.sock_exst = False  # A new socket is needed to successfully connect to a server after a lost connection
             self.sock_connected = False  # Indicate a disconnected socket
-            self.connectButton(False, "Connect")
         return self.sock_connected
 
-    def sendRequest(self, request):
+    def sendRequest(self, request: str):
         if self.sock_connected:
             try:
                 self.sock.send(request.encode('utf-8'))
                 response = self.sock.recv(1024).decode('utf-8')
                 return response
-            except (OSError, InterruptedError):
+            except (OSError, InterruptedError, ConnectionResetError):
                 return "No answer"
         else:
             return "No answer"
 
-    def longWait_rcv(self, time):
-        if self.sock_connected:
-            self.sock.settimeout(time)  # Set the timeout as the user requests
-            try:
-                response = self.sock.recv(1024).decode('utf-8')
-                self.sock.settimeout(20)  # Reset the socket timeout before exiting
-                return response
-            except (OSError, InterruptedError):
-                self.sock.settimeout(20)  # Reset the socket timeout before exiting
-                return "No answer"  # Indicate that nothing was received
-
-    def connectButton(self, actualPress, state = "Connect"):
-        if actualPress:
-            if self.btnStr == "Disconnect":
-                if self.sendRequest("Terminate") == "Bye":
-                    self.logd.log("INFO", "Successfully disconnected from server.", "connectButton")
-                else:
-                    self.logd.log("WARNING",
-                                  "There was a problem contacting the server, although the connection was closed.",
-                                  "connectButton")
-                self.disconnect()  # Close the connection
-                self.btnStr = "Connect"
-                self.mainUi.connectRadioTBtn.setText(self.btnStr)  # Change user's selection
-                self.mainUi.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
-                                             "color:#ff0000;\">Disconnected</span></p></body></html>")
-            elif self.btnStr == "Connect":
-                if self.connect(self.host, self.port):
-                    self.logd.log("INFO", "Client successfully connected to %s:%s." % (self.host, self.port), "connectButton")
-                    self.btnStr = "Disconnect"
-                    self.mainUi.connectRadioTBtn.setText(self.btnStr)
-                    self.mainUi.tcpConRTChkBox.toggle()
-                    self.mainUi.tcpConRTChkBox.setCheckState(QtCore.Qt.Unchecked)
-                    self.mainUi.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
-                                             "color:#00ff00;\">Connected</span></p></body></html>")
-                else:
-                    self.logd.log("WARNING", "Problem establishing connection with %s:%s." % (self.host, self.port), "connectButton")
-                    self.btnStr = "Connect"
-                    self.mainUi.connectRadioTBtn.setText(self.btnStr)
-                    self.mainUi.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
-                                                          "color:#ff0000;\">Disconnected</span></p></body></html>")
+    def connectButtonR(self, thread=None):
+        if self.sock_exst or self.sock_connected:
+            self.stopExec = True  # If there is currently a socket, then the call is to terminate it
         else:
-            if state == "Connect":
-                self.btnStr = state
-                self.mainUi.connectRadioTBtn.setText(self.btnStr)
-                self.mainUi.tcpConRTChkBox.setCheckState(QtCore.Qt.Checked)
-                self.mainUi.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
-                                                      "color:#ff0000;\">Disconnected</span></p></body></html>")
-            elif state == "Disconnect":
-                self.btnStr = state
-                self.mainUi.connectRadioTBtn.setText(self.btnStr)
-                self.mainUi.tcpConRTChkBox.setCheckState(QtCore.Qt.Unchecked)
-                self.mainUi.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
-                                                      "color:#00ff00;\">Connected</span></p></body></html>")
+            self.stopExec = False  # If there is no socket, then the call is for its creation
+        if not thread.isRunning():
+            thread.start()  # Start the thread with the current conditions
 
     @QtCore.pyqtSlot(list, name='clientCommandSendStell')
-    def stellCommSend(self, radec: list):
-        if self.mainUi.stellariumOperationSelect.currentText() == "Transit":
-            self.sendRequest("TRNST %f %f" % (radec[0], radec[1]))
-        elif self.mainUi.stellariumOperationSelect.currentText() == "Aim and track":
-            self.sendRequest("TRK %f %f" % (radec[0], radec[1]))
+    def stellCommSend(self, radec: list, thread=None):
+        if thread is not None:
+            if self.mainUi.stellariumOperationSelect.currentText() == "Transit":
+                self.threadData = "TRNST %f %f" % (radec[0], radec[1])
+                self.threadSendReq = True
+            elif self.mainUi.stellariumOperationSelect.currentText() == "Aim and track":
+                self.threadData = "TRK %f %f" % (radec[0], radec[1])
+                self.threadSendReq = True
+
+            if not thread.isRunning():
+                thread.start()  # Start the thread with the current conditions
