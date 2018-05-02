@@ -1,8 +1,8 @@
 #!/usr/bin/env python3.5
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 from functools import partial
-import UInterface
+from GUI_Windows import UInterface
 import configData
 import logData
 import sys
