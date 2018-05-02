@@ -18,6 +18,8 @@ class StellThread(QtCore.QThread):
 
     def run(self):
         self.stopExec = False  # Initialize it in every thread run to avoid problems
+        print("Stell Thread")
+        print(self.currentThreadId())
         while not self.stopExec:
             if self.clinetDiscon:
                 # Indicate that we are waiting for a connection once we start the program
@@ -32,14 +34,19 @@ class StellThread(QtCore.QThread):
                 self.conStatSig.emit("Connected")  # Send the signal to indicate connection
 
             elif not self.stopExec:
-                recData = self.tcp.receive()  # Start receiving the data from the client
+                # Handle the possible exceptions, to avoid app crash
+                try:
+                    recData = self.tcp.receive()  # Start receiving the data from the client
+                except (OSError, ConnectionResetError):
+                    self.quit()  # Call quit to be sure that we close properly
+                    break
 
                 # If we receive zero length data, then that means the connection is broken
                 if len(recData) != 0:
                     recData = self.dataHandle.decodeStell(recData)
                     self.dataShowSig.emit(recData[0], recData[1])  # Send the data to be shown on the GUI widget
                     self.sendClientConn.emit(recData)  # Emit the signal to send the data to the raspberry pi
-                elif not self.stopExec:
+                else:
                     self.tcp.releaseClient()  # Close all sockets since client is gone
                     self.clinetDiscon = True  # Tell that the client has disconnected
                     self.stopExec = False  # Continue in the loop since quit is not yet called
