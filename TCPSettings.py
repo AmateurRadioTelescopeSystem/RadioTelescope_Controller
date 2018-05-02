@@ -6,7 +6,12 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_TCPSettings(object):
+    def __init__(self):
+        self.tcpWindow = QtWidgets.QMainWindow()
+        self.setupUi(self.tcpWindow)
+
     def setupUi(self, TCPSettings):
         TCPSettings.setWindowIcon(QtGui.QIcon('Net.png'))
         TCPSettings.setObjectName("TCPSettings")
@@ -70,3 +75,5 @@ class Ui_TCPSettings(object):
         self.actionSave.setText(_translate("TCPSettings", "Save"))
         self.actionSave.setShortcut(_translate("TCPSettings", "Ctrl+S"))
 
+    def windShow(self):
+        self.tcpWindow.show()
