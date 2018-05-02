@@ -47,9 +47,18 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.frame_2.setObjectName("frame_2")
         self.formLayout_2 = QtWidgets.QFormLayout(self.frame_2)
         self.formLayout_2.setObjectName("formLayout_2")
+        self.horizontalLayout_11 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_11.setObjectName("horizontalLayout_11")
+        self.rpiConnText = QtWidgets.QLabel(self.frame_2)
+        self.rpiConnText.setObjectName("rpiConnText")
+        self.horizontalLayout_11.addWidget(self.rpiConnText)
+        self.rpiConStatTextInd = QtWidgets.QLabel(self.frame_2)
+        self.rpiConStatTextInd.setObjectName("rpiConStatTextInd")
+        self.horizontalLayout_11.addWidget(self.rpiConStatTextInd)
+        self.formLayout_2.setLayout(0, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_11)
         self.label_4 = QtWidgets.QLabel(self.frame_2)
         self.label_4.setObjectName("label_4")
-        self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_4)
+        self.formLayout_2.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_4)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.label_5 = QtWidgets.QLabel(self.frame_2)
@@ -58,7 +67,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.raPosInd = QtWidgets.QLabel(self.frame_2)
         self.raPosInd.setObjectName("raPosInd")
         self.horizontalLayout_2.addWidget(self.raPosInd)
-        self.formLayout_2.setLayout(1, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_2)
+        self.formLayout_2.setLayout(2, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.label_6 = QtWidgets.QLabel(self.frame_2)
@@ -67,9 +76,9 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.decPosInd = QtWidgets.QLabel(self.frame_2)
         self.decPosInd.setObjectName("decPosInd")
         self.horizontalLayout.addWidget(self.decPosInd)
-        self.formLayout_2.setLayout(2, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout)
+        self.formLayout_2.setLayout(3, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout)
         spacerItem = QtWidgets.QSpacerItem(40, 10, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.formLayout_2.setItem(3, QtWidgets.QFormLayout.LabelRole, spacerItem)
+        self.formLayout_2.setItem(4, QtWidgets.QFormLayout.LabelRole, spacerItem)
         self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_9.setObjectName("horizontalLayout_9")
         self.tcpConRTChkBox = QtWidgets.QCheckBox(self.frame_2)
@@ -80,7 +89,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tcpConRTLabel.setEnabled(False)
         self.tcpConRTLabel.setObjectName("tcpConRTLabel")
         self.horizontalLayout_9.addWidget(self.tcpConRTLabel)
-        self.formLayout_2.setLayout(4, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_9)
+        self.formLayout_2.setLayout(5, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_9)
         self.connectRadioTBtn = QtWidgets.QPushButton(self.frame_2)
         self.connectRadioTBtn.setEnabled(False)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -92,7 +101,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.connectRadioTBtn.setDefault(False)
         self.connectRadioTBtn.setFlat(False)
         self.connectRadioTBtn.setObjectName("connectRadioTBtn")
-        self.formLayout_2.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.connectRadioTBtn)
+        self.formLayout_2.setWidget(6, QtWidgets.QFormLayout.LabelRole, self.connectRadioTBtn)
         self.gridLayout.addWidget(self.frame_2, 0, 0, 1, 1)
         self.gridLayout_4.addWidget(self.groupBox, 0, 0, 1, 1)
         self.groupBox_2 = QtWidgets.QGroupBox(self.tab)
@@ -294,7 +303,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 2, 1)
         RadioTelescopeControl.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(RadioTelescopeControl)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 373, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 385, 21))
         self.menubar.setObjectName("menubar")
         self.menuThis_is_a_menu = QtWidgets.QMenu(self.menubar)
         self.menuThis_is_a_menu.setObjectName("menuThis_is_a_menu")
@@ -360,6 +369,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         _translate = QtCore.QCoreApplication.translate
         RadioTelescopeControl.setWindowTitle(_translate("RadioTelescopeControl", "Radio Telescope Control"))
         self.groupBox.setTitle(_translate("RadioTelescopeControl", "Radio Telescope"))
+        self.rpiConnText.setText(_translate("RadioTelescopeControl",
+                                            "<html><head/><body><p><span style=\" font-weight:600;\">Status:</span></p></body></html>"))
+        self.rpiConStatTextInd.setText(_translate("RadioTelescopeControl",
+                                                  "<html><head/><body><p><span style=\" color:#ff0000;\">Disconnected</span></p></body></html>"))
         self.label_4.setText(_translate("RadioTelescopeControl",
                                         "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Dish Position</span></p></body></html>"))
         self.label_5.setText(_translate("RadioTelescopeControl",
@@ -501,7 +514,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
             self.stackedWidget.setCurrentIndex(0)
 
-    @QtCore.pyqtSlot(float, float)
+    @QtCore.pyqtSlot(float, float, name='dataStellShow')
     def stellDataShow(self, ra: float, dec: float):
         self.raPosInd_2.setText("%.5fh" % ra)  # Update the corresponding field
         self.decPosInd_2.setText("%.5f" % dec + u"\u00b0")  # Update the corresponding field
