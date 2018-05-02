@@ -11,9 +11,9 @@ import logData
 import sys
 
 
-if __name__ == '__main__':
-    logdata = logData.logData(__name__)  # Create the logger for the program
+logdata = logData.logData(__name__)  # Create the logger for the program
 
+def main():
     app = QtWidgets.QApplication(sys.argv)  # Create a Qt application instance
     ui = UInterface.Ui_RadioTelescopeControl()  # Instantiate the class object for the main window GUI
 
@@ -62,3 +62,10 @@ if __name__ == '__main__':
 
     ui.show_application()  # Render and show the GUI main window
     sys.exit(app.exec_())  # Execute the app until exit is selected
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception:
+        logdata.log("EXCEPT", "Some problem occurred. See the traceback below.")
