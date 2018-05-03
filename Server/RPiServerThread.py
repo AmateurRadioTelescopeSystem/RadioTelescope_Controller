@@ -56,3 +56,11 @@ class RPiServerThread(QtCore.QThread):
         self.clinetDiscon = True  # Indicate a disconnected client
         self.tcp.releaseClient()  # Whenever this function is called we need to close the connection
         self.conStatSigR.emit("Disconnected")  # Send the signal to indicate disconnection
+
+    def connectButtonRPi(self):
+        if self.isRunning():
+            self.quit()  # Quit the currently running thread
+            self.logD.log("INFO", "The thread for the server was closed", "connectButton")
+        else:
+            self.logD.log("INFO", "Started a thread for the server", "connectButton")
+            self.start()  # Initiate the server to its thread

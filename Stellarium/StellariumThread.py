@@ -49,7 +49,15 @@ class StellThread(QtCore.QThread):
                     self.stopExec = False  # Continue in the loop since quit is not yet called
 
     def quit(self):
-        self.stopExec = True  # Raise the execution stop flag
         self.clinetDiscon = True  # Indicate a disconnected client
         self.tcp.releaseClient()  # Whenever this function is called we need to close the connection
         self.conStatSig.emit("Disconnected")  # Send the signal to indicate disconnection
+        self.exit(0)
+
+    def connectButton(self):
+        if self.isRunning():
+            self.quit()  # Quit the currently running thread
+            self.logD.log("INFO", "The thread for the server was closed", "connectButton")
+        else:
+            self.logD.log("INFO", "Started a thread for the server", "connectButton")
+            self.start()  # Initiate the server to its thread

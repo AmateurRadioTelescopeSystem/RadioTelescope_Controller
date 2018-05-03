@@ -41,9 +41,7 @@ def main():
 
     # Signal to send the command string to RPi
     tcpStellThread.sendClientConn.connect(partial(tcpClienThread.tcp.stellCommSend, thread=tcpClienThread))
-
-    #tcpClienThread.dataShowSig.connect(ui.stellDataShow)  # Connect the signal to the corresponding function
-    ui.stopMovingRTSig.connect(partial(tcpClienThread.tcp.stopMovingRT, thread=tcpClienThread))
+    ui.stopMovingRTSig.connect(partial(tcpClienThread.tcp.stopMovingRT, thread=tcpClienThread))  # Stop any motion
 
     s_latlon = cfgData.getLatLon()  # First element is latitude and second element is longitude
     s_alt = cfgData.getAltitude()  # Get the altitude from the settings file
@@ -58,9 +56,9 @@ def main():
         tcpServerThread.start()  # Start the RPi server thread, since auto start is enabled
 
     # Give functionality to the buttons and add the necessary texts to fields
-    ui.connectRadioTBtn.clicked.connect(partial(tcpClienThread.tcp.connectButtonR, thread=tcpClienThread))
-    ui.serverRPiConnBtn.clicked.connect(partial(tcpServerThread.tcp.connectButtonRPi, thread=tcpServerThread))
-    ui.connectStellariumBtn.clicked.connect(partial(tcpStellThread.tcp.connectButton, thread=tcpStellThread))
+    ui.connectRadioTBtn.clicked.connect(tcpClienThread.connectButtonR)
+    ui.serverRPiConnBtn.clicked.connect(tcpServerThread.connectButtonRPi)
+    ui.connectStellariumBtn.clicked.connect(tcpStellThread.connectButton)
 
     # Show location on the GUI
     ui.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "

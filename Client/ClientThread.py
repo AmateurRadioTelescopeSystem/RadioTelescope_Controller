@@ -32,3 +32,11 @@ class ClientThread(QtCore.QThread):
             self.tcp.stopExec = False  # Reset the stopping flag
             self.tcp.closeConnection()  # Close all sockets since client is gone
             self.conStatSig.emit("Disconnected")  # Send the signal to indicate disconnectionS
+
+    def connectButtonR(self):
+        if self.tcp.sock_exst or self.tcp.sock_connected:
+            self.tcp.stopExec = True  # If there is currently a socket, then the call is to terminate it
+        else:
+            self.tcp.stopExec = False  # If there is no socket, then the call is for its creation
+        if not self.isRunning():
+            self.start()  # Start the thread with the current conditions
