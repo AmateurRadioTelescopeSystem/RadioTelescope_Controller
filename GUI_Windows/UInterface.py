@@ -28,7 +28,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         RadioTelescopeControl.setWindowIcon(QtGui.QIcon('radiotelescope.png'))
         RadioTelescopeControl.setObjectName("RadioTelescopeControl")
         RadioTelescopeControl.setWindowModality(QtCore.Qt.NonModal)
-        RadioTelescopeControl.resize(385, 473)
+        RadioTelescopeControl.resize(432, 507)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         RadioTelescopeControl.setFont(font)
@@ -55,24 +55,34 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.horizontalLayout_11 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_11.setObjectName("horizontalLayout_11")
         self.rpiConnText = QtWidgets.QLabel(self.frame_2)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.rpiConnText.sizePolicy().hasHeightForWidth())
+        self.rpiConnText.setSizePolicy(sizePolicy)
         self.rpiConnText.setObjectName("rpiConnText")
         self.horizontalLayout_11.addWidget(self.rpiConnText)
         self.rpiConStatTextInd = QtWidgets.QLabel(self.frame_2)
         self.rpiConStatTextInd.setObjectName("rpiConStatTextInd")
         self.horizontalLayout_11.addWidget(self.rpiConStatTextInd)
-        self.formLayout_2.setLayout(0, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_11)
+        self.formLayout_2.setLayout(0, QtWidgets.QFormLayout.SpanningRole, self.horizontalLayout_11)
         self.horizontalLayout_13 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_13.setObjectName("horizontalLayout_13")
         self.servRpiConText = QtWidgets.QLabel(self.frame_2)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.servRpiConText.sizePolicy().hasHeightForWidth())
+        self.servRpiConText.setSizePolicy(sizePolicy)
         self.servRpiConText.setObjectName("servRpiConText")
         self.horizontalLayout_13.addWidget(self.servRpiConText)
         self.servForRpiConTextInd = QtWidgets.QLabel(self.frame_2)
         self.servForRpiConTextInd.setObjectName("servForRpiConTextInd")
         self.horizontalLayout_13.addWidget(self.servForRpiConTextInd)
-        self.formLayout_2.setLayout(1, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_13)
+        self.formLayout_2.setLayout(1, QtWidgets.QFormLayout.SpanningRole, self.horizontalLayout_13)
         self.label_4 = QtWidgets.QLabel(self.frame_2)
         self.label_4.setObjectName("label_4")
-        self.formLayout_2.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.label_4)
+        self.formLayout_2.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.label_4)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.label_5 = QtWidgets.QLabel(self.frame_2)
@@ -81,7 +91,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.raPosInd = QtWidgets.QLabel(self.frame_2)
         self.raPosInd.setObjectName("raPosInd")
         self.horizontalLayout_2.addWidget(self.raPosInd)
-        self.formLayout_2.setLayout(3, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_2)
+        self.formLayout_2.setLayout(4, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.label_6 = QtWidgets.QLabel(self.frame_2)
@@ -90,20 +100,20 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.decPosInd = QtWidgets.QLabel(self.frame_2)
         self.decPosInd.setObjectName("decPosInd")
         self.horizontalLayout.addWidget(self.decPosInd)
-        self.formLayout_2.setLayout(4, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout)
+        self.formLayout_2.setLayout(5, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout)
         spacerItem = QtWidgets.QSpacerItem(40, 10, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.formLayout_2.setItem(5, QtWidgets.QFormLayout.LabelRole, spacerItem)
-        self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
-        self.tcpConRTChkBox = QtWidgets.QCheckBox(self.frame_2)
-        self.tcpConRTChkBox.setText("")
-        self.tcpConRTChkBox.setObjectName("tcpConRTChkBox")
-        self.horizontalLayout_9.addWidget(self.tcpConRTChkBox)
-        self.tcpConRTLabel = QtWidgets.QLabel(self.frame_2)
-        self.tcpConRTLabel.setEnabled(False)
-        self.tcpConRTLabel.setObjectName("tcpConRTLabel")
-        self.horizontalLayout_9.addWidget(self.tcpConRTLabel)
-        self.formLayout_2.setLayout(6, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_9)
+        self.formLayout_2.setItem(6, QtWidgets.QFormLayout.LabelRole, spacerItem)
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.clientRPiEnableLabel = QtWidgets.QCheckBox(self.frame_2)
+        self.clientRPiEnableLabel.setEnabled(True)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.clientRPiEnableLabel.sizePolicy().hasHeightForWidth())
+        self.clientRPiEnableLabel.setSizePolicy(sizePolicy)
+        self.clientRPiEnableLabel.setObjectName("clientRPiEnableLabel")
+        self.verticalLayout.addWidget(self.clientRPiEnableLabel)
         self.connectRadioTBtn = QtWidgets.QPushButton(self.frame_2)
         self.connectRadioTBtn.setEnabled(False)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -115,7 +125,28 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.connectRadioTBtn.setDefault(False)
         self.connectRadioTBtn.setFlat(False)
         self.connectRadioTBtn.setObjectName("connectRadioTBtn")
-        self.formLayout_2.setWidget(7, QtWidgets.QFormLayout.LabelRole, self.connectRadioTBtn)
+        self.verticalLayout.addWidget(self.connectRadioTBtn)
+        self.formLayout_2.setLayout(8, QtWidgets.QFormLayout.LabelRole, self.verticalLayout)
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.serverRPiEnableLabel = QtWidgets.QCheckBox(self.frame_2)
+        self.serverRPiEnableLabel.setObjectName("serverRPiEnableLabel")
+        self.verticalLayout_2.addWidget(self.serverRPiEnableLabel)
+        self.serverRPiConnBtn = QtWidgets.QPushButton(self.frame_2)
+        self.serverRPiConnBtn.setEnabled(False)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.serverRPiConnBtn.sizePolicy().hasHeightForWidth())
+        self.serverRPiConnBtn.setSizePolicy(sizePolicy)
+        self.serverRPiConnBtn.setObjectName("serverRPiConnBtn")
+        self.verticalLayout_2.addWidget(self.serverRPiConnBtn)
+        self.formLayout_2.setLayout(8, QtWidgets.QFormLayout.FieldRole, self.verticalLayout_2)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 5, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.formLayout_2.setItem(2, QtWidgets.QFormLayout.LabelRole, spacerItem1)
+        self.label_3 = QtWidgets.QLabel(self.frame_2)
+        self.label_3.setObjectName("label_3")
+        self.formLayout_2.setWidget(7, QtWidgets.QFormLayout.LabelRole, self.label_3)
         self.gridLayout.addWidget(self.frame_2, 0, 0, 1, 1)
         self.gridLayout_4.addWidget(self.groupBox, 0, 0, 1, 1)
         self.groupBox_2 = QtWidgets.QGroupBox(self.tab)
@@ -148,8 +179,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.stellConStatText.setObjectName("stellConStatText")
         self.horizontalLayout_8.addWidget(self.stellConStatText)
         self.formLayout.setLayout(1, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_8)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 2, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.formLayout.setItem(2, QtWidgets.QFormLayout.LabelRole, spacerItem1)
+        spacerItem2 = QtWidgets.QSpacerItem(40, 2, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.formLayout.setItem(2, QtWidgets.QFormLayout.LabelRole, spacerItem2)
         self.label_2 = QtWidgets.QLabel(self.stackedWidgetPage1)
         self.label_2.setObjectName("label_2")
         self.formLayout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.label_2)
@@ -196,8 +227,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.stackedWidgetPage2.setObjectName("stackedWidgetPage2")
         self.formLayout_5 = QtWidgets.QFormLayout(self.stackedWidgetPage2)
         self.formLayout_5.setObjectName("formLayout_5")
-        spacerItem2 = QtWidgets.QSpacerItem(40, 5, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.formLayout_5.setItem(0, QtWidgets.QFormLayout.LabelRole, spacerItem2)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 5, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.formLayout_5.setItem(0, QtWidgets.QFormLayout.LabelRole, spacerItem3)
         self.label_13 = QtWidgets.QLabel(self.stackedWidgetPage2)
         self.label_13.setObjectName("label_13")
         self.formLayout_5.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_13)
@@ -219,8 +250,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.decPosInd_2.setObjectName("decPosInd_2")
         self.horizontalLayout_7.addWidget(self.decPosInd_2)
         self.formLayout_5.setLayout(3, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_7)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.formLayout_5.setItem(4, QtWidgets.QFormLayout.LabelRole, spacerItem3)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.formLayout_5.setItem(4, QtWidgets.QFormLayout.LabelRole, spacerItem4)
         self.horizontalLayout_12 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_12.setObjectName("horizontalLayout_12")
         self.label = QtWidgets.QLabel(self.stackedWidgetPage2)
@@ -281,8 +312,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.locatChangeBtn = QtWidgets.QPushButton(self.groupBox_3)
         self.locatChangeBtn.setObjectName("locatChangeBtn")
         self.formLayout_3.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.locatChangeBtn)
-        spacerItem4 = QtWidgets.QSpacerItem(40, 10, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.formLayout_3.setItem(3, QtWidgets.QFormLayout.SpanningRole, spacerItem4)
+        spacerItem5 = QtWidgets.QSpacerItem(40, 10, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.formLayout_3.setItem(3, QtWidgets.QFormLayout.SpanningRole, spacerItem5)
         self.gridLayout_4.addWidget(self.groupBox_3, 1, 0, 1, 1)
         self.groupBox_4 = QtWidgets.QGroupBox(self.tab)
         self.groupBox_4.setObjectName("groupBox_4")
@@ -310,8 +341,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.movTextInd = QtWidgets.QLabel(self.groupBox_4)
         self.movTextInd.setObjectName("movTextInd")
         self.formLayout_4.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.movTextInd)
-        spacerItem5 = QtWidgets.QSpacerItem(40, 10, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.formLayout_4.setItem(5, QtWidgets.QFormLayout.SpanningRole, spacerItem5)
+        spacerItem6 = QtWidgets.QSpacerItem(40, 10, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.formLayout_4.setItem(5, QtWidgets.QFormLayout.SpanningRole, spacerItem6)
         self.trackTextInd = QtWidgets.QLabel(self.groupBox_4)
         self.trackTextInd.setObjectName("trackTextInd")
         self.formLayout_4.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.trackTextInd)
@@ -323,7 +354,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 2, 1)
         RadioTelescopeControl.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(RadioTelescopeControl)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 385, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 432, 21))
         self.menubar.setObjectName("menubar")
         self.menuThis_is_a_menu = QtWidgets.QMenu(self.menubar)
         self.menuThis_is_a_menu.setObjectName("menuThis_is_a_menu")
@@ -371,7 +402,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.menubar.addAction(self.menuAbout.menuAction())
 
         # Make all the necessary connections
-        self.tcpConRTChkBox.stateChanged.connect(self.checkBoxTCPRT)  # Assign functionality to the checkbox
+        self.clientRPiEnableLabel.stateChanged.connect(self.checkBoxTCPRTClient)  # Assign functionality to the checkbox
+        self.serverRPiEnableLabel.stateChanged.connect(self.checkBoxTCPRTServer)
         self.tcpStelServChkBox.stateChanged.connect(self.checkBoxTCPStel)  # Assign functionality to the checkbox
         self.actionSettings.triggered.connect(self.uiTCP.windShow)  # Show the TCP settings window
         self.actionManual_Control.triggered.connect(self.uiManCont.windShow)  # Show the manual control window
@@ -410,8 +442,12 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                                         "<html><head/><body><p><span style=\" font-weight:600;\">DEC:</span></p></body></html>"))
         self.decPosInd.setText(_translate("RadioTelescopeControl",
                                           "<html><head/><body><p><span style=\" color:#ff0000;\">0</span><span style=\" color:#ff0000; vertical-align:super;\">o</span><span style=\" color:#ff0000;\"> 0\' 0\'\'</span></p></body></html>"))
-        self.tcpConRTLabel.setText(_translate("RadioTelescopeControl", "TCP Connection"))
+        self.clientRPiEnableLabel.setText(_translate("RadioTelescopeControl", "Client"))
         self.connectRadioTBtn.setText(_translate("RadioTelescopeControl", "Connect"))
+        self.serverRPiEnableLabel.setText(_translate("RadioTelescopeControl", "Server"))
+        self.serverRPiConnBtn.setText(_translate("RadioTelescopeControl", "Enable"))
+        self.label_3.setText(_translate("RadioTelescopeControl",
+                                        "<html><head/><body><p><span style=\" font-weight:600;\">TCP Connection</span></p></body></html>"))
         self.groupBox_2.setTitle(_translate("RadioTelescopeControl", "Stellarium"))
         self.stellarConStatText.setText(_translate("RadioTelescopeControl",
                                                    "<html><head/><body><p><span style=\" font-weight:600;\">Status:</span></p></body></html>"))
@@ -500,13 +536,18 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.actionManual_Control.setShortcut(_translate("RadioTelescopeControl", "Ctrl+M"))
 
     # Function called every time the corresponding checkbox is selected
-    def checkBoxTCPRT(self, state):
+    def checkBoxTCPRTClient(self, state):
         if state == QtCore.Qt.Checked:
-            self.tcpConRTLabel.setEnabled(True)  # Enable the label
             self.connectRadioTBtn.setEnabled(True)  # And also enable the button selection
         else:
-            self.tcpConRTLabel.setEnabled(False)  # Disable the label
             self.connectRadioTBtn.setEnabled(False)  # And also disable the button selection
+
+    # Function called every time the corresponding checkbox is selected
+    def checkBoxTCPRTServer(self, state):
+        if state == QtCore.Qt.Checked:
+            self.serverRPiConnBtn.setEnabled(True)  # And also enable the button selection
+        else:
+            self.serverRPiConnBtn.setEnabled(False)  # And also disable the button selection
 
     # Function called every time the corresponding checkbox is selected
     def checkBoxTCPStel(self, state):
@@ -570,12 +611,12 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     def clientTCPGUIHandle(self, data: str):
         if data == "Connecting":
             self.connectRadioTBtn.setText("Stop")  # Change user's selection
-            self.tcpConRTChkBox.setCheckState(QtCore.Qt.Unchecked)
+            self.clientRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
             self.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
                                              "color:#ffb400;\">Connecting...</span></p></body></html>")
         elif data == "Connected":
             self.connectRadioTBtn.setText("Disconnect")
-            self.tcpConRTChkBox.setCheckState(QtCore.Qt.Unchecked)
+            self.clientRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
             self.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
                                                   "color:#00ff00;\">Connected</span></p></body></html>")
         elif data == "Disconnected":
@@ -587,12 +628,17 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     @QtCore.pyqtSlot(str)
     def rpiTCPGUIHandle(self, data: str):
         if data == "Waiting":
+            self.serverRPiConnBtn.setText("Stop")  # Change user's selection
+            self.serverRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
             self.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
                                           "color:#ffb400;\">Waiting...</span></p></body></html>")
         elif data == "Connected":
+            self.serverRPiConnBtn.setText("Disconnect")
+            self.serverRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
             self.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
                                           "color:#00ff00;\">Connected</span></p></body></html>")
         elif data == "Disconnected":
+            self.serverRPiConnBtn.setText("Connect")  # Change user's selection
             self.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
                                           "color:#ff0000;\">Disconnected</span></p></body></html>")
 
