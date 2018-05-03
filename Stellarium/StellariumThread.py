@@ -36,12 +36,7 @@ class StellThread(QtCore.QThread):
 
             elif not self.stopExec:
                 # Handle the possible exceptions, to avoid app crash
-                try:
-                    recData = self.tcp.receive()  # Start receiving the data from the client
-                except (OSError, ConnectionResetError):
-                    self.logD.log("EXCEPT", "Stellarium server thread stopped.", "run")
-                    self.quit()  # Call quit to be sure that we close properly
-                    break
+                recData = self.tcp.receive()  # Start receiving the data from the client
 
                 # If we receive zero length data, then that means the connection is broken
                 if len(recData) != 0:

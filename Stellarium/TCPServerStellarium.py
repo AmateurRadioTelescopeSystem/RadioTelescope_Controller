@@ -15,6 +15,7 @@ class TCPStellarium(object):
     def createSocket(self):
         host = self.cfgD.getStellHost()  # Get the TCP connection host
         port = self.cfgD.getStellPort()  # Get the TCP connection port
+
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket
         sock.bind((host, int(port)))  # Bind to the socket
         sock.listen(1)  # Set the listening to one connection
@@ -29,7 +30,7 @@ class TCPStellarium(object):
             self.client, claddr = self.sock.accept()
             self.client_connected = True
             return claddr, self.client_connected
-        except:
+        except (OSError, ConnectionResetError, ConnectionAbortedError):
             self.logd.log("EXCEPT", "An exception occurred while waiting for a client to connect", "acceptConnection")
             self.sock.close()
             self.sock_exst = False
@@ -39,7 +40,7 @@ class TCPStellarium(object):
         if self.client_connected:
             try:
                 return self.client.recv(1024)
-            except ConnectionResetError:
+            except (OSError, ConnectionResetError, ConnectionAbortedError):
                 self.logd.log("EXCEPT", "A connected client abruptly disconnected.", "receive")
                 self.client_connected = False
                 return ""
@@ -68,7 +69,7 @@ class TCPStellarium(object):
             except:
                 self.logd.log("EXCEPT", "There was an issue sending the response to the client", "sendResponse")
 
-    def connectButton(self, thread = None):
+    def connectButton(self, thread=None):
         if thread is not None:
             if thread.isRunning():
                 thread.quit()  # Quit the currently running thread
