@@ -67,12 +67,3 @@ class TCPServerRpi(object):
                 return response
             except:
                 self.logd.log("EXCEPT", "There was an issue sending the response to the client", "sendResponse")
-
-    def connectButtonRPi(self, thread=None):
-        if thread is not None:
-            if thread.isRunning():
-                thread.quit()  # Quit the currently running thread
-                self.logd.log("INFO", "The thread for the server was closed", "connectButton")
-            else:
-                self.logd.log("INFO", "Started a thread for the server", "connectButton")
-                thread.start()  # Initiate the server to its thread

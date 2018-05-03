@@ -54,14 +54,6 @@ class TCPClient(QtCore.QObject):
         else:
             return "No answer"
 
-    def connectButtonR(self, thread=None):
-        if self.sock_exst or self.sock_connected:
-            self.stopExec = True  # If there is currently a socket, then the call is to terminate it
-        else:
-            self.stopExec = False  # If there is no socket, then the call is for its creation
-        if not thread.isRunning():
-            thread.start()  # Start the thread with the current conditions
-
     @QtCore.pyqtSlot(list, name='clientCommandSendStell')
     def stellCommSend(self, radec: list, thread=None):
         if thread is not None:
