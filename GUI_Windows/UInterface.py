@@ -7,6 +7,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
 from GUI_Windows import TCPSettings
 from GUI_Windows import ManualControl
+import os
 
 
 class Ui_RadioTelescopeControl(QtCore.QObject):
@@ -29,8 +30,14 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         RadioTelescopeControl.setObjectName("RadioTelescopeControl")
         RadioTelescopeControl.setWindowModality(QtCore.Qt.NonModal)
         RadioTelescopeControl.resize(432, 507)
+
+        # Set the font according to the OS
         font = QtGui.QFont()
-        font.setFamily("Segoe UI")
+        if os.name == 'nt':
+            font.setFamily("Segoe UI")
+        else:
+            font.setFamily("Ubuntu")
+
         RadioTelescopeControl.setFont(font)
         self.centralwidget = QtWidgets.QWidget(RadioTelescopeControl)
         self.centralwidget.setObjectName("centralwidget")
@@ -653,3 +660,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             QtCore.QCoreApplication.instance().quit()  # If user selects "Yes", then exit from the application
         else:
             pass  # If user selects "No" then do not exit
+
+    @QtCore.pyqtSlot(str)
+    def signalTestrt(self, data:str):
+        print("We are from the signal fire")
+        print(data)
