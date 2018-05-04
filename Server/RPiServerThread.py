@@ -5,7 +5,7 @@ import logData
 class RPiServerThread(QtCore.QObject):
     # Create the signals to be used for data handling
     conStatSigR = QtCore.pyqtSignal(str, name='conRPiStat')  # Raspberry pi connection indicator
-    dataRxFromServ = QtCore.pyqtSignal(str, name='rpiServDataRx')
+    dataRxFromServ = QtCore.pyqtSignal(str, name='rpiServDataRx')  # Data received from the server of RPi
 
     def __init__(self, cfgData, parent = None):
         super(RPiServerThread, self).__init__(parent)  # Get the parent of the class
@@ -40,7 +40,7 @@ class RPiServerThread(QtCore.QObject):
         try:
             if self.socket.bytesAvailable() > 0:
                 recData = self.socket.readAll().data()  # Get the data sa a binary array
-                recData =  recData.decode('utf-8') # Decode the data to get a string
+                recData = recData.decode('utf-8')  # Decode the data to get a string
                 self.dataRxFromServ.emit(recData)  # Send a signal to indicate that the server received some data
         except Exception:
             # If data is sent fast, then an exception will occur
