@@ -8,6 +8,7 @@ class StellThread(QtCore.QObject):
     conStatSigS = QtCore.pyqtSignal(str, name='conStellStat')  # Stellarium connection status indication signal
     dataShowSigS = QtCore.pyqtSignal(float, float, name='dataStellShow')  # Coordinates show in the GUI
     sendClientConn = QtCore.pyqtSignal(list, name='clientCommandSendStell')  # Send the command to the radio telescope
+    sendDataStell = QtCore.pyqtSignal(float, float, name='stellariumDataSend')  # Send the data to Stellarium
 
     def __init__(self, cfgData, parent = None):
         super(StellThread, self).__init__(parent)  # Get the parent of the class
@@ -24,6 +25,7 @@ class StellThread(QtCore.QObject):
 
         self.tcpServer = QtNetwork.QTcpServer()  # Create a server object
         self.tcpServer.newConnection.connect(self.new_connection)  # Handler for a new connection
+        self.sendDataStell.connect(self.send)  # Connect the signal trigger for data sending
 
         self.tcpServer.listen(QtNetwork.QHostAddress(self.host), int(self.port))  # Start listening for connections
         self.conStatSigS.emit("Waiting")  # Indicate that the server is listening on the GUI
@@ -58,14 +60,16 @@ class StellThread(QtCore.QObject):
             self.conStatSigS.emit("Waiting")  # Indicate that the server does not have a connection on the GUI
             self.tcpServer.listen(QtNetwork.QHostAddress(self.host), int(self.port))  # Start listening again
 
-    ''''@QtCore.pyqtSlot(float, float, name='clientCommandSendStell')
+    # Thsi method is called whenever the signal to send data back is fired
+    @QtCore.pyqtSlot(float, float, name='stellariumDataSend')
     def send(self, ra: float, dec: float):
         try:
-            self.socket.write(self.dataHandle.encodeStell(ra, dec))  # Send data back to Stellarium
-            self.socket.waitForBytesWritten()  # Wait for the data to be written
-        except Exception as e:
-            print("Stellarium send client issue")
-            print(e)'''
+            if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
+                self.socket.write(self.dataHandle.encodeStell(ra, dec))  # Send data back to Stellarium
+                print(self.dataHandle.encodeStell(ra, dec))
+                self.socket.waitForBytesWritten()  # Wait for the data to be written
+        except Exception:
+            self.logD.log("EXCEPT", "Problem sending data to Stellarium. See traceback.", "_receive")
 
     # This method is called whenever the thread exits
     def close(self):
