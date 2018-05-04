@@ -48,7 +48,7 @@ def main():
     tcpClient.moveToThread(tcpClientThread)  # Move the client to a thread
     tcpClient.conStatSigC.connect(ui.clientTCPGUIHandle)  # Connect the signal to the corresponding function
     # Connect the thread action signals
-    tcpClientThread.started.connect(tcpClient.connect)  # Connect with this function upon thread start
+    tcpClientThread.started.connect(tcpClient.start)  # Connect with this function upon thread start
     tcpClientThread.finished.connect(tcpClient.close)  # Connect with thsi function upon thread exit
 
     # TCP Stellarium server initialization
