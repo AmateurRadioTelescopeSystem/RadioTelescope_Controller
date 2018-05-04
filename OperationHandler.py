@@ -53,7 +53,6 @@ class OpHandler(QtCore.QObject):
                 thread.start()  # Attempt a connection with the client
             else:
                 # If the thread is running and it is not yet connected, attempt a reconnection
-                print("Not doing it")
                 self.tcpServer.reConnectSigR.emit()
 
     # Dta received from the client connected to the RPi server
