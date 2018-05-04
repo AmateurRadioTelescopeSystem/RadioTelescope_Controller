@@ -6,6 +6,7 @@ from GUI_Windows import UInterface
 from Stellarium import StellariumThread
 from Client import ClientThread
 from Server import RPiServerThread
+import OperationHandler
 import configData
 import logData
 import sys
@@ -29,22 +30,16 @@ def main():
         logdata.log("EXCEPT", "There is a problem with the XML file handling. Program terminates.", __name__)
         exit(1)  # Terminate the script
 
-
     # TCP server for the RPi initialization
-    tcpServerThread = RPiServerThread.RPiServerThread(cfgData)
-    tcpServerThread.conStatSigR.connect(ui.rpiTCPGUIHandle)  # Connection status signal for the server
-
-    # TCP Stellarium server initialization
-    tcpStellThread = QtCore.QThread()  # Create a thread for the Stellarium server
-    tcpStell = StellariumThread.StellThread(cfgData)  # Create the instance of the TCP client
+    tcpServerThread = QtCore.QThread()  # Create a thread for the TCP client
+    tcpServer = RPiServerThread.RPiServerThread(cfgData)  # Create the instance of the TCP client
     # Connect the signals from the client
-    tcpStell.moveToThread(tcpStellThread)
-    tcpStell.conStatSigS.connect(ui.stellTCPGUIHandle)  # Connect the signal to the corresponding function
-    tcpStell.dataShowSigS.connect(ui.stellDataShow)  # Connect the signal to the corresponding function
-    tcpStell.sendClientConn.connect(tcpStell.send)
+    tcpServer.moveToThread(tcpServerThread)
+    tcpServer.conStatSigR.connect(ui.rpiTCPGUIHandle)  # Connection status signal for the server
+    #tcpServer.dataRcvSigC.connect(ui.signalTestrt)  # Received data signal
     # Connect the thread action signals
-    tcpStellThread.started.connect(tcpStell.start)
-    tcpStellThread.finished.connect(tcpStell.close)
+    tcpServerThread.started.connect(tcpServer.start)
+    tcpServerThread.finished.connect(tcpServer.close)
 
     # Initialize the TCP client thread
     tcpClientThread = QtCore.QThread()  # Create a thread for the TCP client
@@ -57,9 +52,25 @@ def main():
     tcpClientThread.started.connect(tcpClient.connect)
     tcpClientThread.finished.connect(tcpClient.close)
 
+    # TCP Stellarium server initialization
+    tcpStellThread = QtCore.QThread()  # Create a thread for the Stellarium server
+    tcpStell = StellariumThread.StellThread(cfgData)  # Create the instance of the TCP client
+    # Connect the signals from the client
+    tcpStell.moveToThread(tcpStellThread)
+    tcpStell.conStatSigS.connect(ui.stellTCPGUIHandle)  # Connect the signal to the corresponding function
+    tcpStell.dataShowSigS.connect(ui.stellDataShow)  # Connect the signal to the corresponding function
+    #tcpStell.sendClientConn.connect(tcpClient.send)  # Send the appropriate command request to the RPi server
+    # Connect the thread action signals
+    tcpStellThread.started.connect(tcpStell.start)
+    tcpStellThread.finished.connect(tcpStell.close)
+
+    operHandlerThread = QtCore.QThread()
+    operHandle = OperationHandler.OpHandler(tcpClient, tcpServerThread, tcpStell, ui)
+    operHandle.moveToThread(operHandlerThread)
+    operHandlerThread.start()
+
     # Signal to send the command string to RPi
     #tcpStell.sendClientConn.connect(partial(tcpClienThread.stellCommSend, thread=tcpClienThread))
-    #ui.stopMovingRTSig.connect(partial(tcpClienThread.tcp.stopMovingRT, thread=tcpClienThread))  # Stop any motion
 
     s_latlon = cfgData.getLatLon()  # First element is latitude and second element is longitude
     s_alt = cfgData.getAltitude()  # Get the altitude from the settings file
@@ -71,12 +82,12 @@ def main():
         tcpStellThread.start()  # Start the server thread, since auto start is enabled
     if autoconRPi == "yes":
         tcpClientThread.start()  # Start the client thread, since auto start is enabled
-        #tcpServerThread.start()  # Start the RPi server thread, since auto start is enabled
+        tcpServerThread.start()  # Start the RPi server thread, since auto start is enabled
 
     # Give functionality to the buttons and add the necessary texts to fields
-    ui.connectRadioTBtn.clicked.connect(partial(ui.connectButtonR, thread=tcpClientThread))
-    ui.serverRPiConnBtn.clicked.connect(tcpServerThread.connectButtonRPi)
-    ui.connectStellariumBtn.clicked.connect(partial(ui.connectButtonS, thread=tcpStellThread))
+    ui.connectRadioTBtn.clicked.connect(partial(operHandle.connectButtonR, thread=tcpClientThread))
+    ui.serverRPiConnBtn.clicked.connect(partial(operHandle.connectButtonRPi, thread=tcpServerThread))
+    ui.connectStellariumBtn.clicked.connect(partial(operHandle.connectButtonS, thread=tcpStellThread))
 
     # Show location on the GUI
     ui.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "

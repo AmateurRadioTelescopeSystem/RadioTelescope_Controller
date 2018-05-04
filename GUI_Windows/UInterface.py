@@ -579,8 +579,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             pass
 
     # Signal handler for GUI formatting used for the stellarium connection
-    @QtCore.pyqtSlot(str)
-    def stellTCPGUIHandle(self, data:str):
+    @QtCore.pyqtSlot(str, name='conStellStat')
+    def stellTCPGUIHandle(self, data: str):
         if data == "Waiting":
             self.connectStellariumBtn.setText("Stop")  # Change user's selection
             self.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
@@ -640,42 +640,19 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
                                           "color:#ffb400;\">Waiting...</span></p></body></html>")
         elif data == "Connected":
-            self.serverRPiConnBtn.setText("Disconnect")
+            self.serverRPiConnBtn.setText("Disable")
             self.serverRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
             self.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
                                           "color:#00ff00;\">Connected</span></p></body></html>")
         elif data == "Disconnected":
-            self.serverRPiConnBtn.setText("Connect")  # Change user's selection
+            self.serverRPiConnBtn.setText("Enable")  # Change user's selection
             self.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
                                           "color:#ff0000;\">Disconnected</span></p></body></html>")
 
     @QtCore.pyqtSlot(str)
     def signalTestrt(self, data:str):
-        print("We are from the signal fire")
+        print("We are from the signal fire, testing signal in UI")
         print(data)
-
-    def connectButtonR(self, thread=None):
-        if thread.isRunning() and (self.connectRadioTBtn.text() == "Disconnect" or self.connectRadioTBtn.text() == "Stop"):
-            thread.quit()  # Disconnect from the client
-        elif not thread.isRunning:
-            thread.start()  # Attempt a connection with the client
-        else:
-            # If the thread is running and it is not yet connected, attempt a reconnection
-            thread.quit()
-            thread.wait()
-            thread.start()
-
-    def connectButtonS(self, thread=None):
-        if thread.isRunning() and (self.connectStellariumBtn.text() == "Disconnect" or self.connectStellariumBtn.text() == "Stop"):
-            thread.quit()  # Quit the currently running thread
-            self.logD.log("INFO", "The thread for the server was closed", "connectButton")
-        elif not thread.isRunning:
-            thread.start()  # Attempt a connection with the client
-        else:
-            # If the thread is running and it is not yet connected, attempt a reconnection
-            thread.quit()
-            thread.wait()
-            thread.start()
 
     # Show the main GUI
     def show_application(self):
@@ -683,7 +660,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
     # Ask before exiting the GUI
     def close_application(self, objec):
-        choice = QtWidgets.QMessageBox.question(objec, 'Exit', "Are you sure?", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        choice = QtWidgets.QMessageBox.question(objec, 'Exit', "Are you sure?",
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if choice == QtWidgets.QMessageBox.Yes:
             QtCore.QCoreApplication.instance().quit()  # If user selects "Yes", then exit from the application
         else:

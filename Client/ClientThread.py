@@ -49,7 +49,7 @@ class ClientThread(QtCore.QObject):
 
     # This method is called when the thread exits
     def close(self):
-        self.sock.disconnectFromHost()
-        self.sock.waitForDisconnected()
+        self.sock.disconnectFromHost()  # Disconnect from the host
+        self.sock.waitForDisconnected()  # And wait until disconnected or timeout (default 3 seconds)
         if self.sock.state() == QtNetwork.QAbstractSocket.UnconnectedState:
-            self.conStatSigC.emit("Disconnected")
+            self.conStatSigC.emit("Disconnected")  # Indicate a disconnected state on the GUI
