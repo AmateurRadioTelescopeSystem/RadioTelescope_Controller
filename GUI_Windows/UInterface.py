@@ -7,7 +7,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
 from GUI_Windows import TCPSettings
 from GUI_Windows import ManualControl
-import os
+import os, sys
 
 
 class Ui_RadioTelescopeControl(QtCore.QObject):
@@ -588,7 +588,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                                              "color:#ffb400;\">Waiting...</span></p></body></html>")
             self.nextPageLabel.setEnabled(False)  # Disable the next page label
             self.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
-            self.stackedWidget.setCurrentIndex(0)
+            self.stackedWidget.setCurrentIndex(0)  # Stay in the same widget
         elif data == "Connected":
             self.connectStellariumBtn.setText("Disable")  # Change user's selection
             self.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
@@ -596,16 +596,16 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                                              "color:#00ff00;\">Connected</span></p></body></html>")
             self.nextPageLabel.setEnabled(True)  # Enable the label to indicate functionality
             self.stellNextPageBtn.setEnabled(True)  # Enable next page transition, since we have a connection
-            self.stackedWidget.setCurrentIndex(1)
+            self.stackedWidget.setCurrentIndex(1)  # Change the widget index since we are connected
         elif data == "Disconnected":
             self.connectStellariumBtn.setText("Enable")
-            self.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
+            self.tcpStelServChkBox.setCheckState(QtCore.Qt.Checked)
             self.stellConStatText.setText("<html><head/><body><p><span style=\" "
                                              "color:#ff0000;\">Disconnected</span></p></body></html>")
             self.nextPageLabel.setEnabled(False)  # Disable the next page label
             self.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
             self.stackedWidget.setCurrentIndex(0)
-        self.commandStellIndLabel.setText(self.stellariumOperationSelect.currentText())
+        self.commandStellIndLabel.setText(self.stellariumOperationSelect.currentText())  # Set the text initially
 
     # Signal handler to show the received data fro Stellarium on the GUI
     @QtCore.pyqtSlot(float, float, name='dataStellShow')
@@ -628,6 +628,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                                                   "color:#00ff00;\">Connected</span></p></body></html>")
         elif data == "Disconnected":
             self.connectRadioTBtn.setText("Connect")  # Change user's selection
+            self.clientRPiEnableLabel.setCheckState(QtCore.Qt.Checked)
             self.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
                                                   "color:#ff0000;\">Disconnected</span></p></body></html>")
 
@@ -646,13 +647,9 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                                           "color:#00ff00;\">Connected</span></p></body></html>")
         elif data == "Disconnected":
             self.serverRPiConnBtn.setText("Enable")  # Change user's selection
+            self.serverRPiEnableLabel.setCheckState(QtCore.Qt.Checked)  # Set the checkbox to checked state
             self.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
                                           "color:#ff0000;\">Disconnected</span></p></body></html>")
-
-    @QtCore.pyqtSlot(str)
-    def signalTestrt(self, data:str):
-        print("We are from the signal fire, testing signal in UI")
-        print(data)
 
     # Show the main GUI
     def show_application(self):
@@ -664,5 +661,6 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                                                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if choice == QtWidgets.QMessageBox.Yes:
             QtCore.QCoreApplication.instance().quit()  # If user selects "Yes", then exit from the application
+            sys.exit(0)  # Successful exit indication
         else:
             pass  # If user selects "No" then do not exit

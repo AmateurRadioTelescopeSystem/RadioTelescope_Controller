@@ -16,7 +16,7 @@ logdata = logData.logData(__name__)  # Create the logger for the program
 
 
 def main():
-    print("\nMain thread: %d\n" % int(QtCore.QThread.currentThreadId()))
+    print("\nMain thread: %d\n" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
     QtCore.QThreadPool.globalInstance().setMaxThreadCount(8)  # Set the global thread pool count
 
     app = QtWidgets.QApplication(sys.argv)  # Create a Qt application instance
@@ -34,40 +34,43 @@ def main():
     tcpServerThread = QtCore.QThread()  # Create a thread for the TCP client
     tcpServer = RPiServerThread.RPiServerThread(cfgData)  # Create the instance of the TCP client
     # Connect the signals from the client
-    tcpServer.moveToThread(tcpServerThread)
+    tcpServer.moveToThread(tcpServerThread)  # Move the server to a thread
     tcpServer.conStatSigR.connect(ui.rpiTCPGUIHandle)  # Connection status signal for the server
     #tcpServer.dataRcvSigC.connect(ui.signalTestrt)  # Received data signal
     # Connect the thread action signals
-    tcpServerThread.started.connect(tcpServer.start)
-    tcpServerThread.finished.connect(tcpServer.close)
+    tcpServerThread.started.connect(tcpServer.start)  # What to do upon thread start
+    tcpServerThread.finished.connect(tcpServer.close)  # What to do upon thread exit
 
     # Initialize the TCP client thread
     tcpClientThread = QtCore.QThread()  # Create a thread for the TCP client
     tcpClient = ClientThread.ClientThread(cfgData)  # Create the instance of the TCP client
     # Connect the signals from the client
-    tcpClient.moveToThread(tcpClientThread)
+    tcpClient.moveToThread(tcpClientThread)  # Move the client to a thread
     tcpClient.conStatSigC.connect(ui.clientTCPGUIHandle)  # Connect the signal to the corresponding function
-    tcpClient.dataRcvSigC.connect(ui.signalTestrt)  # Received data signal
     # Connect the thread action signals
-    tcpClientThread.started.connect(tcpClient.connect)
-    tcpClientThread.finished.connect(tcpClient.close)
+    tcpClientThread.started.connect(tcpClient.connect)  # Connect with this function upon thread start
+    tcpClientThread.finished.connect(tcpClient.close)  # Connect with thsi function upon thread exit
 
     # TCP Stellarium server initialization
     tcpStellThread = QtCore.QThread()  # Create a thread for the Stellarium server
     tcpStell = StellariumThread.StellThread(cfgData)  # Create the instance of the TCP client
     # Connect the signals from the client
-    tcpStell.moveToThread(tcpStellThread)
+    tcpStell.moveToThread(tcpStellThread)  # Move the Stellarium server to a thread
     tcpStell.conStatSigS.connect(ui.stellTCPGUIHandle)  # Connect the signal to the corresponding function
     tcpStell.dataShowSigS.connect(ui.stellDataShow)  # Connect the signal to the corresponding function
     #tcpStell.sendClientConn.connect(tcpClient.send)  # Send the appropriate command request to the RPi server
     # Connect the thread action signals
-    tcpStellThread.started.connect(tcpStell.start)
-    tcpStellThread.finished.connect(tcpStell.close)
+    tcpStellThread.started.connect(tcpStell.start)  # Run the start code for the thread, once it starts
+    tcpStellThread.finished.connect(tcpStell.close)  # Run the stop code when a quit is requested
 
-    operHandlerThread = QtCore.QThread()
+    # Initialize the operation handler
+    operHandlerThread = QtCore.QThread()  # Create a thread for the operation handler
     operHandle = OperationHandler.OpHandler(tcpClient, tcpServerThread, tcpStell, ui)
-    operHandle.moveToThread(operHandlerThread)
-    operHandlerThread.start()
+    operHandle.moveToThread(operHandlerThread)  # Move the operation handler to a thread
+    operHandlerThread.started.connect(operHandle.start)  # Run the start method upon thread start
+    operHandlerThread.start()  # Start the operation handler
+
+    app.aboutToQuit.connect(ui.close_application)
 
     # Signal to send the command string to RPi
     #tcpStell.sendClientConn.connect(partial(tcpClienThread.stellCommSend, thread=tcpClienThread))

@@ -11,9 +11,12 @@ class OpHandler(QtCore.QObject):
         self.ui = ui  # User interface handling object
         self.logD = logData.logData(__name__)  # Data logger object
 
+    def start(self):
         self.tcpStellarium.sendClientConn.connect(self.stellCommSend)
+        self.tcpClient.dataRcvSigC.connect(self.clientDataRx)
         self.ui.stopMovingRTSig.connect(self.stopMovingRT)
 
+    # Client connection button handling method
     def connectButtonR(self, thread=None):
         if thread.isRunning() and \
                 (self.ui.connectRadioTBtn.text() == "Disconnect" or self.ui.connectRadioTBtn.text() == "Stop"):
@@ -26,6 +29,7 @@ class OpHandler(QtCore.QObject):
             thread.wait()
             thread.start()
 
+    # Stellarium server connection handling method
     def connectButtonS(self, thread=None):
         if thread.isRunning() and \
                 (self.ui.connectStellariumBtn.text() == "Disable" or self.ui.connectStellariumBtn.text() == "Stop"):
@@ -39,9 +43,10 @@ class OpHandler(QtCore.QObject):
             thread.wait()
             thread.start()
 
+    # RPi server connection handling method
     def connectButtonRPi(self, thread=None):
         if thread.isRunning() and \
-                (self.ui.connectStellariumBtn.text() == "Disable" or self.ui.connectStellariumBtn.text() == "Stop"):
+                (self.ui.serverRPiConnBtn.text() == "Disable" or self.ui.serverRPiConnBtn.text() == "Stop"):
             thread.quit()  # Quit the currently running thread
             self.logD.log("INFO", "The thread for the server was closed", "connectButtonRPi")
         elif not thread.isRunning:
@@ -51,6 +56,11 @@ class OpHandler(QtCore.QObject):
             thread.quit()
             thread.wait()
             thread.start()
+
+    @QtCore.pyqtSlot(str, name='dataClientRX')
+    def clientDataRx(self, data: str):
+        print("We are from the signal fire, testing signal in op handle")
+        print(data)
 
     @QtCore.pyqtSlot(list, name='clientCommandSendStell')
     def stellCommSend(self, radec: list):
@@ -64,3 +74,5 @@ class OpHandler(QtCore.QObject):
     @QtCore.pyqtSlot(name='stopRadioTele')
     def stopMovingRT(self):
         self.tcpClient.sendData.emit("STOP")  # Send the request to stop moving to the RPi server
+
+
