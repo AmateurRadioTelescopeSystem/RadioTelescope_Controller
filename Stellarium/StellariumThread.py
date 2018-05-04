@@ -9,6 +9,7 @@ class StellThread(QtCore.QObject):
     dataShowSigS = QtCore.pyqtSignal(float, float, name='dataStellShow')  # Coordinates show in the GUI
     sendClientConn = QtCore.pyqtSignal(list, name='clientCommandSendStell')  # Send the command to the radio telescope
     sendDataStell = QtCore.pyqtSignal(float, float, name='stellariumDataSend')  # Send the data to Stellarium
+    reConnectSigS = QtCore.pyqtSignal(name='reConnectStell')  # A reconnection signal originating from a button press
 
     def __init__(self, cfgData, parent = None):
         super(StellThread, self).__init__(parent)  # Get the parent of the class
@@ -17,8 +18,13 @@ class StellThread(QtCore.QObject):
 
     # This method is called in every thread start
     def start(self):
+        self.socket = None  # Create the instance os the socket variable to use it later
         self.dataHandle = StellariumDataHandling.StellariumData()  # Data conversion object
+        self.reConnectSigS.connect(self.connectStell)  # Connect the signal to the connection function
+        self.connectStell()  # Start the Stellarium server
 
+    @QtCore.pyqtSlot(name='reConnectStell')
+    def connectStell(self):
         # Get the saved data from the settings file
         self.host = self.cfgData.getStellHost()  # Get the TCP connection host
         self.port = self.cfgData.getStellPort()  # Get the TCP connection port
@@ -73,7 +79,8 @@ class StellThread(QtCore.QObject):
 
     # This method is called whenever the thread exits
     def close(self):
-        self.socket.close()  # Close the underlying TCP socket
+        if self.socket is not None:
+            self.socket.close()  # Close the underlying TCP socket
         self.tcpServer.close()  # Close the TCP server
         self.conStatSigS.emit("Disconnected")  # Indicate disconnection on the GUI
 
