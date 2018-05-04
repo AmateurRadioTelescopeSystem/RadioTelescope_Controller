@@ -5,7 +5,7 @@ from Client import TCPClient
 class ClientThread(QtCore.QThread):
     # Create the signals to be used for data handling
     conStatSig = QtCore.pyqtSignal(str, name='conClientStat')  # Connection indication signal
-    #dataRcvSigC = QtCore.pyqtSignal(str, name='dataClientRX')  # Send the received data out
+    dataRcvSigC = QtCore.pyqtSignal(str, name='dataClientRX')  # Send the received data out
 
     def __init__(self, cfgData, ui, parent = None):
         super(ClientThread, self).__init__(parent)  # Get the parent of the class
@@ -26,8 +26,7 @@ class ClientThread(QtCore.QThread):
 
             # If we receive zero length data, then that means the connection is broken
             if len(recData) != 0:
-                recData = recData
-                #self.dataRcvSig.emit(recData)  # Send the data to be shown on the GUI widget
+                self.dataRcvSigC.emit(recData)  # Send the data to be shown on the GUI widget
         elif self.tcp.stopExec:
             self.tcp.stopExec = False  # Reset the stopping flag
             self.tcp.closeConnection()  # Close all sockets since client is gone

@@ -17,7 +17,7 @@ class TCPClient(QtCore.QObject):
 
     def createSocket(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket object
-        #sock.settimeout(20)  # Set the timeout to 20 seconds
+        sock.settimeout(10)  # Set the timeout to 20 seconds
         self.sock_exst = True  # Indicate that a socket object exists
         return sock
 
