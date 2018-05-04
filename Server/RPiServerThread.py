@@ -6,14 +6,21 @@ class RPiServerThread(QtCore.QObject):
     # Create the signals to be used for data handling
     conStatSigR = QtCore.pyqtSignal(str, name='conRPiStat')  # Raspberry pi connection indicator
     dataRxFromServ = QtCore.pyqtSignal(str, name='rpiServDataRx')  # Data received from the server of RPi
+    reConnectSigR = QtCore.pyqtSignal(name='reConnectServer')  # A reconnection signal originating from a button press
 
     def __init__(self, cfgData, parent = None):
         super(RPiServerThread, self).__init__(parent)  # Get the parent of the class
         self.cfgData = cfgData
         self.logD = logData.logData(__name__)  # Create the logger
 
-    # This method is called in every thread start
+    # This method is called in every thread start and if the re-connect signal is fired
     def start(self):
+        self.socket = None  # Create a variable to hold the socket
+        self.reConnectSigR.connect(self.connectServ)
+        self.connectServ()  # Start the server
+
+    @QtCore.pyqtSlot(name='reConnectServer')
+    def connectServ(self):
         # Get the saved data from the settings file
         self.host = self.cfgData.getRPiHost()  # Get the TCP connection host
         self.port = self.cfgData.getRPiPort()  # Get the TCP connection port
@@ -64,7 +71,8 @@ class RPiServerThread(QtCore.QObject):
 
     # This method is called whenever the thread exits
     def close(self):
-        self.socket.close()  # Close the underlying TCP socket
+        if self.socket is not None:
+            self.socket.close()  # Close the underlying TCP socket
         self.tcpServer.close()  # Close the TCP server
         self.conStatSigR.emit("Disconnected")  # Indicate disconnection on the GUI
 
