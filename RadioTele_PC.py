@@ -65,20 +65,20 @@ def main():
 
     # Initialize the operation handler
     operHandlerThread = QtCore.QThread()  # Create a thread for the operation handler
-    operHandle = OperationHandler.OpHandler(tcpClient, tcpServerThread, tcpStell, ui)
+    operHandle = OperationHandler.OpHandler(tcpClient, tcpServer, tcpStell, ui)
     operHandle.moveToThread(operHandlerThread)  # Move the operation handler to a thread
     operHandlerThread.started.connect(operHandle.start)  # Run the start method upon thread start
     operHandlerThread.start()  # Start the operation handler
-
-    app.aboutToQuit.connect(ui.close_application)
-
-    # Signal to send the command string to RPi
-    #tcpStell.sendClientConn.connect(partial(tcpClienThread.stellCommSend, thread=tcpClienThread))
 
     s_latlon = cfgData.getLatLon()  # First element is latitude and second element is longitude
     s_alt = cfgData.getAltitude()  # Get the altitude from the settings file
     autoconStell = cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
     autoconRPi = cfgData.getTCPAutoConnStatus()  # Get the auto-connection preference for the RPi
+
+    # Give functionality to the buttons and add the necessary texts to fields
+    ui.connectRadioTBtn.clicked.connect(partial(operHandle.connectButtonR, thread=tcpClientThread))
+    ui.serverRPiConnBtn.clicked.connect(partial(operHandle.connectButtonRPi, thread=tcpServerThread))
+    ui.connectStellariumBtn.clicked.connect(partial(operHandle.connectButtonS, thread=tcpStellThread))
 
     # If auto-connection is selected for thr TCP section, then do as requested
     if autoconStell == "yes":
@@ -86,11 +86,6 @@ def main():
     if autoconRPi == "yes":
         tcpClientThread.start()  # Start the client thread, since auto start is enabled
         tcpServerThread.start()  # Start the RPi server thread, since auto start is enabled
-
-    # Give functionality to the buttons and add the necessary texts to fields
-    ui.connectRadioTBtn.clicked.connect(partial(operHandle.connectButtonR, thread=tcpClientThread))
-    ui.serverRPiConnBtn.clicked.connect(partial(operHandle.connectButtonRPi, thread=tcpServerThread))
-    ui.connectStellariumBtn.clicked.connect(partial(operHandle.connectButtonS, thread=tcpStellThread))
 
     # Show location on the GUI
     ui.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
