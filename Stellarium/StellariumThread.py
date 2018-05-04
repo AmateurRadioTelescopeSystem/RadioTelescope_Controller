@@ -43,13 +43,14 @@ class StellThread(QtCore.QThread):
                     recData = self.dataHandle.decodeStell(recData)
                     self.dataShowSig.emit(recData[0], recData[1])  # Send the data to be shown on the GUI widget
                     self.sendClientConn.emit(recData)  # Emit the signal to send the data to the raspberry pi
-                else:
+                elif not self.stopExec:
                     self.tcp.releaseClient()  # Close all sockets since client is gone
                     self.clinetDiscon = True  # Tell that the client has disconnected
                     self.stopExec = False  # Continue in the loop since quit is not yet called
 
     def quit(self):
         self.clinetDiscon = True  # Indicate a disconnected client
+        self.stopExec = True
         self.tcp.releaseClient()  # Whenever this function is called we need to close the connection
         self.conStatSig.emit("Disconnected")  # Send the signal to indicate disconnection
         self.exit(0)

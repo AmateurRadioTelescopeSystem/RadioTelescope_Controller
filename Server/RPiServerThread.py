@@ -6,6 +6,7 @@ import logData
 class RPiServerThread(QtCore.QThread):
     # Create the signals to be used for data handling
     conStatSigR = QtCore.pyqtSignal(str, name='conRPiStat')  # Raspberry pi connection indicator
+    dataRxFromServ = QtCore.pyqtSignal(str, name='rpiServDataRx')
     #dataShowSig = QtCore.pyqtSignal(float, float, name='dataStellShow')  # Coordinates show in the GUI
     #sendClientConn = QtCore.pyqtSignal(list, name='clientCommandSendStell')  # Send the command to the radio telescope
 
@@ -43,10 +44,8 @@ class RPiServerThread(QtCore.QThread):
 
                 # If we receive zero length data, then that means the connection is broken
                 if len(recData) != 0:
-                    recData = self.dataHandle.decodeStell(recData)
-                    self.dataShowSig.emit(recData[0], recData[1])  # Send the data to be shown on the GUI widget
-                    self.sendClientConn.emit(recData)  # Emit the signal to send the data to the raspberry pi
-                else:
+                    self.dataRxFromServ.emit(recData.decode('utf-8'))
+                elif not self.stopExec:
                     self.tcp.releaseClient()  # Close all sockets since client is gone
                     self.clinetDiscon = True  # Tell that the client has disconnected
                     self.stopExec = False  # Continue in the loop since quit is not yet called
@@ -56,6 +55,7 @@ class RPiServerThread(QtCore.QThread):
         self.clinetDiscon = True  # Indicate a disconnected client
         self.tcp.releaseClient()  # Whenever this function is called we need to close the connection
         self.conStatSigR.emit("Disconnected")  # Send the signal to indicate disconnection
+        self.exit(0)
 
     def connectButtonRPi(self):
         if self.isRunning():
