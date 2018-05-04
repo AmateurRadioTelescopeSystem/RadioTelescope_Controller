@@ -6,11 +6,18 @@ class ClientThread(QtCore.QObject):
     conStatSigC = QtCore.pyqtSignal(str, name='conClientStat')  # Connection indication signal
     dataRcvSigC = QtCore.pyqtSignal(str, name='dataClientRX')  # Send the received data out
     sendData = QtCore.pyqtSignal(str, name='sendDataClient')  # Data to be sent to the server
+    reConnectSigC = QtCore.pyqtSignal(name='reConnectClient')  # A reconnection signal originating from a button press
 
     def __init__(self, cfgData, parent=None):
         super(ClientThread, self).__init__(parent)  # Get the parent of the class
         self.cfgData = cfgData  # Create a variable for the cfg file
 
+    def start(self):
+        self.reConnectSigC.connect(self.connect)  # Do the reconnect signal connection
+        self.connect()  # Start a connection
+
+    # The connect function is called if the signal is fired or in the start of the thread
+    @QtCore.pyqtSlot(name='reConnectClient')
     def connect(self):
         # Get the host and port from the settings file for the client connection
         host = self.cfgData.getHost()
@@ -42,8 +49,9 @@ class ClientThread(QtCore.QObject):
 
     @QtCore.pyqtSlot(str, name='sendDataClient')
     def send(self, data: str):
-        self.sock.write(data.encode('utf-8'))
-        self.sock.waitForBytesWritten()
+        if self.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
+            self.sock.write(data.encode('utf-8'))
+            self.sock.waitForBytesWritten()
 
     # This method is called when the thread exits
     def close(self):
