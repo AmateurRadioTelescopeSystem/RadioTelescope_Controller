@@ -24,23 +24,21 @@ class ClientThread(QtCore.QObject):
 
         self.conStatSigC.emit("Connecting")  # Indicate that we are attempting a connection
         self.sock.connectToHost(QtNetwork.QHostAddress(host), int(port))  # Attempt to connect to the server
-        self.sock.waitForConnected()  # Wait a bit until connected
 
-        if self.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
+        if self.sock.waitForConnected(msecs=3000):  # Wait a until connected (the function is waiting for 3 sec)
             self.conStatSigC.emit("Connected")  # If we have a connection send the signal
-        elif self.sock.state() == QtNetwork.QAbstractSocket.UnconnectedState:
+        else:
             self.conStatSigC.emit("Disconnected")
 
     def _receive(self):
         if self.sock.bytesAvailable() > 0:
             string = self.sock.readAll().data()  # Get the data from the received QByteArray object
             self.dataRcvSigC.emit(string.decode('utf-8'))  # Decode the data to a string
-            print(string.decode('utf-8'))
-            print("We listened")
 
     def _stateChange(self):
         if self.sock.state() == QtNetwork.QAbstractSocket.UnconnectedState:
             self.conStatSigC.emit("Disconnected")
+            self.sock.waitForConnected(msecs=3000)
 
     @QtCore.pyqtSlot(str, name='sendDataClient')
     def send(self, data: str):
