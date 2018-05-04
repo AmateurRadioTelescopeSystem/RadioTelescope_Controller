@@ -1,41 +1,55 @@
-from PyQt5 import QtCore
-from Client import TCPClient
+from PyQt5 import QtCore, QtNetwork
 
 
-class ClientThread(QtCore.QThread):
+class ClientThread(QtCore.QObject):
     # Create the signals to be used for data handling
-    conStatSig = QtCore.pyqtSignal(str, name='conClientStat')  # Connection indication signal
+    conStatSigC = QtCore.pyqtSignal(str, name='conClientStat')  # Connection indication signal
     dataRcvSigC = QtCore.pyqtSignal(str, name='dataClientRX')  # Send the received data out
+    sendData = QtCore.pyqtSignal(str, name='sendDataClient')  # Data to be sent to the server
 
-    def __init__(self, cfgData, ui, parent = None):
+    def __init__(self, cfgData, parent=None):
         super(ClientThread, self).__init__(parent)  # Get the parent of the class
-        self.tcp = TCPClient.TCPClient(cfgData, ui)  # TCP handling object
+        self.cfgData = cfgData  # Create a variable for the cfg file
 
-    def run(self):
-        if not self.tcp.sock_exst:
-            # Indicate that we are waiting for a connection once we start the program
-            self.conStatSig.emit("Connecting")  # Send the signal to indicate that we are waiting for connection
-            self.tcp.connect()  # Try to connect to the server
+    def connect(self):
+        # Get the host and port from the settings file for the client connection
+        host = self.cfgData.getHost()
+        port = self.cfgData.getPort()
 
-            if self.tcp.sock_connected:
-                # If we have a connection, then we proceed and indicate that to the user
-                self.conStatSig.emit("Connected")  # Send the signal to indicate connection
-        elif not self.tcp.stopExec and self.tcp.sock_exst and self.tcp.threadSendReq and self.tcp.sock_connected:
-            recData = self.tcp.sendRequest(self.tcp.threadData)  # Send the request to the server
-            self.tcp.threadSendReq = False  # Reset the data reception flag
+        self.sock = QtNetwork.QTcpSocket()  # Create the TCP socket
+        self.sock.readyRead.connect(self._receive)  # Data que signal
+        self.sock.stateChanged.connect(self._stateChange)  # If there is state change then call the function
 
-            # If we receive zero length data, then that means the connection is broken
-            if len(recData) != 0:
-                self.dataRcvSigC.emit(recData)  # Send the data to be shown on the GUI widget
-        elif self.tcp.stopExec:
-            self.tcp.stopExec = False  # Reset the stopping flag
-            self.tcp.closeConnection()  # Close all sockets since client is gone
-            self.conStatSig.emit("Disconnected")  # Send the signal to indicate disconnectionS
+        self.sendData.connect(self.send)  # Send the data to the server when this signal is fired
 
-    def connectButtonR(self):
-        if self.tcp.sock_exst or self.tcp.sock_connected:
-            self.tcp.stopExec = True  # If there is currently a socket, then the call is to terminate it
-        else:
-            self.tcp.stopExec = False  # If there is no socket, then the call is for its creation
-        if not self.isRunning():
-            self.start()  # Start the thread with the current conditions
+        self.conStatSigC.emit("Connecting")  # Indicate that we are attempting a connection
+        self.sock.connectToHost(QtNetwork.QHostAddress(host), int(port))  # Attempt to connect to the server
+        self.sock.waitForConnected()  # Wait a bit until connected
+
+        if self.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
+            self.conStatSigC.emit("Connected")  # If we have a connection send the signal
+        elif self.sock.state() == QtNetwork.QAbstractSocket.UnconnectedState:
+            self.conStatSigC.emit("Disconnected")
+
+    def _receive(self):
+        if self.sock.bytesAvailable() > 0:
+            string = self.sock.readAll().data()  # Get the data from the received QByteArray object
+            self.dataRcvSigC.emit(string.decode('utf-8'))  # Decode the data to a string
+            print(string.decode('utf-8'))
+            print("We listened")
+
+    def _stateChange(self):
+        if self.sock.state() == QtNetwork.QAbstractSocket.UnconnectedState:
+            self.conStatSigC.emit("Disconnected")
+
+    @QtCore.pyqtSlot(str, name='sendDataClient')
+    def send(self, data: str):
+        self.sock.write(data.encode('utf-8'))
+        self.sock.waitForBytesWritten()
+
+    # This method is called when the thread exits
+    def close(self):
+        self.sock.disconnectFromHost()
+        self.sock.waitForDisconnected()
+        if self.sock.state() == QtNetwork.QAbstractSocket.UnconnectedState:
+            self.conStatSigC.emit("Disconnected")

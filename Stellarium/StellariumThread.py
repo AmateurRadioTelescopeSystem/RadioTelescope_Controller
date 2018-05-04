@@ -1,64 +1,70 @@
 from Stellarium import StellariumDataHandling
-from Stellarium import TCPServerStellarium
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtNetwork
 import logData
 
 
-class StellThread(QtCore.QThread):
+class StellThread(QtCore.QObject):
     # Create the signals to be used for data handling
-    conStatSig = QtCore.pyqtSignal(str, name='conStellStat')  # Stellarium connection status indication signal
-    dataShowSig = QtCore.pyqtSignal(float, float, name='dataStellShow')  # Coordinates show in the GUI
-    sendClientConn = QtCore.pyqtSignal(list, name='clientCommandSendStell')  # Send the command to the radio telescope
+    conStatSigS = QtCore.pyqtSignal(str, name='conStellStat')  # Stellarium connection status indication signal
+    dataShowSigS = QtCore.pyqtSignal(float, float, name='dataStellShow')  # Coordinates show in the GUI
+    sendClientConn = QtCore.pyqtSignal(float, float, name='clientCommandSendStell')  # Send the command to the radio telescope
 
     def __init__(self, cfgData, parent = None):
         super(StellThread, self).__init__(parent)  # Get the parent of the class
-        self.tcp = TCPServerStellarium.TCPStellarium(cfgData)  # TCP handling object
+        self.cfgData = cfgData  # Settings file object
         self.dataHandle = StellariumDataHandling.StellariumData()  # Data conversion object
         self.logD = logData.logData(__name__)  # Create the logger
 
-        self.clinetDiscon = True  # Client disconnection indicator
-        self.stopExec = False  # Stop thread execution indicator
+    def start(self):
+        # Get the saved data from the settings file
+        self.host = self.cfgData.getStellHost()  # Get the TCP connection host
+        self.port = self.cfgData.getStellPort()  # Get the TCP connection port
 
-    def run(self):
-        self.stopExec = False  # Initialize it in every thread run to avoid problems
-        while not self.stopExec:
-            if self.clinetDiscon:
-                # Indicate that we are waiting for a connection once we start the program
-                self.conStatSig.emit("Waiting")  # Send the signal to indicate that we are waiting for connection
+        self.tcpServer = QtNetwork.QTcpServer()  # Create a server object
+        self.tcpServer.newConnection.connect(self.new_connection)  # Handler for a new connection
 
-                self.tcp.acceptConnection()  # Wait for a connection to come
-                if self.stopExec:
-                    break  # Exit immediately after request
+        self.tcpServer.listen(QtNetwork.QHostAddress(self.host), int(self.port))  # Start listening for connections
+        self.conStatSigS.emit("Waiting")  # Indicate that the server is listening on the GUI
 
-                # If we have a connection, then we proceed and indicate that to the user
-                self.clinetDiscon = False  # If we reach this point, then we have a connected client
-                self.conStatSig.emit("Connected")  # Send the signal to indicate connection
+    def new_connection(self):
+        if self.tcpServer.hasPendingConnections():
+            self.socket = self.tcpServer.nextPendingConnection()  # Returns a new QTcpSocket
 
-            elif not self.stopExec:
-                # Handle the possible exceptions, to avoid app crash
-                recData = self.tcp.receive()  # Start receiving the data from the client
+            if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
+                self.conStatSigS.emit("Connected")  # Indicate that the server has a connection on the GUI
+                self.socket.readyRead.connect(self._receive)
+                self.socket.stateChanged.connect(self._stateChange)  # Execute the appropriate code on state change
+                self.tcpServer.close()  # Stop listening for other connections
 
-                # If we receive zero length data, then that means the connection is broken
-                if len(recData) != 0:
-                    recData = self.dataHandle.decodeStell(recData)
-                    self.dataShowSig.emit(recData[0], recData[1])  # Send the data to be shown on the GUI widget
-                    self.sendClientConn.emit(recData)  # Emit the signal to send the data to the raspberry pi
-                elif not self.stopExec:
-                    self.tcp.releaseClient()  # Close all sockets since client is gone
-                    self.clinetDiscon = True  # Tell that the client has disconnected
-                    self.stopExec = False  # Continue in the loop since quit is not yet called
+    def _receive(self):
+        try:
+            if self.socket.bytesAvailable() > 0:
+                recData = self.socket.readAll()  # Get the data sa a binary array
+                recData = self.dataHandle.decodeStell(recData)  # Decode the Stellarium data to get coordinates
+                self.dataShowSigS.emit(recData[0], recData[1])  # Send the data to be shown on the GUI widget
+                self.sendClientConn.emit(recData)  # Emit the signal to send the data to the raspberry pi
+        except Exception:
+            # If data is sent fast, then an exception will occur
+            self.logD.log("EXCEPT", "Some problem occurred while receiving Stellarium data. See traceback.", "_receive")
 
-    def quit(self):
-        self.clinetDiscon = True  # Indicate a disconnected client
-        self.stopExec = True
-        self.tcp.releaseClient()  # Whenever this function is called we need to close the connection
-        self.conStatSig.emit("Disconnected")  # Send the signal to indicate disconnection
-        self.exit(0)
+    def _stateChange(self):
+        # Do the following if the connection is lost
+        if self.socket.state() == QtNetwork.QAbstractSocket.UnconnectedState:
+            self.conStatSigS.emit("Waiting")  # Indicate that the server does not have a connection on the GUI
+            self.tcpServer.listen(QtNetwork.QHostAddress(self.host), int(self.port))  # Start listening again
 
-    def connectButton(self):
-        if self.isRunning():
-            self.quit()  # Quit the currently running thread
-            self.logD.log("INFO", "The thread for the server was closed", "connectButton")
-        else:
-            self.logD.log("INFO", "Started a thread for the server", "connectButton")
-            self.start()  # Initiate the server to its thread
+    @QtCore.pyqtSlot(float, float, name='clientCommandSendStell')
+    def send(self, ra: float, dec: float):
+        try:
+            self.socket.write(self.dataHandle.encodeStell(ra, dec))  # Send data back to Stellarium
+            self.socket.waitForBytesWritten()  # Wait for the data to be written
+        except Exception as e:
+            print("Stellarium send client issue")
+            print(e)
+
+    # This method is called when the thread exits
+    def close(self):
+        self.socket.close()  # Close the underlying TCP socket
+        self.tcpServer.close()  # Close the TCP server
+        self.conStatSigSC.emit("Disconnected")  # Indicate disconnection on the GUI
+

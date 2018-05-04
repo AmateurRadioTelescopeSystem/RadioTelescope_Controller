@@ -632,7 +632,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                                                   "color:#ff0000;\">Disconnected</span></p></body></html>")
 
     # Signal handler to show the status of the RPi server on the GUI
-    @QtCore.pyqtSlot(str)
+    @QtCore.pyqtSlot(str, name='conRPiStat')
     def rpiTCPGUIHandle(self, data: str):
         if data == "Waiting":
             self.serverRPiConnBtn.setText("Stop")  # Change user's selection
@@ -649,6 +649,34 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
                                           "color:#ff0000;\">Disconnected</span></p></body></html>")
 
+    @QtCore.pyqtSlot(str)
+    def signalTestrt(self, data:str):
+        print("We are from the signal fire")
+        print(data)
+
+    def connectButtonR(self, thread=None):
+        if thread.isRunning() and (self.connectRadioTBtn.text() == "Disconnect" or self.connectRadioTBtn.text() == "Stop"):
+            thread.quit()  # Disconnect from the client
+        elif not thread.isRunning:
+            thread.start()  # Attempt a connection with the client
+        else:
+            # If the thread is running and it is not yet connected, attempt a reconnection
+            thread.quit()
+            thread.wait()
+            thread.start()
+
+    def connectButtonS(self, thread=None):
+        if thread.isRunning() and (self.connectStellariumBtn.text() == "Disconnect" or self.connectStellariumBtn.text() == "Stop"):
+            thread.quit()  # Quit the currently running thread
+            self.logD.log("INFO", "The thread for the server was closed", "connectButton")
+        elif not thread.isRunning:
+            thread.start()  # Attempt a connection with the client
+        else:
+            # If the thread is running and it is not yet connected, attempt a reconnection
+            thread.quit()
+            thread.wait()
+            thread.start()
+
     # Show the main GUI
     def show_application(self):
         self.mainWin.show()
@@ -660,8 +688,3 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             QtCore.QCoreApplication.instance().quit()  # If user selects "Yes", then exit from the application
         else:
             pass  # If user selects "No" then do not exit
-
-    @QtCore.pyqtSlot(str)
-    def signalTestrt(self, data:str):
-        print("We are from the signal fire")
-        print(data)
