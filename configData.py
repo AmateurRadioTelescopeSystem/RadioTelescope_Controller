@@ -80,7 +80,7 @@ class confData(object):
         self.root.find("TCP").set("autoconnect", "no")
         self.tree.write(self.filename)
 
-    # TCP server data
+    # TCP Stellarium server data
     def getStellHost(self):
         return self.getConfig("TCPStell", "host")
 
@@ -104,6 +104,20 @@ class confData(object):
         self.root.find("TCPStell").set("autoconnect", "no")
         self.tree.write(self.filename)
 
+    # TCP RPi server data (Auto-connection is dependant on the client)
+    def getRPiHost(self):
+        return self.getConfig("TCPRPiServ", "host")
+
+    def setRPiHost(self, host):
+        self.setConfig("TCPRPiServ", "host", host)
+
+    def getRPiPort(self):
+        return self.getConfig("TCPRPiServ", "port")
+
+    def setRPiPort(self, port):
+        self.setConfig("TCPRPiServ", "port", str(port))
+
+    # Get the currently saved object
     def getObject(self):
         stat_obj = self.root.find("object").get("stationary")
         if stat_obj == "no":
