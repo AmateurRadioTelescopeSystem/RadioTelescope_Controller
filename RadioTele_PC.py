@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.5
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from functools import partial
 from GUI_Windows import UInterface
 from Stellarium import StellariumThread
@@ -15,6 +15,8 @@ logdata = logData.logData(__name__)  # Create the logger for the program
 
 
 def main():
+    QtCore.QThreadPool.globalInstance().setMaxThreadCount(8)  # Set the global thread pool count
+
     app = QtWidgets.QApplication(sys.argv)  # Create a Qt application instance
     ui = UInterface.Ui_RadioTelescopeControl()  # Instantiate the class object for the main window GUI
 
@@ -29,6 +31,7 @@ def main():
     # Initialize the TCP client thread first, since it is used below
     tcpClienThread = ClientThread.ClientThread(cfgData, ui)
     tcpClienThread.conStatSig.connect(ui.clientTCPGUIHandle)  # Connect the signal to the corresponding function
+    tcpClienThread.dataRcvSigC.connect(ui.signalTestrt)
 
     # TCP server for the RPi initialization
     tcpServerThread = RPiServerThread.RPiServerThread(cfgData)
