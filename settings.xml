@@ -1,0 +1,20 @@
+<settings>
+    <location updated="no">
+        <altitude>50</altitude>
+        <latitude>40.6436100</latitude>
+        <longitude>22.9308600</longitude>
+    </location>
+    <TCP autoconnect="yes" updated="no">
+        <host>127.0.0.1</host>
+        <port>10001</port>
+    </TCP>
+    <TCPStell autoconnect="yes" updated="no">
+        <host>127.0.0.1</host>
+        <port>10002</port>
+    </TCPStell>
+    <object stationary="yes">
+        <name>Crab Nebula</name>
+        <RA>83.63308333</RA>
+        <DEC>22.0145</DEC>
+    </object>
+</settings>

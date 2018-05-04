@@ -213,7 +213,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # XML settings files
-settings.xml
+#settings.xml
 
 # Exclude LOG files
 *.log
