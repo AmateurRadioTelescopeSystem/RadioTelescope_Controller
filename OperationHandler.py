@@ -23,13 +23,11 @@ class OpHandler(QtCore.QObject):
             if thread.isRunning() and \
                     (self.ui.connectRadioTBtn.text() == "Disconnect" or self.ui.connectRadioTBtn.text() == "Stop"):
                 thread.quit()  # Disconnect from the client
-            elif not thread.isRunning:
+            elif not thread.isRunning():
                 thread.start()  # Attempt a connection with the client
             else:
                 # If the thread is running and it is not yet connected, attempt a reconnection
-                thread.quit()
-                thread.wait()
-                thread.start()
+                self.tcpClient.reConnectSigC.emit()
 
     # Stellarium server connection handling method
     def connectButtonS(self, thread=None):
@@ -38,13 +36,11 @@ class OpHandler(QtCore.QObject):
                     (self.ui.connectStellariumBtn.text() == "Disable" or self.ui.connectStellariumBtn.text() == "Stop"):
                 thread.quit()  # Quit the currently running thread
                 self.logD.log("INFO", "The thread for the server was closed", "connectButtonS")
-            elif not thread.isRunning:
+            elif not thread.isRunning():
                 thread.start()  # Attempt a connection with the client
             else:
                 # If the thread is running and it is not yet connected, attempt a reconnection
-                thread.quit()
-                thread.wait()
-                thread.start()
+                self.tcpStellarium.reConnectSigS.emit()
 
     # RPi server connection handling method
     def connectButtonRPi(self, thread=None):
@@ -53,13 +49,12 @@ class OpHandler(QtCore.QObject):
                     (self.ui.serverRPiConnBtn.text() == "Disable" or self.ui.serverRPiConnBtn.text() == "Stop"):
                 thread.quit()  # Quit the currently running thread
                 self.logD.log("INFO", "The thread for the server was closed", "connectButtonRPi")
-            elif not thread.isRunning:
+            elif not thread.isRunning():
                 thread.start()  # Attempt a connection with the client
             else:
                 # If the thread is running and it is not yet connected, attempt a reconnection
-                thread.quit()
-                thread.wait()
-                thread.start()
+                print("Not doing it")
+                self.tcpServer.reConnectSigR.emit()
 
     # Dta received from the client connected to the RPi server
     @QtCore.pyqtSlot(str, name='dataClientRX')
