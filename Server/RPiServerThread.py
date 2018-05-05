@@ -67,6 +67,7 @@ class RPiServerThread(QtCore.QObject):
     def _disconnected(self):
         # Do the following if the connection is lost
         self.conStatSigR.emit("Waiting")  # Indicate that the server does not have a connection on the GUI
+        self.socket.readyRead.disconnect()  # Disconnect the signal to avoid double firing
         self.tcpServer.listen(self.host, int(self.port))  # Start listening again
 
     ''''@QtCore.pyqtSlot(float, float, name='clientCommandSendStell')

@@ -63,6 +63,7 @@ class StellThread(QtCore.QObject):
     def _disconnected(self):
         # Do the following if the connection is lost
         self.conStatSigS.emit("Waiting")  # Indicate that the server does not have a connection on the GUI
+        self.socket.readyRead.diconnect()  # Close the signal since it not needed
         self.tcpServer.listen(QtNetwork.QHostAddress(self.host), int(self.port))  # Start listening again
 
     # Thsi method is called whenever the signal to send data back is fired
