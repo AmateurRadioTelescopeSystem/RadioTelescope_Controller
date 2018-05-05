@@ -11,10 +11,10 @@ import os, sys
 
 
 class Ui_RadioTelescopeControl(QtCore.QObject):
-    stopMovingRTSig = QtCore.pyqtSignal(name='stopRadioTele')
+    stopMovingRTSig = QtCore.pyqtSignal(name='stopRadioTele')  # Signal to stop dish's motion
 
-    def __init__(self):
-        super(Ui_RadioTelescopeControl, self).__init__()
+    def __init__(self, parent=None):
+        super(Ui_RadioTelescopeControl, self).__init__(parent)
         # Create all other windows, except from the main one
         self.uiTCP = TCPSettings.Ui_TCPSettings()  # Create the TCP settings pop-up window
         self.uiManCont = ManualControl.Ui_ManualControl()  # Create the manual control pop-up window
@@ -572,7 +572,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     # Handle the motion stop request
     def stopMotion(self, objec):
         choice = QtWidgets.QMessageBox.warning(objec, 'Stop Radio telescope', "Stop the currently moving dish?",
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                                        QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
         if choice == QtWidgets.QMessageBox.Yes:
             self.stopMovingRTSig.emit()
         else:
@@ -658,9 +658,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     # Ask before exiting the GUI
     def close_application(self, objec):
         choice = QtWidgets.QMessageBox.question(objec, 'Exit', "Are you sure?",
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                                        QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
         if choice == QtWidgets.QMessageBox.Yes:
-            QtCore.QCoreApplication.instance().quit()  # If user selects "Yes", then exit from the application
-            sys.exit(0)  # Successful exit indication
+            QtCore.QCoreApplication.quit()  # If user selects "Yes", then exit from the application
         else:
             pass  # If user selects "No" then do not exit

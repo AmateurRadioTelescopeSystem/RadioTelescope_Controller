@@ -72,7 +72,7 @@ class StellThread(QtCore.QObject):
         try:
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
                 self.socket.write(self.dataHandle.encodeStell(ra, dec))  # Send data back to Stellarium
-                print(self.dataHandle.encodeStell(ra, dec))
+                print(self.dataHandle.encodeStell(ra, dec))  # Debugging print
                 self.socket.waitForBytesWritten()  # Wait for the data to be written
         except Exception:
             self.logD.log("EXCEPT", "Problem sending data to Stellarium. See traceback.", "_receive")
