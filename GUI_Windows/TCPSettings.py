@@ -13,7 +13,7 @@ class Ui_TCPSettings(object):
         self.setupUi(self.tcpWindow)
 
     def setupUi(self, TCPSettings):
-        TCPSettings.setWindowIcon(QtGui.QIcon('GUI_Windows/Net.png'))
+        TCPSettings.setWindowIcon(QtGui.QIcon('Icons/Net.png'))
         TCPSettings.setObjectName("TCPSettings")
         TCPSettings.setWindowModality(QtCore.Qt.ApplicationModal)
         TCPSettings.resize(282, 348)
@@ -44,7 +44,7 @@ class Ui_TCPSettings(object):
         self.statusbar.setObjectName("statusbar")
         TCPSettings.setStatusBar(self.statusbar)
         
-        extractAction = QtWidgets.QAction(QtGui.QIcon('GUI_Windows/TCP.png'), 'Python', TCPSettings)
+        extractAction = QtWidgets.QAction(QtGui.QIcon('Icons/TCP.png'), 'Python', TCPSettings)
 
         self.toolBar = QtWidgets.QToolBar(TCPSettings)
         self.toolBar.setEnabled(True)
