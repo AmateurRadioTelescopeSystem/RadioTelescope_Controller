@@ -77,11 +77,11 @@ class OpHandler(QtCore.QObject):
     # Received data from the server that the RPi is connected as a client. Signal is (dataRxFromServ)
     @QtCore.pyqtSlot(str, name='rpiServDataRx')
     def rpiServRcvData(self, data: str):
-        spltData = data.split("_")
+        spltData = data.split("_")  # Split the string with the set delimiter
         if spltData[0] == "DISHPOS":
-            ra = spltData[2]
-            dec = spltData[4]
-            self.tcpStellarium.sendDataStell.emit(float(ra), float(dec))
+            ra = spltData[2]  # Get the RA from the received position
+            dec = spltData[4]  # Get the DEC from the received position
+            self.tcpStellarium.sendDataStell.emit(float(ra), float(dec))  # Send the data to Stellarium
 
     # Command to stop any motion of the radio telescope dish
     @QtCore.pyqtSlot(name='stopRadioTele')
@@ -90,11 +90,20 @@ class OpHandler(QtCore.QObject):
 
     # This function is called whenever the app is about to quit
     def appExitRequest(self):
+        # First quit from the thread and then delete both the thread and the corresponding object
+        # Quit exits the thread and then wait is waiting for the thread exit
+        # deleteLater, deletes the thread object and the threaded object
         self.tcpClThread.quit()
         self.tcpClThread.wait()
+        self.tcpClient.deleteLater()
+        self.tcpClThread.deleteLater()
 
         self.tcpServThread.quit()
         self.tcpServThread.wait()
+        self.tcpServer.deleteLater()
+        self.tcpServThread.deleteLater()
 
         self.tcpStelThread.quit()
         self.tcpStelThread.wait()
+        self.tcpStellarium.deleteLater()
+        self.tcpStelThread.deleteLater()

@@ -7,7 +7,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
 from GUI_Windows import TCPSettings
 from GUI_Windows import ManualControl
-import os, sys
+import sys
 
 
 class Ui_RadioTelescopeControl(QtCore.QObject):
@@ -33,10 +33,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
         # Set the font according to the OS
         font = QtGui.QFont()
-        if os.name == 'nt':
-            font.setFamily("Segoe UI")
-        else:
-            font.setFamily("Ubuntu")
+        if sys.platform.startswith('linux'):
+            font.setFamily("Ubuntu")  # Set the font for Ubuntu/linux
+        elif sys.platform.startswith('win32'):
+            font.setFamily("Segoe UI")  # Set the font for Windows
 
         RadioTelescopeControl.setFont(font)
         self.centralwidget = QtWidgets.QWidget(RadioTelescopeControl)
@@ -119,6 +119,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.clientRPiEnableLabel.sizePolicy().hasHeightForWidth())
         self.clientRPiEnableLabel.setSizePolicy(sizePolicy)
+        self.clientRPiEnableLabel.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.clientRPiEnableLabel.setObjectName("clientRPiEnableLabel")
         self.verticalLayout.addWidget(self.clientRPiEnableLabel)
         self.connectRadioTBtn = QtWidgets.QPushButton(self.frame_2)
@@ -128,6 +129,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.connectRadioTBtn.sizePolicy().hasHeightForWidth())
         self.connectRadioTBtn.setSizePolicy(sizePolicy)
+        self.connectRadioTBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.connectRadioTBtn.setAutoDefault(False)
         self.connectRadioTBtn.setDefault(False)
         self.connectRadioTBtn.setFlat(False)
@@ -137,6 +139,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.serverRPiEnableLabel = QtWidgets.QCheckBox(self.frame_2)
+        self.serverRPiEnableLabel.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.serverRPiEnableLabel.setObjectName("serverRPiEnableLabel")
         self.verticalLayout_2.addWidget(self.serverRPiEnableLabel)
         self.serverRPiConnBtn = QtWidgets.QPushButton(self.frame_2)
@@ -146,6 +149,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.serverRPiConnBtn.sizePolicy().hasHeightForWidth())
         self.serverRPiConnBtn.setSizePolicy(sizePolicy)
+        self.serverRPiConnBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.serverRPiConnBtn.setObjectName("serverRPiConnBtn")
         self.verticalLayout_2.addWidget(self.serverRPiConnBtn)
         self.formLayout_2.setLayout(8, QtWidgets.QFormLayout.FieldRole, self.verticalLayout_2)
@@ -200,6 +204,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.horizontalLayout_10 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_10.setObjectName("horizontalLayout_10")
         self.tcpStelServChkBox = QtWidgets.QCheckBox(self.stackedWidgetPage1)
+        self.tcpStelServChkBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.tcpStelServChkBox.setText("")
         self.tcpStelServChkBox.setObjectName("tcpStelServChkBox")
         self.horizontalLayout_10.addWidget(self.tcpStelServChkBox)
@@ -210,6 +215,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.formLayout.setLayout(5, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_10)
         self.connectStellariumBtn = QtWidgets.QPushButton(self.stackedWidgetPage1)
         self.connectStellariumBtn.setEnabled(False)
+        self.connectStellariumBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.connectStellariumBtn.setAcceptDrops(False)
         self.connectStellariumBtn.setCheckable(False)
         self.connectStellariumBtn.setObjectName("connectStellariumBtn")
@@ -225,6 +231,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.stellNextPageBtn.sizePolicy().hasHeightForWidth())
         self.stellNextPageBtn.setSizePolicy(sizePolicy)
+        self.stellNextPageBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.stellNextPageBtn.setAutoRaise(True)
         self.stellNextPageBtn.setArrowType(QtCore.Qt.RightArrow)
         self.stellNextPageBtn.setObjectName("stellNextPageBtn")
@@ -277,6 +284,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.stellPrevPageBtn.sizePolicy().hasHeightForWidth())
         self.stellPrevPageBtn.setSizePolicy(sizePolicy)
+        self.stellPrevPageBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.stellPrevPageBtn.setAutoRaise(True)
         self.stellPrevPageBtn.setArrowType(QtCore.Qt.LeftArrow)
         self.stellPrevPageBtn.setObjectName("stellPrevPageBtn")
@@ -317,6 +325,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.horizontalLayout_5.addWidget(self.altTextInd)
         self.formLayout_3.setLayout(2, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_5)
         self.locatChangeBtn = QtWidgets.QPushButton(self.groupBox_3)
+        self.locatChangeBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.locatChangeBtn.setObjectName("locatChangeBtn")
         self.formLayout_3.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.locatChangeBtn)
         spacerItem5 = QtWidgets.QSpacerItem(40, 10, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -330,6 +339,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.label_8.setObjectName("label_8")
         self.formLayout_4.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_8)
         self.stopMovingBtn = QtWidgets.QPushButton(self.groupBox_4)
+        self.stopMovingBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.stopMovingBtn.setObjectName("stopMovingBtn")
         self.formLayout_4.setWidget(6, QtWidgets.QFormLayout.LabelRole, self.stopMovingBtn)
         self.onTargetProgress = QtWidgets.QProgressBar(self.groupBox_4)

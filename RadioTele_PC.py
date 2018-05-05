@@ -39,8 +39,6 @@ def main():
     # Connect the thread action signals
     tcpStellThread.started.connect(tcpStell.start)  # Run the start code for the thread, once it starts
     tcpStellThread.finished.connect(tcpStell.close)  # Run the stop code when a quit is requested
-    tcpStellThread.finished.connect(tcpStell.deleteLater)
-    tcpStellThread.finished.connect(tcpStellThread.deleteLater)
 
     # RPi communications
     # TCP server for the RPi initialization
@@ -53,8 +51,6 @@ def main():
     # Connect the thread action signals
     tcpServerThread.started.connect(tcpServer.start)  # What to do upon thread start
     tcpServerThread.finished.connect(tcpServer.close)  # What to do upon thread exit
-    tcpServerThread.finished.connect(tcpServer.deleteLater)
-    tcpServerThread.finished.connect(tcpServerThread.deleteLater)  # Wait until the run returns from the thread
 
     # Initialize the TCP client thread
     tcpClientThread = QtCore.QThread()  # Create a thread for the TCP client
@@ -65,8 +61,6 @@ def main():
     # Connect the thread action signals
     tcpClientThread.started.connect(tcpClient.start)  # Connect with this function upon thread start
     tcpClientThread.finished.connect(tcpClient.close)  # Connect with thsi function upon thread exit
-    tcpClientThread.finished.connect(tcpClient.deleteLater)
-    tcpClientThread.finished.connect(tcpClientThread.deleteLater)  # Wait until the run returns from the thread
 
     # Initialize the operation handler
     operHandlerThread = QtCore.QThread()  # Create a thread for the operation handler
