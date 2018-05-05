@@ -1,13 +1,19 @@
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 import logData
 
 
 class OpHandler(QtCore.QObject):
-    def __init__(self, tcpClient, tcpServer, tcpStellarium, ui, parent=None):
+    def __init__(self, tcpClient, tcpServer, tcpStellarium, tcpClThread, tcpServThread, tcpStelThread, ui, parent=None):
         super(OpHandler, self).__init__(parent)
         self.tcpClient = tcpClient  # TCP client object
         self.tcpServer = tcpServer  # TCP RPi server object
         self.tcpStellarium = tcpStellarium  # TCP Stellarium server object
+
+        # Create the thread varaible for the class
+        self.tcpClThread = tcpClThread
+        self.tcpServThread = tcpServThread
+        self.tcpStelThread = tcpStelThread
+
         self.ui = ui  # User interface handling object
         self.logD = logData.logData(__name__)  # Data logger object
 
@@ -18,42 +24,39 @@ class OpHandler(QtCore.QObject):
         self.ui.stopMovingRTSig.connect(self.stopMovingRT)  # Send a motion stop command, once this signal is triggered
 
     # Client connection button handling method
-    def connectButtonR(self, thread=None):
-        if thread is not None:
-            if thread.isRunning() and \
-                    (self.ui.connectRadioTBtn.text() == "Disconnect" or self.ui.connectRadioTBtn.text() == "Stop"):
-                thread.quit()  # Disconnect from the client
-            elif not thread.isRunning():
-                thread.start()  # Attempt a connection with the client
-            else:
-                # If the thread is running and it is not yet connected, attempt a reconnection
-                self.tcpClient.reConnectSigC.emit()
+    def connectButtonR(self):
+        if self.tcpClThread.isRunning() and \
+                (self.ui.connectRadioTBtn.text() == "Disconnect" or self.ui.connectRadioTBtn.text() == "Stop"):
+            self.tcpClThread.quit()  # Disconnect from the client
+        elif not self.tcpClThread.isRunning():
+            self.tcpClThread.start()  # Attempt a connection with the client
+        else:
+            # If the thread is running and it is not yet connected, attempt a reconnection
+            self.tcpClient.reConnectSigC.emit()
 
     # Stellarium server connection handling method
-    def connectButtonS(self, thread=None):
-        if thread is not None:
-            if thread.isRunning() and \
-                    (self.ui.connectStellariumBtn.text() == "Disable" or self.ui.connectStellariumBtn.text() == "Stop"):
-                thread.quit()  # Quit the currently running thread
-                self.logD.log("INFO", "The thread for the server was closed", "connectButtonS")
-            elif not thread.isRunning():
-                thread.start()  # Attempt a connection with the client
-            else:
-                # If the thread is running and it is not yet connected, attempt a reconnection
-                self.tcpStellarium.reConnectSigS.emit()
+    def connectButtonS(self):
+        if self.tcpStelThread.isRunning() and \
+                (self.ui.connectStellariumBtn.text() == "Disable" or self.ui.connectStellariumBtn.text() == "Stop"):
+            self.tcpStelThread.quit()  # Quit the currently running thread
+            self.logD.log("INFO", "The thread for the server was closed", "connectButtonS")
+        elif not self.tcpStelThread.isRunning():
+            self.tcpStelThread.start()  # Attempt a connection with the client
+        else:
+            # If the thread is running and it is not yet connected, attempt a reconnection
+            self.tcpStellarium.reConnectSigS.emit()
 
     # RPi server connection handling method
-    def connectButtonRPi(self, thread=None):
-        if thread is not None:
-            if thread.isRunning() and \
-                    (self.ui.serverRPiConnBtn.text() == "Disable" or self.ui.serverRPiConnBtn.text() == "Stop"):
-                thread.quit()  # Quit the currently running thread
-                self.logD.log("INFO", "The thread for the server was closed", "connectButtonRPi")
-            elif not thread.isRunning():
-                thread.start()  # Attempt a connection with the client
-            else:
-                # If the thread is running and it is not yet connected, attempt a reconnection
-                self.tcpServer.reConnectSigR.emit()
+    def connectButtonRPi(self):
+        if self.tcpServThread.isRunning() and \
+                (self.ui.serverRPiConnBtn.text() == "Disable" or self.ui.serverRPiConnBtn.text() == "Stop"):
+            self.tcpServThread.quit()  # Quit the currently running thread
+            self.logD.log("INFO", "The thread for the server was closed", "connectButtonRPi")
+        elif not self.tcpServThread.isRunning():
+            self.tcpServThread.start()  # Attempt a connection with the client
+        else:
+            # If the thread is running and it is not yet connected, attempt a reconnection
+            self.tcpServer.reConnectSigR.emit()
 
     # Dta received from the client connected to the RPi server
     @QtCore.pyqtSlot(str, name='dataClientRX')
@@ -85,4 +88,13 @@ class OpHandler(QtCore.QObject):
     def stopMovingRT(self):
         self.tcpClient.sendData.emit("STOP")  # Send the request to stop moving to the RPi server
 
+    # This function is called whenever the app is about to quit
+    def appExitRequest(self):
+        self.tcpClThread.quit()
+        self.tcpClThread.wait()
 
+        self.tcpServThread.quit()
+        self.tcpServThread.wait()
+
+        self.tcpStelThread.quit()
+        self.tcpStelThread.wait()
