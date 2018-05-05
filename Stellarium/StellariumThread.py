@@ -44,7 +44,7 @@ class StellThread(QtCore.QObject):
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
                 self.conStatSigS.emit("Connected")  # Indicate that the server has a connection on the GUI
                 self.socket.readyRead.connect(self._receive)  # If there is pending data get it
-                self.socket.stateChanged.connect(self._stateChange)  # Execute the appropriate code on state change
+                self.socket.disconnected.connect(self._disconnected)  # Execute the appropriate code on state change
                 self.tcpServer.close()  # Stop listening for other connections
 
     # Should we have data pending to be received, this method is called
@@ -60,11 +60,10 @@ class StellThread(QtCore.QObject):
             self.logD.log("EXCEPT", "Some problem occurred while receiving Stellarium data. See traceback.", "_receive")
 
     # If at any moment the connection state is changed, we call this method
-    def _stateChange(self):
+    def _disconnected(self):
         # Do the following if the connection is lost
-        if self.socket.state() == QtNetwork.QAbstractSocket.UnconnectedState:
-            self.conStatSigS.emit("Waiting")  # Indicate that the server does not have a connection on the GUI
-            self.tcpServer.listen(QtNetwork.QHostAddress(self.host), int(self.port))  # Start listening again
+        self.conStatSigS.emit("Waiting")  # Indicate that the server does not have a connection on the GUI
+        self.tcpServer.listen(QtNetwork.QHostAddress(self.host), int(self.port))  # Start listening again
 
     # Thsi method is called whenever the signal to send data back is fired
     @QtCore.pyqtSlot(float, float, name='stellariumDataSend')
@@ -72,15 +71,18 @@ class StellThread(QtCore.QObject):
         try:
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
                 self.socket.write(self.dataHandle.encodeStell(ra, dec))  # Send data back to Stellarium
-                print("Sent to stellarium RA=%.5f, DEC=%.5f" %(ra, dec))  # Debugging print
                 self.socket.waitForBytesWritten()  # Wait for the data to be written
+                print("Sent to Stellarium: RA=%.5f, DEC=%.5f" % (ra, dec))  # Debugging print
         except Exception:
             self.logD.log("EXCEPT", "Problem sending data to Stellarium. See traceback.", "_receive")
 
     # This method is called whenever the thread exits
     def close(self):
         if self.socket is not None:
+            self.socket.disconnected.disconnect()  # Close the disconnect signal first to avoid firing
             self.socket.close()  # Close the underlying TCP socket
         self.tcpServer.close()  # Close the TCP server
+        self.sendDataStell.disconnect()  # Detach the signal to avoid any accidental firing (Reconnected at start)
+        self.reConnectSigS.disconnect()  # Not needed any more since we are closing
         self.conStatSigS.emit("Disconnected")  # Indicate disconnection on the GUI
 

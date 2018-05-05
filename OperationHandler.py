@@ -61,8 +61,7 @@ class OpHandler(QtCore.QObject):
     # Dta received from the client connected to the RPi server
     @QtCore.pyqtSlot(str, name='dataClientRX')
     def clientDataRx(self, data: str):
-        print("We are from the signal fire, testing signal in op handle")
-        print(data)
+        print("Data received from client: %s" % data)
 
     # Send the appropriate command according to the selected mode. Data is received from Stellarium (sendClientConn)
     @QtCore.pyqtSlot(list, name='clientCommandSendStell')

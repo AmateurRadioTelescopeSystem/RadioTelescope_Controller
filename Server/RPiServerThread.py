@@ -25,10 +25,20 @@ class RPiServerThread(QtCore.QObject):
         self.host = self.cfgData.getRPiHost()  # Get the TCP connection host
         self.port = self.cfgData.getRPiPort()  # Get the TCP connection port
 
+        if self.host == "localhost":
+            self.host = QtNetwork.QHostAddress.LocalHost
+        else:
+            for ipAddress in QtNetwork.QNetworkInterface.allAddresses():
+                if ipAddress != QtNetwork.QHostAddress.LocalHost and ipAddress.toIPv4Address() != 0:
+                    break
+                else:
+                    ipAddress = QtNetwork.QHostAddress.LocalHost
+            self.host = ipAddress
+
         self.tcpServer = QtNetwork.QTcpServer()  # Create a server object
         self.tcpServer.newConnection.connect(self.new_connection)  # Handler for a new connection
 
-        self.tcpServer.listen(QtNetwork.QHostAddress(self.host), int(self.port))  # Start listening for connections
+        self.tcpServer.listen(self.host, int(self.port))  # Start listening for connections
         self.conStatSigR.emit("Waiting")  # Indicate that the server is listening on the GUI
 
     # Whenever there is new connection, we call this method
@@ -39,7 +49,7 @@ class RPiServerThread(QtCore.QObject):
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
                 self.conStatSigR.emit("Connected")  # Indicate that the server has a connection on the GUI
                 self.socket.readyRead.connect(self._receive)  # If there is pending data get it
-                self.socket.stateChanged.connect(self._stateChange)  # Execute the appropriate code on state change
+                self.socket.disconnected.connect(self._disconnected)  # Execute the appropriate code on state change
                 self.tcpServer.close()  # Stop listening for other connections
 
     # Should we have data pending to be received, this method is called
@@ -54,11 +64,10 @@ class RPiServerThread(QtCore.QObject):
             self.logD.log("EXCEPT", "Some problem occurred while receiving server data. See traceback", "_receive")
 
     # If at any moment the connection state is changed, we call this method
-    def _stateChange(self):
+    def _disconnected(self):
         # Do the following if the connection is lost
-        if self.socket.state() == QtNetwork.QAbstractSocket.UnconnectedState:
-            self.conStatSigR.emit("Waiting")  # Indicate that the server does not have a connection on the GUI
-            self.tcpServer.listen(QtNetwork.QHostAddress(self.host), int(self.port))  # Start listening again
+        self.conStatSigR.emit("Waiting")  # Indicate that the server does not have a connection on the GUI
+        self.tcpServer.listen(self.host, int(self.port))  # Start listening again
 
     ''''@QtCore.pyqtSlot(float, float, name='clientCommandSendStell')
     def send(self, ra: float, dec: float):
@@ -72,7 +81,9 @@ class RPiServerThread(QtCore.QObject):
     # This method is called whenever the thread exits
     def close(self):
         if self.socket is not None:
+            self.socket.disconnected.disconnect()  # Close the disconnect signal first to avoid firing
             self.socket.close()  # Close the underlying TCP socket
         self.tcpServer.close()  # Close the TCP server
+        self.reConnectSigR.disconnect()  # Signal not used after thread exit (Reconnected at thread start)
         self.conStatSigR.emit("Disconnected")  # Indicate disconnection on the GUI
 

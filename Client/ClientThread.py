@@ -25,7 +25,7 @@ class ClientThread(QtCore.QObject):
 
         self.sock = QtNetwork.QTcpSocket()  # Create the TCP socket
         self.sock.readyRead.connect(self._receive)  # Data que signal
-        self.sock.stateChanged.connect(self._stateChange)  # If there is state change then call the function
+        self.sock.disconnected.connect(self._disconnected)  # If there is state change then call the function
 
         self.sendData.connect(self.send)  # Send the data to the server when this signal is fired
 
@@ -42,7 +42,7 @@ class ClientThread(QtCore.QObject):
             string = self.sock.readAll().data()  # Get the data from the received QByteArray object
             self.dataRcvSigC.emit(string.decode('utf-8'))  # Decode the data to a string
 
-    def _stateChange(self):
+    def _disconnected(self):
         if self.sock.state() == QtNetwork.QAbstractSocket.UnconnectedState:
             self.conStatSigC.emit("Disconnected")
             self.sock.waitForConnected(msecs=1000)
@@ -55,9 +55,13 @@ class ClientThread(QtCore.QObject):
 
     # This method is called when the thread exits
     def close(self):
+        self.sock.disconnected.disconnect()  # Disconnect this signal first to avoid getting in the function
         if self.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
             self.sock.disconnectFromHost()  # Disconnect from the host
             self.sock.waitForDisconnected(msecs=1000)  # And wait until disconnected or timeout (default 3 seconds)
         else:
             self.sock.close()  # Close the socket before exiting
+        self.sock.readyRead.disconnect()  # Close the RX buffer
+        self.sendData.disconnect()  # Disconnect the data send signal, since the thread is closing
+        self.reConnectSigC.disconnect()  # Thread is closing so it will not be needed any more
         self.conStatSigC.emit("Disconnected")  # Indicate a disconnected state on the GUI
