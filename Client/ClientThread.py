@@ -32,7 +32,7 @@ class ClientThread(QtCore.QObject):
         self.conStatSigC.emit("Connecting")  # Indicate that we are attempting a connection
         self.sock.connectToHost(QtNetwork.QHostAddress(host), int(port))  # Attempt to connect to the server
 
-        if self.sock.waitForConnected(msecs=3000):  # Wait a until connected (the function is waiting for 3 sec)
+        if self.sock.waitForConnected(msecs=1000):  # Wait a until connected (the function is waiting for 3 sec)
             self.conStatSigC.emit("Connected")  # If we have a connection send the signal
         else:
             self.conStatSigC.emit("Disconnected")
@@ -45,7 +45,7 @@ class ClientThread(QtCore.QObject):
     def _stateChange(self):
         if self.sock.state() == QtNetwork.QAbstractSocket.UnconnectedState:
             self.conStatSigC.emit("Disconnected")
-            self.sock.waitForConnected(msecs=3000)
+            self.sock.waitForConnected(msecs=1000)
 
     @QtCore.pyqtSlot(str, name='sendDataClient')
     def send(self, data: str):
@@ -55,8 +55,9 @@ class ClientThread(QtCore.QObject):
 
     # This method is called when the thread exits
     def close(self):
-        self.sock.disconnectFromHost()  # Disconnect from the host
-        self.sock.waitForDisconnected()  # And wait until disconnected or timeout (default 3 seconds)
-        if self.sock.state() == QtNetwork.QAbstractSocket.UnconnectedState:
+        if self.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
+            self.sock.disconnectFromHost()  # Disconnect from the host
+            self.sock.waitForDisconnected(msecs=1000)  # And wait until disconnected or timeout (default 3 seconds)
+        else:
             self.sock.close()  # Close the socket before exiting
-            self.conStatSigC.emit("Disconnected")  # Indicate a disconnected state on the GUI
+        self.conStatSigC.emit("Disconnected")  # Indicate a disconnected state on the GUI
