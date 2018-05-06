@@ -36,19 +36,20 @@ class RPiServerThread(QtCore.QObject):
             self.host = ipAddress
 
         self.tcpServer = QtNetwork.QTcpServer()  # Create a server object
-        self.tcpServer.newConnection.connect(self.new_connection)  # Handler for a new connection
+        self.tcpServer.newConnection.connect(self._new_connection)  # Handler for a new connection
 
         self.tcpServer.listen(self.host, int(self.port))  # Start listening for connections
         self.conStatSigR.emit("Waiting")  # Indicate that the server is listening on the GUI
 
     # Whenever there is new connection, we call this method
-    def new_connection(self):
+    def _new_connection(self):
         if self.tcpServer.hasPendingConnections():
             self.socket = self.tcpServer.nextPendingConnection()  # Returns a new QTcpSocket
 
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
                 self.conStatSigR.emit("Connected")  # Indicate that the server has a connection on the GUI
                 self.socket.readyRead.connect(self._receive)  # If there is pending data get it
+                self.socket.error.connect(self._error)  # Log any error occurred and also perform the necessary actions
                 self.socket.disconnected.connect(self._disconnected)  # Execute the appropriate code on state change
                 self.tcpServer.close()  # Stop listening for other connections
 
@@ -69,6 +70,11 @@ class RPiServerThread(QtCore.QObject):
         self.conStatSigR.emit("Waiting")  # Indicate that the server does not have a connection on the GUI
         self.socket.readyRead.disconnect()  # Disconnect the signal to avoid double firing
         self.tcpServer.listen(self.host, int(self.port))  # Start listening again
+
+    def _error(self):
+        # Print and log any error occurred
+        print("An error occurred in RPi server: %s" % self.socket.errorString())
+        self.logD.log("WARNING", "Some error occurred in RPi server: %s" % self.socket.errorString(), "_error")
 
     ''''@QtCore.pyqtSlot(float, float, name='clientCommandSendStell')
     def send(self, ra: float, dec: float):

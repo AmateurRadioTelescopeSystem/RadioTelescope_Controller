@@ -29,21 +29,32 @@ class StellThread(QtCore.QObject):
         self.host = self.cfgData.getStellHost()  # Get the TCP connection host
         self.port = self.cfgData.getStellPort()  # Get the TCP connection port
 
+        if self.host == "localhost" or self.host == "127.0.0.1":
+            self.host = QtNetwork.QHostAddress.LocalHost
+        else:
+            for ipAddress in QtNetwork.QNetworkInterface.allAddresses():
+                if ipAddress != QtNetwork.QHostAddress.LocalHost and ipAddress.toIPv4Address() != 0:
+                    break
+                else:
+                    ipAddress = QtNetwork.QHostAddress.LocalHost
+            self.host = ipAddress
+
         self.tcpServer = QtNetwork.QTcpServer()  # Create a server object
-        self.tcpServer.newConnection.connect(self.new_connection)  # Handler for a new connection
+        self.tcpServer.newConnection.connect(self._new_connection)  # Handler for a new connection
         self.sendDataStell.connect(self.send)  # Connect the signal trigger for data sending
 
-        self.tcpServer.listen(QtNetwork.QHostAddress(self.host), int(self.port))  # Start listening for connections
+        self.tcpServer.listen(self.host, int(self.port))  # Start listening for connections
         self.conStatSigS.emit("Waiting")  # Indicate that the server is listening on the GUI
 
     # Whenever there is new connection, we call this method
-    def new_connection(self):
+    def _new_connection(self):
         if self.tcpServer.hasPendingConnections():
             self.socket = self.tcpServer.nextPendingConnection()  # Returns a new QTcpSocket
 
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
                 self.conStatSigS.emit("Connected")  # Indicate that the server has a connection on the GUI
                 self.socket.readyRead.connect(self._receive)  # If there is pending data get it
+                self.socket.error.connect(self._error)  # Log any error occurred and also perform the necessary actions
                 self.socket.disconnected.connect(self._disconnected)  # Execute the appropriate code on state change
                 self.tcpServer.close()  # Stop listening for other connections
 
@@ -63,8 +74,13 @@ class StellThread(QtCore.QObject):
     def _disconnected(self):
         # Do the following if the connection is lost
         self.conStatSigS.emit("Waiting")  # Indicate that the server does not have a connection on the GUI
-        self.socket.readyRead.diconnect()  # Close the signal since it not needed
-        self.tcpServer.listen(QtNetwork.QHostAddress(self.host), int(self.port))  # Start listening again
+        self.socket.readyRead.disconnect()  # Close the signal since it not needed
+        self.tcpServer.listen(self.host, int(self.port))  # Start listening again
+
+    def _error(self):
+        # Print and log any error occurred
+        print("An error occurred in Stellarium server: %s" % self.socket.errorString())
+        self.logD.log("WARNING", "Some error occurred in Stellarium server: %s" % self.socket.errorString(), "_error")
 
     # Thsi method is called whenever the signal to send data back is fired
     @QtCore.pyqtSlot(float, float, name='stellariumDataSend')
