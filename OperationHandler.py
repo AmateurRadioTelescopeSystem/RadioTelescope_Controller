@@ -18,9 +18,11 @@ class OpHandler(QtCore.QObject):
         self.logD = logData.logData(__name__)  # Data logger object
 
     def start(self):
+        print("Ops handle thread: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
         self.tcpStellarium.sendClientConn.connect(self.stellCommSend)  # Send data from Stellarium to the RPi
         self.tcpClient.dataRcvSigC.connect(self.clientDataRx)  # Receive pending data from RPi connected client
         self.tcpServer.dataRxFromServ.connect(self.rpiServRcvData)  # Receive data from the RPi server
+        self.tcpServer.clientNotice.connect(self.tcpClient.connect)  # Tell the client to reconnect
         self.ui.stopMovingRTSig.connect(self.stopMovingRT)  # Send a motion stop command, once this signal is triggered
 
     # Client connection button handling method

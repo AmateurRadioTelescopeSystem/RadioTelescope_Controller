@@ -18,6 +18,7 @@ class StellThread(QtCore.QObject):
 
     # This method is called in every thread start
     def start(self):
+        print("Stellarium thread: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
         self.socket = None  # Create the instance os the socket variable to use it later
         self.dataHandle = StellariumDataHandling.StellariumData()  # Data conversion object
         self.reConnectSigS.connect(self.connectStell)  # Connect the signal to the connection function

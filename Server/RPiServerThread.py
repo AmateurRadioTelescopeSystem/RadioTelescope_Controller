@@ -7,6 +7,7 @@ class RPiServerThread(QtCore.QObject):
     conStatSigR = QtCore.pyqtSignal(str, name='conRPiStat')  # Raspberry pi connection indicator
     dataRxFromServ = QtCore.pyqtSignal(str, name='rpiServDataRx')  # Data received from the server of RPi
     reConnectSigR = QtCore.pyqtSignal(name='reConnectServer')  # A reconnection signal originating from a button press
+    clientNotice = QtCore.pyqtSignal(name='clientNotice')  # Notify the client that we have a connection
 
     def __init__(self, cfgData, parent = None):
         super(RPiServerThread, self).__init__(parent)  # Get the parent of the class
@@ -15,6 +16,7 @@ class RPiServerThread(QtCore.QObject):
 
     # This method is called in every thread start and if the re-connect signal is fired
     def start(self):
+        print("RPi server thread: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
         self.socket = None  # Create a variable to hold the socket
         self.reConnectSigR.connect(self.connectServ)
         self.connectServ()  # Start the server
@@ -47,11 +49,12 @@ class RPiServerThread(QtCore.QObject):
             self.socket = self.tcpServer.nextPendingConnection()  # Returns a new QTcpSocket
 
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
+                self.tcpServer.close()  # Stop listening for other connections
                 self.conStatSigR.emit("Connected")  # Indicate that the server has a connection on the GUI
+                self.clientNotice.emit()  # Tell the client that we are connected, so to attempt a connection
                 self.socket.readyRead.connect(self._receive)  # If there is pending data get it
                 self.socket.error.connect(self._error)  # Log any error occurred and also perform the necessary actions
                 self.socket.disconnected.connect(self._disconnected)  # Execute the appropriate code on state change
-                self.tcpServer.close()  # Stop listening for other connections
 
     # Should we have data pending to be received, this method is called
     def _receive(self):
