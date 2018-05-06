@@ -42,7 +42,7 @@ class ClientThread(QtCore.QObject):
         if self.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
             self.sock.write(data.encode('utf-8'))
             self.sock.waitForBytesWritten()
-            print(data)
+            print("Sent data to RPi server: %s" % data)
 
     def _receive(self):
         if self.sock.bytesAvailable() > 0:
@@ -52,7 +52,6 @@ class ClientThread(QtCore.QObject):
     def _disconnected(self):
         self.conStatSigC.emit("Disconnected")
         self.sendData.disconnect()
-        self.sock.waitForConnected(msecs=1000)
 
     def _hostConnected(self):
         self.sendData.connect(self.send)  # Send the data to the server when this signal is fired
@@ -60,8 +59,8 @@ class ClientThread(QtCore.QObject):
 
     def _error(self):
         # Print and log any error occurred
-        print("An error occurred in client: %s" %self.sock.errorString())
-        self.log.log("WARNING", "Some error occurred in client: %s" %self.sock.errorString(), "_error")
+        print("An error occurred in client: %s" % self.sock.errorString())
+        self.log.log("WARNING", "Some error occurred in client: %s" % self.sock.errorString(), "_error")
 
     # This method is called when the thread exits
     def close(self):

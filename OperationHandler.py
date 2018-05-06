@@ -88,10 +88,10 @@ class OpHandler(QtCore.QObject):
         self.tcpClient.sendData.emit("STOP")  # Send the request to stop moving to the RPi server
 
     # This function is called whenever the app is about to quit
+    # First quit from the thread and then delete both the thread and the corresponding object
+    # Quit exits the thread and then wait is waiting for the thread exit
+    # deleteLater, deletes the thread object and the threaded object
     def appExitRequest(self):
-        # First quit from the thread and then delete both the thread and the corresponding object
-        # Quit exits the thread and then wait is waiting for the thread exit
-        # deleteLater, deletes the thread object and the threaded object
         self.tcpClThread.quit()
         self.tcpClThread.wait()
         self.tcpClient.deleteLater()

@@ -25,7 +25,7 @@ class RPiServerThread(QtCore.QObject):
         self.host = self.cfgData.getRPiHost()  # Get the TCP connection host
         self.port = self.cfgData.getRPiPort()  # Get the TCP connection port
 
-        if self.host == "localhost":
+        if self.host == "localhost" or self.host == "127.0.0.1":
             self.host = QtNetwork.QHostAddress.LocalHost
         else:
             for ipAddress in QtNetwork.QNetworkInterface.allAddresses():
