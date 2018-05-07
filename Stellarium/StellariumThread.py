@@ -18,7 +18,7 @@ class StellThread(QtCore.QObject):
 
     # This method is called in every thread start
     def start(self):
-        print("Stellarium thread: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
+        print("Stellarium thread ID: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
         self.socket = None  # Create the instance os the socket variable to use it later
         self.dataHandle = StellariumDataHandling.StellariumData()  # Data conversion object
         self.reConnectSigS.connect(self.connectStell)  # Connect the signal to the connection function
@@ -98,11 +98,12 @@ class StellThread(QtCore.QObject):
 
     # This method is called whenever the thread exits
     def close(self):
+        self.tcpServer.close()  # Close the TCP server
         if self.socket is not None:
             self.socket.disconnected.disconnect()  # Close the disconnect signal first to avoid firing
+            # TODO work a bit better with disconnect
+            self.sendDataStell.disconnect()  # Detach the signal to avoid any accidental firing (Reconnected at start)
             self.socket.close()  # Close the underlying TCP socket
-        self.tcpServer.close()  # Close the TCP server
-        self.sendDataStell.disconnect()  # Detach the signal to avoid any accidental firing (Reconnected at start)
         self.reConnectSigS.disconnect()  # Not needed any more since we are closing
         self.conStatSigS.emit("Disconnected")  # Indicate disconnection on the GUI
 
