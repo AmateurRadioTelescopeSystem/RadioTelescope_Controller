@@ -42,7 +42,7 @@ class StellThread(QtCore.QObject):
 
         self.tcpServer = QtNetwork.QTcpServer()  # Create a server object
         self.tcpServer.newConnection.connect(self._new_connection)  # Handler for a new connection
-        self.sendDataStell.connect(self.send)  # Connect the signal trigger for data sending
+
 
         self.tcpServer.listen(self.host, int(self.port))  # Start listening for connections
         self.conStatSigS.emit("Waiting")  # Indicate that the server is listening on the GUI
@@ -53,11 +53,12 @@ class StellThread(QtCore.QObject):
             self.socket = self.tcpServer.nextPendingConnection()  # Returns a new QTcpSocket
 
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
+                self.tcpServer.close()  # Stop listening for other connections
                 self.conStatSigS.emit("Connected")  # Indicate that the server has a connection on the GUI
+                self.sendDataStell.connect(self.send)  # Connect the signal trigger for data sending
                 self.socket.readyRead.connect(self._receive)  # If there is pending data get it
                 self.socket.error.connect(self._error)  # Log any error occurred and also perform the necessary actions
                 self.socket.disconnected.connect(self._disconnected)  # Execute the appropriate code on state change
-                self.tcpServer.close()  # Stop listening for other connections
 
     # Should we have data pending to be received, this method is called
     def _receive(self):
@@ -76,6 +77,7 @@ class StellThread(QtCore.QObject):
         # Do the following if the connection is lost
         self.conStatSigS.emit("Waiting")  # Indicate that the server does not have a connection on the GUI
         self.socket.readyRead.disconnect()  # Close the signal since it not needed
+        self.sendDataStell.disconnect()  # Detach the signal to avoid any accidental firing
         self.tcpServer.listen(self.host, int(self.port))  # Start listening again
 
     def _error(self):

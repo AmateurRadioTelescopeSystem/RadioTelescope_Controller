@@ -45,7 +45,6 @@ class ClientThread(QtCore.QObject):
     def sendC(self, data: str):
         if self.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
             self.sock.write(data.encode('utf-8'))
-            self.sock.waitForBytesWritten()
             print("Sent data to RPi server: %s" % data)
 
     def _receive(self):
@@ -59,7 +58,8 @@ class ClientThread(QtCore.QObject):
 
     def _hostConnected(self):
         self.sendData.connect(self.sendC)  # Send the data to the server when this signal is fired
-        self.sendData.emit("CONNECT_CLIENT")  # Tell the RPi to connect the client, since the local server should be running
+        self.sendData.emit("CONNECT_CLIENT\n")  # Tell the RPi to connect the client, since the local server should be running
+        self.sendData.emit("START_SENDING_POS")
         self.conStatSigC.emit("Connected")  # If we have a connection send the signal
 
     def _error(self):

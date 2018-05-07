@@ -80,9 +80,11 @@ class OpHandler(QtCore.QObject):
     def rpiServRcvData(self, data: str):
         spltData = data.split("_")  # Split the string with the set delimiter
         if spltData[0] == "DISHPOS":
-            ra = spltData[2]  # Get the RA from the received position
-            dec = spltData[4]  # Get the DEC from the received position
-            self.tcpStellarium.sendDataStell.emit(float(ra), float(dec))  # Send the data to Stellarium
+            ra = float(spltData[2])  # Get the RA from the received position
+            dec = float(spltData[4])  # Get the DEC from the received position
+            self.ui.raPosInd.setText("%.5fh" % ra)  # Show the RA of the dish on the GUI
+            self.ui.decPosInd.setText("%.5f" % dec + u"\u00b0")  # Show the declination of the dish on the GUI
+            self.tcpStellarium.sendDataStell.emit(ra, dec)  # Send the data to Stellarium
 
     # Command to stop any motion of the radio telescope dish
     @QtCore.pyqtSlot(name='stopRadioTele')

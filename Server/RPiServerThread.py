@@ -8,8 +8,9 @@ class RPiServerThread(QtCore.QObject):
     dataRxFromServ = QtCore.pyqtSignal(str, name='rpiServDataRx')  # Data received from the server of RPi
     reConnectSigR = QtCore.pyqtSignal(name='reConnectServer')  # A reconnection signal originating from a button press
     clientNotice = QtCore.pyqtSignal(name='clientNotice')  # Notify the client that we have a connection
+    sendDataBack = QtCore.pyqtSignal(str, name='sendDtaBack')
 
-    def __init__(self, cfgData, parent = None):
+    def __init__(self, cfgData, parent=None):
         super(RPiServerThread, self).__init__(parent)  # Get the parent of the class
         self.cfgData = cfgData
         self.logD = logData.logData(__name__)  # Create the logger
@@ -52,6 +53,7 @@ class RPiServerThread(QtCore.QObject):
                 self.tcpServer.close()  # Stop listening for other connections
                 self.conStatSigR.emit("Connected")  # Indicate that the server has a connection on the GUI
                 self.clientNotice.emit()  # Tell the client that we are connected, so to attempt a connection
+                self.sendDataBack.connect(self.sendRPi)  # Connect the data sending signal
                 self.socket.readyRead.connect(self._receive)  # If there is pending data get it
                 self.socket.error.connect(self._error)  # Log any error occurred and also perform the necessary actions
                 self.socket.disconnected.connect(self._disconnected)  # Execute the appropriate code on state change
@@ -72,6 +74,7 @@ class RPiServerThread(QtCore.QObject):
         # Do the following if the connection is lost
         self.conStatSigR.emit("Waiting")  # Indicate that the server does not have a connection on the GUI
         self.socket.readyRead.disconnect()  # Disconnect the signal to avoid double firing
+        self.sendDataBack.disconnect()  # Detach the signal to avoid any accidental firing
         self.tcpServer.listen(self.host, int(self.port))  # Start listening again
 
     def _error(self):
@@ -79,14 +82,14 @@ class RPiServerThread(QtCore.QObject):
         print("An error occurred in RPi server: %s" % self.socket.errorString())
         self.logD.log("WARNING", "Some error occurred in RPi server: %s" % self.socket.errorString(), "_error")
 
-    ''''@QtCore.pyqtSlot(float, float, name='clientCommandSendStell')
-    def send(self, ra: float, dec: float):
+    @QtCore.pyqtSlot(str, name='sendDtaBack')
+    def sendRPi(self, data: str):
         try:
-            self.socket.write(self.dataHandle.encodeStell(ra, dec))  # Send data back to Stellarium
+            self.socket.write(data.encode('utf-8'))  # Send data back to the client
             self.socket.waitForBytesWritten()  # Wait for the data to be written
         except Exception as e:
-            print("Stellarium send client issue")
-            print(e)'''
+            print("RPi server send client issue")
+            print(e)
 
     # This method is called whenever the thread exits
     def close(self):
@@ -95,5 +98,6 @@ class RPiServerThread(QtCore.QObject):
             self.socket.close()  # Close the underlying TCP socket
         self.tcpServer.close()  # Close the TCP server
         self.reConnectSigR.disconnect()  # Signal not used after thread exit (Reconnected at thread start)
+        self.sendDataBack.disconnect()  # Detach the signal to avoid any accidental firing
         self.conStatSigR.emit("Disconnected")  # Indicate disconnection on the GUI
 
