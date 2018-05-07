@@ -14,7 +14,7 @@ class ClientThread(QtCore.QObject):
         self.cfgData = cfgData  # Create a variable for the cfg file
 
     def start(self):
-        print("Client thread: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
+        print("Client thread ID: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
         self.log = logData.logData(__name__)  # Create the logger
         self.sock = QtNetwork.QTcpSocket()  # Create the TCP socket
         self.reConnectSigC.connect(self.connect)  # Do the reconnect signal connection
@@ -23,7 +23,6 @@ class ClientThread(QtCore.QObject):
     # The connect function is called if the signal is fired or in the start of the thread
     @QtCore.pyqtSlot(name='reConnectClient')
     def connect(self):
-        print("Thread ID from connect (client): %d" % QtCore.QThread.currentThreadId())  # Debugging print
         if self.sock.state() != QtNetwork.QAbstractSocket.ConnectedState:
             # Get the host and port from the settings file for the client connection
             host = self.cfgData.getHost()
@@ -48,9 +47,9 @@ class ClientThread(QtCore.QObject):
             print("Sent data to RPi server: %s" % data)
 
     def _receive(self):
-        if self.sock.bytesAvailable() > 0:
-            string = self.sock.readAll().data()  # Get the data from the received QByteArray object
-            self.dataRcvSigC.emit(string.decode('utf-8'))  # Decode the data to a string
+        while self.sock.bytesAvailable() > 0:  # Read all data in que
+            string = self.sock.readLine().data().decode('utf-8').rstrip('\n')  # Get the data as a string
+            self.dataRcvSigC.emit(string)  # Decode the data to a string
 
     def _disconnected(self):
         self.conStatSigC.emit("Disconnected")
@@ -59,7 +58,7 @@ class ClientThread(QtCore.QObject):
     def _hostConnected(self):
         self.sendData.connect(self.sendC)  # Send the data to the server when this signal is fired
         self.sendData.emit("CONNECT_CLIENT\n")  # Tell the RPi to connect the client, since the local server should be running
-        self.sendData.emit("START_SENDING_POS")
+        #self.sendData.emit("START_SENDING_POS")  # Send the position report request
         self.conStatSigC.emit("Connected")  # If we have a connection send the signal
 
     def _error(self):
@@ -71,9 +70,9 @@ class ClientThread(QtCore.QObject):
     def close(self):
         self.sock.disconnected.disconnect()  # Disconnect this signal first to avoid getting in the function
         if self.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
-            self.sendData.disconnect(self.sendC)  # Disconnect the data send signal, since the thread is closing
+            self.sendData.disconnect()  # Disconnect the data send signal, since the thread is closing
             self.sock.disconnectFromHost()  # Disconnect from the host
-            self.sock.waitForDisconnected(msecs=1000)  # And wait until disconnected or timeout (default 3 seconds)
+            # self.sock.waitForDisconnected(msecs=1000)  # And wait until disconnected or timeout (default 3 seconds)
         else:
             self.sock.close()  # Close the socket before exiting
         self.reConnectSigC.disconnect()  # Thread is closing so it will not be needed any more
