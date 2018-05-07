@@ -8,7 +8,7 @@ class RPiServerThread(QtCore.QObject):
     dataRxFromServ = QtCore.pyqtSignal(str, name='rpiServDataRx')  # Data received from the server of RPi
     reConnectSigR = QtCore.pyqtSignal(name='reConnectServer')  # A reconnection signal originating from a button press
     clientNotice = QtCore.pyqtSignal(name='clientNotice')  # Notify the client that we have a connection
-    sendDataBack = QtCore.pyqtSignal(str, name='sendDtaBack')
+    sendDataBack = QtCore.pyqtSignal(str, name='sendDtaBack')  # Send data to the RPi from the server
 
     def __init__(self, cfgData, parent=None):
         super(RPiServerThread, self).__init__(parent)  # Get the parent of the class
@@ -17,7 +17,7 @@ class RPiServerThread(QtCore.QObject):
 
     # This method is called in every thread start and if the re-connect signal is fired
     def start(self):
-        print("RPi server thread: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
+        print("RPi server thread ID: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
         self.socket = None  # Create a variable to hold the socket
         self.reConnectSigR.connect(self.connectServ)
         self.connectServ()  # Start the server
@@ -33,10 +33,10 @@ class RPiServerThread(QtCore.QObject):
         else:
             for ipAddress in QtNetwork.QNetworkInterface.allAddresses():
                 if ipAddress != QtNetwork.QHostAddress.LocalHost and ipAddress.toIPv4Address() != 0:
-                    break
+                    break  # If we found an IP then we exit the loop
                 else:
-                    ipAddress = QtNetwork.QHostAddress.LocalHost
-            self.host = ipAddress
+                    ipAddress = QtNetwork.QHostAddress.LocalHost  # If no IP is found, assign localhost
+            self.host = ipAddress  # Assign the IP address that wa found above
 
         self.tcpServer = QtNetwork.QTcpServer()  # Create a server object
         self.tcpServer.newConnection.connect(self._new_connection)  # Handler for a new connection
@@ -47,7 +47,7 @@ class RPiServerThread(QtCore.QObject):
     # Whenever there is new connection, we call this method
     def _new_connection(self):
         if self.tcpServer.hasPendingConnections():
-            self.socket = self.tcpServer.nextPendingConnection()  # Returns a new QTcpSocket
+            self.socket = self.tcpServer.nextPendingConnection()  # Returns a new QTcpSocket for the connection
 
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
                 self.tcpServer.close()  # Stop listening for other connections
@@ -61,9 +61,9 @@ class RPiServerThread(QtCore.QObject):
     # Should we have data pending to be received, this method is called
     def _receive(self):
         try:
-            if self.socket.bytesAvailable() > 0:
-                recData = self.socket.readAll().data()  # Get the data sa a binary array
-                recData = recData.decode('utf-8')  # Decode the data to get a string
+            while self.socket.bytesAvailable() > 0:  # Read all data in que
+                recData = self.socket.readLine().data().decode('utf-8').rstrip('\n')  # Get the data as a string
+                #recData = self.socket.readAll().data().decode('utf-8')  # Get the data as a string
                 self.dataRxFromServ.emit(recData)  # Send a signal to indicate that the server received some data
         except Exception:
             # If data is sent fast, then an exception will occur
@@ -88,16 +88,16 @@ class RPiServerThread(QtCore.QObject):
             self.socket.write(data.encode('utf-8'))  # Send data back to the client
             self.socket.waitForBytesWritten()  # Wait for the data to be written
         except Exception as e:
-            print("RPi server send client issue")
-            print(e)
+            print("RPi server send client issue: %s" % e)  # Debugging print
 
     # This method is called whenever the thread exits
     def close(self):
+        self.tcpServer.close()  # Close the TCP server
         if self.socket is not None:
             self.socket.disconnected.disconnect()  # Close the disconnect signal first to avoid firing
+            # TODO make the disconnect better so the program does not crash on exit
+            self.sendDataBack.disconnect()  # Detach the signal to avoid any accidental firing
             self.socket.close()  # Close the underlying TCP socket
-        self.tcpServer.close()  # Close the TCP server
         self.reConnectSigR.disconnect()  # Signal not used after thread exit (Reconnected at thread start)
-        self.sendDataBack.disconnect()  # Detach the signal to avoid any accidental firing
         self.conStatSigR.emit("Disconnected")  # Indicate disconnection on the GUI
 
