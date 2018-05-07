@@ -34,7 +34,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         RadioTelescopeControl.setWindowIcon(QtGui.QIcon('Icons/radiotelescope.png'))
         RadioTelescopeControl.setObjectName("RadioTelescopeControl")
         RadioTelescopeControl.setWindowModality(QtCore.Qt.NonModal)
-        RadioTelescopeControl.resize(432, 507)
+        RadioTelescopeControl.resize(432, 526)
 
         # Set the font according to the OS
         font = QtGui.QFont()
@@ -66,7 +66,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.stackedWidget = QtWidgets.QStackedWidget(self.groupBox_2)
         self.stackedWidget.setEnabled(True)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.stackedWidget.sizePolicy().hasHeightForWidth())
@@ -164,10 +164,25 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.commandStellIndLabel = QtWidgets.QLabel(self.stackedWidgetPage2)
         self.commandStellIndLabel.setObjectName("commandStellIndLabel")
         self.horizontalLayout_12.addWidget(self.commandStellIndLabel)
-        self.formLayout_5.setLayout(5, QtWidgets.QFormLayout.SpanningRole, self.horizontalLayout_12)
+        self.formLayout_5.setLayout(5, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_12)
+        self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
+        self.label_7 = QtWidgets.QLabel(self.stackedWidgetPage2)
+        self.label_7.setObjectName("label_7")
+        self.horizontalLayout_9.addWidget(self.label_7)
+        self.stellPosUpdtBtn = QtWidgets.QPushButton(self.stackedWidgetPage2)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.stellPosUpdtBtn.sizePolicy().hasHeightForWidth())
+        self.stellPosUpdtBtn.setSizePolicy(sizePolicy)
+        self.stellPosUpdtBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.stellPosUpdtBtn.setObjectName("stellPosUpdtBtn")
+        self.horizontalLayout_9.addWidget(self.stellPosUpdtBtn)
+        self.formLayout_5.setLayout(6, QtWidgets.QFormLayout.SpanningRole, self.horizontalLayout_9)
         self.previousPageLabel = QtWidgets.QLabel(self.stackedWidgetPage2)
         self.previousPageLabel.setObjectName("previousPageLabel")
-        self.formLayout_5.setWidget(6, QtWidgets.QFormLayout.LabelRole, self.previousPageLabel)
+        self.formLayout_5.setWidget(7, QtWidgets.QFormLayout.LabelRole, self.previousPageLabel)
         self.stellPrevPageBtn = QtWidgets.QToolButton(self.stackedWidgetPage2)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -178,7 +193,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.stellPrevPageBtn.setAutoRaise(True)
         self.stellPrevPageBtn.setArrowType(QtCore.Qt.LeftArrow)
         self.stellPrevPageBtn.setObjectName("stellPrevPageBtn")
-        self.formLayout_5.setWidget(6, QtWidgets.QFormLayout.FieldRole, self.stellPrevPageBtn)
+        self.formLayout_5.setWidget(7, QtWidgets.QFormLayout.FieldRole, self.stellPrevPageBtn)
         self.stackedWidget.addWidget(self.stackedWidgetPage2)
         self.gridLayout_2.addWidget(self.stackedWidget, 0, 0, 1, 1)
         self.gridLayout_4.addWidget(self.groupBox_2, 0, 1, 1, 1)
@@ -466,6 +481,9 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.label.setText(_translate("RadioTelescopeControl",
                                       "<html><head/><body><p><span style=\" font-weight:600;\">Command:</span></p></body></html>"))
         self.commandStellIndLabel.setText(_translate("RadioTelescopeControl", "-"))
+        self.label_7.setText(_translate("RadioTelescopeControl",
+                                        "<html><head/><body><p><span style=\" font-weight:600;\">Position:</span></p></body></html>"))
+        self.stellPosUpdtBtn.setText(_translate("RadioTelescopeControl", "Update"))
         self.previousPageLabel.setText(_translate("RadioTelescopeControl", "Previous Page"))
         self.stellPrevPageBtn.setText(_translate("RadioTelescopeControl", "..."))
         self.groupBox.setTitle(_translate("RadioTelescopeControl", "Radio Telescope"))
@@ -662,6 +680,15 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.serverRPiEnableLabel.setCheckState(QtCore.Qt.Checked)  # Set the checkbox to checked state
             self.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
                                           "color:#ff0000;\">Disconnected</span></p></body></html>")
+
+    @QtCore.pyqtSlot(float, float, name='posDataShow')
+    def posDataShow(self, ra: float, dec: float):
+        self.raPosInd.setText("%.5fh" % ra)  # Show the RA of the dish on the GUI
+        self.decPosInd.setText("%.5f" % dec + u"\u00b0")  # Show the declination of the dish on the GUI
+
+    @QtCore.pyqtSlot(float, name='moveProgress')
+    def moveProgress(self, percent: float):
+        self.onTargetProgress.setValue(percent)  # Set the percentage of the progress according to position
 
     # Show current date and time on the GUI
     def dateTime(self):
