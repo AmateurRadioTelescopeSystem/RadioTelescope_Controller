@@ -30,7 +30,7 @@ class OpHandler(QtCore.QObject):
     # Client connection button handling method
     def connectButtonR(self):
         if self.tcpClThread.isRunning() and \
-                (self.ui.connectRadioTBtn.text() == "Disconnect" or self.ui.connectRadioTBtn.text() == "Stop"):
+                (self.ui.mainWin.connectRadioTBtn.text() == "Disconnect" or self.ui.mainWin.connectRadioTBtn.text() == "Stop"):
             self.tcpClThread.quit()  # Disconnect from the client
         elif not self.tcpClThread.isRunning():
             self.tcpClThread.start()  # Attempt a connection with the client
@@ -41,7 +41,7 @@ class OpHandler(QtCore.QObject):
     # Stellarium server connection handling method
     def connectButtonS(self):
         if self.tcpStelThread.isRunning() and \
-                (self.ui.connectStellariumBtn.text() == "Disable" or self.ui.connectStellariumBtn.text() == "Stop"):
+                (self.ui.mainWin.connectStellariumBtn.text() == "Disable" or self.ui.mainWin.connectStellariumBtn.text() == "Stop"):
             self.tcpStelThread.quit()  # Quit the currently running thread
             self.logD.log("INFO", "The thread for the server was closed", "connectButtonS")
         elif not self.tcpStelThread.isRunning():
@@ -53,7 +53,7 @@ class OpHandler(QtCore.QObject):
     # RPi server connection handling method
     def connectButtonRPi(self):
         if self.tcpServThread.isRunning() and \
-                (self.ui.serverRPiConnBtn.text() == "Disable" or self.ui.serverRPiConnBtn.text() == "Stop"):
+                (self.ui.mainWin.serverRPiConnBtn.text() == "Disable" or self.ui.mainWin.serverRPiConnBtn.text() == "Stop"):
             self.tcpServThread.quit()  # Quit the currently running thread
             self.logD.log("INFO", "The thread for the server was closed", "connectButtonRPi")
         elif not self.tcpServThread.isRunning():
@@ -70,10 +70,10 @@ class OpHandler(QtCore.QObject):
     # Send the appropriate command according to the selected mode. Data is received from Stellarium (sendClientConn)
     @QtCore.pyqtSlot(list, name='clientCommandSendStell')
     def stellCommSend(self, radec: list):
-        if self.ui.stellariumOperationSelect.currentText() == "Transit":
+        if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
             command = "TRNST_RA_%.5f_DEC_%.5f" % (radec[0], radec[1])
             self.tcpClient.sendData.emit(command)
-        elif self.ui.stellariumOperationSelect.currentText() == "Aim and track":
+        elif self.ui.mainWin.stellariumOperationSelect.currentText() == "Aim and track":
             command = "TRK %f %f" % (radec[0], radec[1])
             self.tcpClient.sendData.emit(command)
 
@@ -104,7 +104,7 @@ class OpHandler(QtCore.QObject):
         self.tcpServer.clientNotice.connect(self.tcpClient.connect)  # Tell the client to reconnect
 
         self.ui.stopMovingRTSig.connect(self.stopMovingRT)  # Send a motion stop command, once this signal is triggered
-        self.ui.stellPosUpdtBtn.clicked.connect(partial(self.tcpClient.sendData.emit, "SEND_POS_UPDATE"))
+        self.ui.mainWin.stellPosUpdtBtn.clicked.connect(partial(self.tcpClient.sendData.emit, "SEND_POS_UPDATE"))
         self.posDataShow.connect(self.ui.posDataShow)  # Show the dish position data, when available
 
     # This function is called whenever the app is about to quit
