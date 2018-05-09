@@ -1,0 +1,12 @@
+2018-05-09 17:20:26,281  [Client.ClientThread           ]  ERROR    - _error             -  Client reported an error: Network operation timed out
+2018-05-09 17:20:26,282  [Client.ClientThread           ]  WARNING  - connect            -  Client was unable to connect to: 10.42.0.167:10001
+2018-05-09 17:20:38,553  [Client.ClientThread           ]  ERROR    - _error             -  Client reported an error: Network operation timed out
+2018-05-09 17:20:38,554  [Client.ClientThread           ]  WARNING  - connect            -  Client was unable to connect to: 10.42.0.167:10001
+2018-05-09 17:31:04,635  [Client.ClientThread           ]  ERROR    - _error             -  Client reported an error: Network operation timed out
+2018-05-09 17:31:04,636  [Client.ClientThread           ]  WARNING  - connect            -  Client was unable to connect to: 10.42.0.167:10001
+2018-05-09 17:31:27,359  [Client.ClientThread           ]  ERROR    - _error             -  Client reported an error: Network operation timed out
+2018-05-09 17:31:27,360  [Client.ClientThread           ]  WARNING  - connect            -  Client was unable to connect to: 10.42.0.167:10001
+2018-05-09 17:37:04,366  [Client.ClientThread           ]  ERROR    - _error             -  Client reported an error: Network operation timed out
+2018-05-09 17:37:04,367  [Client.ClientThread           ]  WARNING  - connect            -  Client was unable to connect to: 10.42.0.167:10001
+2018-05-09 17:38:04,291  [Client.ClientThread           ]  ERROR    - _error             -  Client reported an error: Network operation timed out
+2018-05-09 17:38:04,292  [Client.ClientThread           ]  WARNING  - connect            -  Client was unable to connect to: 10.42.0.167:10001
