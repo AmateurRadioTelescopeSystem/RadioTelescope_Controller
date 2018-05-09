@@ -5,13 +5,17 @@
         <longitude>22.9308600</longitude>
     </location>
     <TCP autoconnect="yes" updated="no">
-        <host>127.0.0.1</host>
+        <host>10.42.0.167</host>
         <port>10001</port>
     </TCP>
     <TCPStell autoconnect="yes" updated="no">
         <host>127.0.0.1</host>
         <port>10002</port>
     </TCPStell>
+    <TCPRPiServ updated="no">
+        <host>remote</host>
+        <port>10003</port>
+    </TCPRPiServ>
     <object stationary="yes">
         <name>Crab Nebula</name>
         <RA>83.63308333</RA>
