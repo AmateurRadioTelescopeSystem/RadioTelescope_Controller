@@ -9,6 +9,7 @@
 *.xml text
 *.log text
 *.ui text
+*.ini text
 
 # Declare files that should have CRLF line endings on checkout.
 
