@@ -1,12 +1,13 @@
 from PyQt5 import QtCore, QtGui
 from functools import partial
-import logData
+import logging
 
 
 class OpHandler(QtCore.QObject):
     posDataShow = QtCore.pyqtSignal(float, float, name='posDataShow')
 
-    def __init__(self, tcpClient, tcpServer, tcpStellarium, tcpClThread, tcpServThread, tcpStelThread, ui, parent=None):
+    def __init__(self, tcpClient, tcpServer, tcpStellarium, tcpClThread, tcpServThread,
+                 tcpStelThread, ui, cfgData, parent=None):
         super(OpHandler, self).__init__(parent)
         self.tcpClient = tcpClient  # TCP client object
         self.tcpServer = tcpServer  # TCP RPi server object
@@ -18,12 +19,22 @@ class OpHandler(QtCore.QObject):
         self.tcpStelThread = tcpStelThread
 
         self.ui = ui  # User interface handling object
-        self.logD = logData.logData(__name__)  # Data logger object
+        self.cfgData = cfgData
+        self.logD = logging.getLogger(__name__)  # Data logger object
 
     def start(self):
-        print("Operations handle thread ID: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
+        self.logD.info("Operations handler thread started")
         self.prev_pos = ["", ""]  # The dish position is saved for change comparison
         self.signalConnectios()  # Make all the necessary signal connections
+
+        autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
+        autoconRPi = self.cfgData.getTCPAutoConnStatus()  # Auto-connection preference for the RPi server and client
+        # If auto-connection is selected for thr TCP section, then do as requested
+        if autoconStell == "yes":
+            self.tcpStelThread.start()  # Start the server thread, since auto start is enabled
+        if autoconRPi == "yes":
+            self.tcpClThread.start()  # Start the client thread, since auto start is enabled
+            self.tcpServThread.start()  # Start the RPi server thread, since auto start is enabled
 
         self.val = 0.0
 
@@ -43,7 +54,6 @@ class OpHandler(QtCore.QObject):
         if self.tcpStelThread.isRunning() and \
                 (self.ui.mainWin.connectStellariumBtn.text() == "Disable" or self.ui.mainWin.connectStellariumBtn.text() == "Stop"):
             self.tcpStelThread.quit()  # Quit the currently running thread
-            self.logD.log("INFO", "The thread for the server was closed", "connectButtonS")
         elif not self.tcpStelThread.isRunning():
             self.tcpStelThread.start()  # Attempt a connection with the client
         else:
@@ -55,7 +65,6 @@ class OpHandler(QtCore.QObject):
         if self.tcpServThread.isRunning() and \
                 (self.ui.mainWin.serverRPiConnBtn.text() == "Disable" or self.ui.mainWin.serverRPiConnBtn.text() == "Stop"):
             self.tcpServThread.quit()  # Quit the currently running thread
-            self.logD.log("INFO", "The thread for the server was closed", "connectButtonRPi")
         elif not self.tcpServThread.isRunning():
             self.tcpServThread.start()  # Attempt a connection with the client
         else:
@@ -65,7 +74,7 @@ class OpHandler(QtCore.QObject):
     # Dta received from the client connected to the RPi server
     @QtCore.pyqtSlot(str, name='dataClientRX')
     def clientDataRx(self, data: str):
-        print("Data received from client (RPi server connected): %s" % data)
+        self.logD.info("Data received from client (Connected to remote RPi server): %s" % data)
 
     # Send the appropriate command according to the selected mode. Data is received from Stellarium (sendClientConn)
     @QtCore.pyqtSlot(list, name='clientCommandSendStell')
@@ -94,6 +103,7 @@ class OpHandler(QtCore.QObject):
     def stopMovingRT(self):
         # TODO change the command to the appropriate one
         self.tcpClient.sendData.emit("STOP")  # Send the request to stop moving to the RPi server
+        self.logD.warning("A dish motion halt was requested")
 
     # Make all the necessary signal connections
     def signalConnectios(self):
@@ -106,6 +116,13 @@ class OpHandler(QtCore.QObject):
         self.ui.stopMovingRTSig.connect(self.stopMovingRT)  # Send a motion stop command, once this signal is triggered
         self.ui.mainWin.stellPosUpdtBtn.clicked.connect(partial(self.tcpClient.sendData.emit, "SEND_POS_UPDATE"))
         self.posDataShow.connect(self.ui.posDataShow)  # Show the dish position data, when available
+
+        # Give functionality to the buttons
+        self.ui.mainWin.connectRadioTBtn.clicked.connect(self.connectButtonR)  # TCP client connection button
+        self.ui.mainWin.serverRPiConnBtn.clicked.connect(self.connectButtonRPi)  # TCP server connection button
+        self.ui.mainWin.connectStellariumBtn.clicked.connect(
+            self.connectButtonS)  # Stellarium TCP server connection button
+        self.logD.debug("All signal connections made")
 
     # This function is called whenever the app is about to quit
     # First quit from the thread and then delete both the thread and the corresponding object
@@ -126,3 +143,4 @@ class OpHandler(QtCore.QObject):
         self.tcpStelThread.wait()
         self.tcpStellarium.deleteLater()
         self.tcpStelThread.deleteLater()
+        self.logD.info("Operations handler thread closed")

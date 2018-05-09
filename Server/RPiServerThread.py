@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtNetwork
-import logData
+import logging
 
 
 class RPiServerThread(QtCore.QObject):
@@ -12,12 +12,12 @@ class RPiServerThread(QtCore.QObject):
 
     def __init__(self, cfgData, parent=None):
         super(RPiServerThread, self).__init__(parent)  # Get the parent of the class
-        self.cfgData = cfgData
-        self.logD = logData.logData(__name__)  # Create the logger
+        self.cfgData = cfgData  # Create the configuration file object
+        self.logD = logging.getLogger(__name__)  # Create the logger
 
     # This method is called in every thread start and if the re-connect signal is fired
     def start(self):
-        print("RPi server thread ID: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
+        self.logD.info("Raspberry Pi connection server thread started")
         self.socket = None  # Create a variable to hold the socket
         self.reConnectSigR.connect(self.connectServ)
         self.connectServ()  # Start the server
@@ -43,6 +43,7 @@ class RPiServerThread(QtCore.QObject):
 
         self.tcpServer.listen(self.host, int(self.port))  # Start listening for connections
         self.conStatSigR.emit("Waiting")  # Indicate that the server is listening on the GUI
+        self.logD.debug("RPI server connection initializer called")
 
     # Whenever there is new connection, we call this method
     def _new_connection(self):
@@ -57,17 +58,18 @@ class RPiServerThread(QtCore.QObject):
                 self.socket.readyRead.connect(self._receive)  # If there is pending data get it
                 self.socket.error.connect(self._error)  # Log any error occurred and also perform the necessary actions
                 self.socket.disconnected.connect(self._disconnected)  # Execute the appropriate code on state change
+                self.logD.info("RPi server has new connection")
 
     # Should we have data pending to be received, this method is called
     def _receive(self):
         try:
             while self.socket.bytesAvailable() > 0:  # Read all data in que
                 recData = self.socket.readLine().data().decode('utf-8').rstrip('\n')  # Get the data as a string
-                #recData = self.socket.readAll().data().decode('utf-8')  # Get the data as a string
                 self.dataRxFromServ.emit(recData)  # Send a signal to indicate that the server received some data
+                self.logD.info("RPi server received: %s" % recData)
         except Exception:
             # If data is sent fast, then an exception will occur
-            self.logD.log("EXCEPT", "Some problem occurred while receiving server data. See traceback", "_receive")
+            self.logD.exception("Some problem occurred while receiving server data. See traceback")
 
     # If at any moment the connection state is changed, we call this method
     def _disconnected(self):
@@ -76,28 +78,29 @@ class RPiServerThread(QtCore.QObject):
         self.socket.readyRead.disconnect()  # Disconnect the signal to avoid double firing
         self.sendDataBack.disconnect()  # Detach the signal to avoid any accidental firing
         self.tcpServer.listen(self.host, int(self.port))  # Start listening again
+        self.logD.warning("The client disconnected from us")
 
     def _error(self):
         # Print and log any error occurred
-        print("An error occurred in RPi server: %s" % self.socket.errorString())
-        self.logD.log("WARNING", "Some error occurred in RPi server: %s" % self.socket.errorString(), "_error")
+        self.logD.error("RPi server reported an error: %s" % self.socket.errorString())
 
     @QtCore.pyqtSlot(str, name='sendDtaBack')
     def sendRPi(self, data: str):
         try:
             self.socket.write(data.encode('utf-8'))  # Send data back to the client
             self.socket.waitForBytesWritten()  # Wait for the data to be written
-        except Exception as e:
-            print("RPi server send client issue: %s" % e)  # Debugging print
+        except Exception:
+            self.logD.exception("There was a problem sending the data. See traceback")
 
     # This method is called whenever the thread exits
     def close(self):
         self.tcpServer.close()  # Close the TCP server
         if self.socket is not None:
             self.socket.disconnected.disconnect()  # Close the disconnect signal first to avoid firing
-            # TODO make the disconnect better so the program does not crash on exit
-            self.sendDataBack.disconnect()  # Detach the signal to avoid any accidental firing
+            if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:  # Check if socket is connected
+                self.sendDataBack.disconnect()  # Detach the signal to avoid any accidental firing
             self.socket.close()  # Close the underlying TCP socket
         self.reConnectSigR.disconnect()  # Signal not used after thread exit (Reconnected at thread start)
         self.conStatSigR.emit("Disconnected")  # Indicate disconnection on the GUI
+        self.logD.info("RPi server thread closed")
 

@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtNetwork
-import logData
+import logging
 
 
 class ClientThread(QtCore.QObject):
@@ -12,10 +12,10 @@ class ClientThread(QtCore.QObject):
     def __init__(self, cfgData, parent=None):
         super(ClientThread, self).__init__(parent)  # Get the parent of the class
         self.cfgData = cfgData  # Create a variable for the cfg file
+        self.log = logging.getLogger(__name__)  # Create the logger
 
     def start(self):
-        print("Client thread ID: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
-        self.log = logData.logData(__name__)  # Create the logger
+        self.log.info("Client thread started")  # Indicate thread start
         self.sock = QtNetwork.QTcpSocket()  # Create the TCP socket
         self.reConnectSigC.connect(self.connect)  # Do the reconnect signal connection
         self.connect()  # Start a connection
@@ -23,6 +23,7 @@ class ClientThread(QtCore.QObject):
     # The connect function is called if the signal is fired or in the start of the thread
     @QtCore.pyqtSlot(name='reConnectClient')
     def connect(self):
+        self.log.debug("Client connection initializer called")
         if self.sock.state() != QtNetwork.QAbstractSocket.ConnectedState:
             # Get the host and port from the settings file for the client connection
             host = self.cfgData.getHost()
@@ -38,33 +39,36 @@ class ClientThread(QtCore.QObject):
             self.sock.connectToHost(QtNetwork.QHostAddress(host), int(port))  # Attempt to connect to the server
 
             if not self.sock.waitForConnected(msecs=1000):  # Wait a until connected (the function is waiting for 1 sec)
-                self.conStatSigC.emit("Disconnected")
+                self.conStatSigC.emit("Disconnected")  # Indicate that we are not connected
+                self.log.warning("Client was unable to connect to: %s:%s" % (host, port))
 
     @QtCore.pyqtSlot(str, name='sendDataClient')
     def sendC(self, data: str):
         if self.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
-            self.sock.write(data.encode('utf-8'))
-            print("Sent data to RPi server: %s" % data)
+            self.sock.write(data.encode('utf-8'))  # Send the data to the server
+            self.log.info("Data sent to RPi server: %s" % data)
 
     def _receive(self):
         while self.sock.bytesAvailable() > 0:  # Read all data in que
             string = self.sock.readLine().data().decode('utf-8').rstrip('\n')  # Get the data as a string
             self.dataRcvSigC.emit(string)  # Decode the data to a string
+            self.log.info("Client received: %s" % string)
 
     def _disconnected(self):
-        self.conStatSigC.emit("Disconnected")
-        self.sendData.disconnect()
+        self.conStatSigC.emit("Disconnected")  # Indicate disconnection on the GUI
+        self.sendData.disconnect()  # Detach the data sending signal to avoid accidental firing
+        self.log.warning("Client disconnected from server or connection broken")
 
     def _hostConnected(self):
         self.sendData.connect(self.sendC)  # Send the data to the server when this signal is fired
         self.sendData.emit("CONNECT_CLIENT\n")  # Tell the RPi to connect the client, since the local server should be running
         #self.sendData.emit("START_SENDING_POS")  # Send the position report request
         self.conStatSigC.emit("Connected")  # If we have a connection send the signal
+        self.log.info("Client connected to server")
 
     def _error(self):
-        # Print and log any error occurred
-        print("An error occurred in client: %s" % self.sock.errorString())
-        self.log.log("WARNING", "Some error occurred in client: %s" % self.sock.errorString(), "_error")
+        # Log any error occurred
+        self.log.error("Client reported an error: %s" % self.sock.errorString())
 
     # This method is called when the thread exits
     def close(self):
@@ -77,3 +81,4 @@ class ClientThread(QtCore.QObject):
             self.sock.close()  # Close the socket before exiting
         self.reConnectSigC.disconnect()  # Thread is closing so it will not be needed any more
         self.conStatSigC.emit("Disconnected")  # Indicate a disconnected state on the GUI
+        self.log.info("Client thread closed")

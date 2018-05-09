@@ -1,6 +1,6 @@
 from Stellarium import StellariumDataHandling
 from PyQt5 import QtCore, QtNetwork
-import logData
+import logging
 
 
 class StellThread(QtCore.QObject):
@@ -14,11 +14,11 @@ class StellThread(QtCore.QObject):
     def __init__(self, cfgData, parent = None):
         super(StellThread, self).__init__(parent)  # Get the parent of the class
         self.cfgData = cfgData  # Settings file object
-        self.logD = logData.logData(__name__)  # Create the logger
+        self.logD = logging.getLogger(__name__)  # Create the logger
 
     # This method is called in every thread start
     def start(self):
-        print("Stellarium thread ID: %d" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
+        self.logD.info("Stellarium server thread started")
         self.socket = None  # Create the instance os the socket variable to use it later
         self.dataHandle = StellariumDataHandling.StellariumData()  # Data conversion object
         self.reConnectSigS.connect(self.connectStell)  # Connect the signal to the connection function
@@ -43,9 +43,9 @@ class StellThread(QtCore.QObject):
         self.tcpServer = QtNetwork.QTcpServer()  # Create a server object
         self.tcpServer.newConnection.connect(self._new_connection)  # Handler for a new connection
 
-
         self.tcpServer.listen(self.host, int(self.port))  # Start listening for connections
         self.conStatSigS.emit("Waiting")  # Indicate that the server is listening on the GUI
+        self.logD.debug("Stellarium server connection initializer called")
 
     # Whenever there is new connection, we call this method
     def _new_connection(self):
@@ -59,6 +59,7 @@ class StellThread(QtCore.QObject):
                 self.socket.readyRead.connect(self._receive)  # If there is pending data get it
                 self.socket.error.connect(self._error)  # Log any error occurred and also perform the necessary actions
                 self.socket.disconnected.connect(self._disconnected)  # Execute the appropriate code on state change
+                self.logD.info("Server has new connection")
 
     # Should we have data pending to be received, this method is called
     def _receive(self):
@@ -70,7 +71,7 @@ class StellThread(QtCore.QObject):
                 self.sendClientConn.emit(recData)  # Emit the signal to send the data to the raspberry pi
         except Exception:
             # If data is sent fast, then an exception will occur
-            self.logD.log("EXCEPT", "Some problem occurred while receiving Stellarium data. See traceback.", "_receive")
+            self.logD.exception("An exception occurred at data reception. See traceback.")
 
     # If at any moment the connection state is changed, we call this method
     def _disconnected(self):
@@ -79,11 +80,11 @@ class StellThread(QtCore.QObject):
         self.socket.readyRead.disconnect()  # Close the signal since it not needed
         self.sendDataStell.disconnect()  # Detach the signal to avoid any accidental firing
         self.tcpServer.listen(self.host, int(self.port))  # Start listening again
+        self.logD.warning("Stellarium client disconnected")
 
     def _error(self):
         # Print and log any error occurred
-        print("An error occurred in Stellarium server: %s" % self.socket.errorString())
-        self.logD.log("WARNING", "Some error occurred in Stellarium server: %s" % self.socket.errorString(), "_error")
+        self.logD.error("Stellarium server reported an error: %s" % self.socket.errorString())
 
     # Thsi method is called whenever the signal to send data back is fired
     @QtCore.pyqtSlot(float, float, name='stellariumDataSend')
@@ -92,18 +93,19 @@ class StellThread(QtCore.QObject):
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
                 self.socket.write(self.dataHandle.encodeStell(ra, dec))  # Send data back to Stellarium
                 self.socket.waitForBytesWritten()  # Wait for the data to be written
-                print("Sent to Stellarium: RA=%.5f, DEC=%.5f" % (ra, dec))  # Debugging print
+                self.logD.debug("Data sent to Stellarium: RA=%.5f, DEC=%.5f" % (ra, dec))
         except Exception:
-            self.logD.log("EXCEPT", "Problem sending data to Stellarium. See traceback.", "_receive")
+            self.logD.exception("Problem sending data to Stellarium. See traceback.")
 
     # This method is called whenever the thread exits
     def close(self):
         self.tcpServer.close()  # Close the TCP server
         if self.socket is not None:
             self.socket.disconnected.disconnect()  # Close the disconnect signal first to avoid firing
-            # TODO work a bit better with disconnect
-            self.sendDataStell.disconnect()  # Detach the signal to avoid any accidental firing (Reconnected at start)
+            if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
+                self.sendDataStell.disconnect()  # Disconnect to avoid any accidental firing (Reconnected at start)
             self.socket.close()  # Close the underlying TCP socket
         self.reConnectSigS.disconnect()  # Not needed any more since we are closing
         self.conStatSigS.emit("Disconnected")  # Indicate disconnection on the GUI
+        self.logD.info("Stellarium server thread closed")  # Indicate that we closed
 

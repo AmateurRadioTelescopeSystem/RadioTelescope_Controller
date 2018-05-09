@@ -5,6 +5,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from functools import partial
+import logging
 import sys
 
 
@@ -13,18 +14,23 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
     def __init__(self, parent=None):
         super(Ui_RadioTelescopeControl, self).__init__(parent)
+        self.logD = logging.getLogger(__name__)  # Create the logger for the file
         # Create the main GUI window and the other windows
         self.mainWin = QtWidgets.QMainWindow()  # Create the main window of the GUI
         self.uiManContWin = QtWidgets.QMainWindow()  # Create the Manual control window
-        self.uiTCPWin = QtWidgets.QMainWindow()
+        self.uiTCPWin = QtWidgets.QMainWindow()  # Create the TCP settings window object
 
         self.mainWin.setWindowIcon(QtGui.QIcon('Icons/radiotelescope.png'))
         self.uiManContWin.setWindowIcon(QtGui.QIcon('Icons/manControl.png'))
         self.uiTCPWin.setWindowIcon(QtGui.QIcon('Icons/Net.png'))
 
-        self.main_widg = uic.loadUi('GUI_Windows/RadioTelescope.ui', self.mainWin)
-        self.man_cn_widg = uic.loadUi('GUI_Windows/ManualControl.ui', self.uiManContWin)
-        self.tcp_widg = uic.loadUi('GUI_Windows/TCPSettings.ui', self.uiTCPWin)
+        try:
+            self.main_widg = uic.loadUi('GUI_Windows/RadioTelescope.ui', self.mainWin)
+            self.man_cn_widg = uic.loadUi('GUI_Windows/ManualControl.ui', self.uiManContWin)
+            self.tcp_widg = uic.loadUi('GUI_Windows/TCPSetting.ui', self.uiTCPWin)
+        except (FileNotFoundError, Exception):
+            self.logD.exception("Something happened when loading GUI files. See traceback")
+            sys.exit(-1)  # Indicate a problematic shutdown
         self.setupUi()  # Call the function to make all the connections for the GUI things
 
         # Timer for the date and time label

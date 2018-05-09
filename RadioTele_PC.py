@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.5
 
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore
 from GUI_Windows import UInterface
 from Stellarium import StellariumThread
 from Client import ClientThread
@@ -12,12 +12,12 @@ import logging
 import sys
 
 
-logdata = logging.getLogger(__name__)  # Create the logger for the program
 logging.config.fileConfig('log_config.ini')  # Get the and apply the logger configuration
 
 
 def main():
-    print("\nMain thread ID: %d\n" % int(QtCore.QThread.currentThreadId()))  # Used in debugging
+    logdata = logging.getLogger(__name__)  # Create the logger for the program
+    logdata.info("Main thread started")  # Use that in debugging
     QtCore.QThreadPool.globalInstance().setMaxThreadCount(8)  # Set the global thread pool count
 
     app = QtWidgets.QApplication(sys.argv)  # Create a Qt application instance
@@ -27,8 +27,7 @@ def main():
     try:
         cfgData = configData.confData("settings.xml")
     except:
-        print("There is a problem with the XML file handling. See log file for the traceback of the exception.\n")
-        logdata.exception("EXCEPT", "There is a problem with the XML file handling. Program terminates.")
+        logdata.exception("There is a problem with the XML file handling. Program terminates.")
         sys.exit(1)  # Terminate the script
 
     # TCP Stellarium server initialization
@@ -63,7 +62,7 @@ def main():
     # Initialize the operation handler
     operHandlerThread = QtCore.QThread()  # Create a thread for the operation handler
     operHandle = OperationHandler.OpHandler(tcpClient, tcpServer, tcpStell,
-                                            tcpClientThread, tcpServerThread, tcpStellThread, ui)
+                                            tcpClientThread, tcpServerThread, tcpStellThread, ui, cfgData)
     operHandle.moveToThread(operHandlerThread)  # Move the operation handler to a thread
     operHandlerThread.started.connect(operHandle.start)  # Run the start method upon thread start
     operHandlerThread.finished.connect(operHandle.appExitRequest)  # If the handler exits, then the app cloes
@@ -73,20 +72,6 @@ def main():
 
     s_latlon = cfgData.getLatLon()  # First element is latitude and second element is longitude
     s_alt = cfgData.getAltitude()  # Get the altitude from the settings file
-    autoconStell = cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
-    autoconRPi = cfgData.getTCPAutoConnStatus()  # Get the auto-connection preference for the RPi server and client
-
-    # If auto-connection is selected for thr TCP section, then do as requested
-    if autoconStell == "yes":
-        tcpStellThread.start()  # Start the server thread, since auto start is enabled
-    if autoconRPi == "yes":
-        tcpClientThread.start()  # Start the client thread, since auto start is enabled
-        tcpServerThread.start()  # Start the RPi server thread, since auto start is enabled
-
-    # Give functionality to the buttons
-    ui.mainWin.connectRadioTBtn.clicked.connect(operHandle.connectButtonR)  # TCP client connection button
-    ui.mainWin.serverRPiConnBtn.clicked.connect(operHandle.connectButtonRPi)  # TCP server connection button
-    ui.mainWin.connectStellariumBtn.clicked.connect(operHandle.connectButtonS)  # Stellarium TCP server connection button
 
     # Show location on the GUI
     ui.mainWin.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
