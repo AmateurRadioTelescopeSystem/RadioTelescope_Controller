@@ -27,7 +27,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         try:
             self.main_widg = uic.loadUi('GUI_Windows/RadioTelescope.ui', self.mainWin)
             self.man_cn_widg = uic.loadUi('GUI_Windows/ManualControl.ui', self.uiManContWin)
-            self.tcp_widg = uic.loadUi('GUI_Windows/TCPSetting.ui', self.uiTCPWin)
+            self.tcp_widg = uic.loadUi('GUI_Windows/TCPSettings.ui', self.uiTCPWin)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown

@@ -133,14 +133,17 @@ class OpHandler(QtCore.QObject):
         self.tcpClThread.wait()
         self.tcpClient.deleteLater()
         self.tcpClThread.deleteLater()
+        self.logD.debug("Client thread is closed for sure")
 
         self.tcpServThread.quit()
         self.tcpServThread.wait()
         self.tcpServer.deleteLater()
         self.tcpServThread.deleteLater()
+        self.logD.debug("RPi server thread is surely closed")
 
         self.tcpStelThread.quit()
         self.tcpStelThread.wait()
         self.tcpStellarium.deleteLater()
         self.tcpStelThread.deleteLater()
+        self.logD.debug("Stellarium server thread is closed for sure")
         self.logD.info("Operations handler thread closed")
