@@ -9,12 +9,10 @@ import OperationHandler
 import configData
 import logging.config
 import logging
-import yaml
 import sys
 
 
-config = yaml.safe_load(open('log_config.yaml', 'r'))
-logging.config.dictConfig(config)  # Get the and apply the logger configuration
+logging.config.fileConfig('log_config.ini')  # Get the and apply the logger configuration
 
 
 def main():
