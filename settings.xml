@@ -5,7 +5,7 @@
         <longitude>22.9308600</longitude>
     </location>
     <TCP autoconnect="yes" updated="no">
-        <host>10.42.0.167</host>
+        <host>192.168.1.13</host>
         <port>10001</port>
     </TCP>
     <TCPStell autoconnect="yes" updated="no">
