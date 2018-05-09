@@ -1,17 +1,19 @@
 #!/usr/bin/env python3.5
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from GUI_Windows import UInterface
 from Stellarium import StellariumThread
 from Client import ClientThread
 from Server import RPiServerThread
 import OperationHandler
 import configData
-import logData
+import logging.config
+import logging
 import sys
 
 
-logdata = logData.logData(__name__)  # Create the logger for the program
+logdata = logging.getLogger(__name__)  # Create the logger for the program
+logging.config.fileConfig('log_config.ini')  # Get the and apply the logger configuration
 
 
 def main():
@@ -26,7 +28,7 @@ def main():
         cfgData = configData.confData("settings.xml")
     except:
         print("There is a problem with the XML file handling. See log file for the traceback of the exception.\n")
-        logdata.log("EXCEPT", "There is a problem with the XML file handling. Program terminates.", __name__)
+        logdata.exception("EXCEPT", "There is a problem with the XML file handling. Program terminates.")
         sys.exit(1)  # Terminate the script
 
     # TCP Stellarium server initialization
