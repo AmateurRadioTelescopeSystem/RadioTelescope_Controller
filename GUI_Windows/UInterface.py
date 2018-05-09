@@ -5,8 +5,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from functools import partial
-from GUI_Windows import TCPSettings
-from GUI_Windows import ManualControl
 import sys
 
 
@@ -15,15 +13,19 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
     def __init__(self, parent=None):
         super(Ui_RadioTelescopeControl, self).__init__(parent)
-        # Create all other windows, except from the main one
-        self.uiTCP = TCPSettings.Ui_TCPSettings()  # Create the TCP settings pop-up window
-        self.uiManCont = ManualControl.Ui_ManualControl()  # Create the manual control pop-up window
+        # Create the main GUI window and the other windows
+        self.mainWin = QtWidgets.QMainWindow()  # Create the main window of the GUI
+        self.uiManContWin = QtWidgets.QMainWindow()  # Create the Manual control window
+        self.uiTCPWin = QtWidgets.QMainWindow()
 
-        # Create the main GUI window
-        self.mainWin = QtWidgets.QMainWindow()  # Create the main window of th GUI
         self.mainWin.setWindowIcon(QtGui.QIcon('Icons/radiotelescope.png'))
+        self.uiManContWin.setWindowIcon(QtGui.QIcon('Icons/manControl.png'))
+        self.uiTCPWin.setWindowIcon(QtGui.QIcon('Icons/Net.png'))
+
+        self.main_widg = uic.loadUi('GUI_Windows/RadioTelescope.ui', self.mainWin)
+        self.man_cn_widg = uic.loadUi('GUI_Windows/ManualControl.ui', self.uiManContWin)
+        self.tcp_widg = uic.loadUi('GUI_Windows/TCPSettings.ui', self.uiTCPWin)
         self.setupUi()  # Call the function to make all the connections for the GUI things
-        uic.loadUi('GUI_Windows/RadioTelescope.ui', self.mainWin)
 
         # Timer for the date and time label
         self.timer = QtCore.QTimer()  # Create a timer object
@@ -33,12 +35,17 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create("Fusion"))  # Change the style of the GUI
 
     def setupUi(self):
-
         # Set the font according to the OS
-        '''if sys.platform.startswith('linux'):
-            self.mainWin.font.setFamily("Ubuntu")  # Set the font for Ubuntu/linux
+        fnt = QtGui.QFont()  # Create the font object
+        fnt.setStyleHint(QtGui.QFont.Monospace)  # Set the a default font in case some of the following is not found
+        if sys.platform.startswith('linux'):
+            fnt.setFamily("Ubuntu")  # Set the font for Ubuntu/linux
         elif sys.platform.startswith('win32'):
-            self.mainWin.font.setFamily("Segoe UI")  # Set the font for Windows'''
+            fnt.setFamily("Segoe UI")  # Set the font for Windows
+
+        # Set the font in the widgets
+        self.main_widg.setFont(fnt)
+        self.man_cn_widg.setFont(fnt)
 
         # Make all the necessary connections
         self.mainWin.clientRPiEnableLabel.stateChanged.connect(
@@ -46,8 +53,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.serverRPiEnableLabel.stateChanged.connect(self.checkBoxTCPRTServer)
         self.mainWin.tcpStelServChkBox.stateChanged.connect(
             self.checkBoxTCPStel)  # Assign functionality to the checkbox
-        self.mainWin.actionSettings.triggered.connect(self.uiTCP.windShow)  # Show the TCP settings window
-        self.mainWin.actionManual_Control.triggered.connect(self.uiManCont.windShow)  # Show the manual control window
+        self.mainWin.actionSettings.triggered.connect(self.uiTCPWin.show)  # Show the TCP settings window
+        self.mainWin.actionManual_Control.triggered.connect(self.uiManContWin.show)  # Show the manual control window
         self.mainWin.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
         self.mainWin.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
 
