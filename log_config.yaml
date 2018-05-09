@@ -1,0 +1,39 @@
+version: 1
+Logging:
+  disable_existing_loggers: True
+
+  formatters:
+    debugging:
+      format: "%(asctime)s  [%(thread)12d] %(levelname)-8s - %(name)30s.%(funcName)-20s - %(message)s"
+    mainFile:
+      format: "%(asctime)s  [%(name)-30s]  %(levelname)-8s - %(funcName)-18s -  %(message)s"
+    brief:
+      format: "%(levelname)s [%(thread)12d] - %(name)30s.%(funcName)-20s - %(message)s"
+
+  handlers:
+    console:
+      class: logging.StreamHandler
+      formatter: brief
+      level: DEBUG
+      stream: sys.stderr
+    debugFile:
+      class: logging.FileHandler
+      formatter: debugging
+      level: DEBUG
+      filename: logs/debugging_info.log
+    radioTelescope:
+      class: logging.handlers.TimedRotatingFileHandler
+      formatter: mainFile
+      level: WARNING
+      filename: logs/RadioTelescope_Logger
+      backupCount: 0
+      atTime: None
+      when: 'midnight'  # Rotate the file creation every midnight in UTC time
+      encoding: 'utf-8'  # Set the file encoding to utf-8
+      utc: True  # Set the time of file creation to be UTC
+
+  loggers:
+    root:
+      level: DEBUG
+      handlers: [console, debugFile, radioTelescope]
+
