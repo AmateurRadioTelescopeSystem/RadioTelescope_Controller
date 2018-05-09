@@ -15,10 +15,13 @@ class ClientThread(QtCore.QObject):
         self.log = logging.getLogger(__name__)  # Create the logger
 
     def start(self):
+        mut = QtCore.QMutex()  # Create a QMutex object
+        mut.lock()  # Lock the thread until it has started, to avoid any overlapping problems
         self.log.info("Client thread started")  # Indicate thread start
         self.sock = QtNetwork.QTcpSocket()  # Create the TCP socket
         self.reConnectSigC.connect(self.connect)  # Do the reconnect signal connection
         self.connect()  # Start a connection
+        mut.unlock()  # Unlock the thread, since it has started successfully
 
     # The connect function is called if the signal is fired or in the start of the thread
     @QtCore.pyqtSlot(name='reConnectClient')
@@ -46,13 +49,13 @@ class ClientThread(QtCore.QObject):
     def sendC(self, data: str):
         if self.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
             self.sock.write(data.encode('utf-8'))  # Send the data to the server
-            self.log.info("Data sent to RPi server: %s" % data)
+            self.log.debug("Data sent to RPi server: %s" % data)
 
     def _receive(self):
         while self.sock.bytesAvailable() > 0:  # Read all data in que
             string = self.sock.readLine().data().decode('utf-8').rstrip('\n')  # Get the data as a string
             self.dataRcvSigC.emit(string)  # Decode the data to a string
-            self.log.info("Client received: %s" % string)
+            self.log.debug("Client received: %s" % string)
 
     def _disconnected(self):
         self.conStatSigC.emit("Disconnected")  # Indicate disconnection on the GUI

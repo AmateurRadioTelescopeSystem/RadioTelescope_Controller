@@ -18,11 +18,14 @@ class StellThread(QtCore.QObject):
 
     # This method is called in every thread start
     def start(self):
+        mut = QtCore.QMutex()  # Create a QMutex object
+        mut.lock()  # Lock the thread until it has started, to avoid any overlapping problems
         self.logD.info("Stellarium server thread started")
         self.socket = None  # Create the instance os the socket variable to use it later
         self.dataHandle = StellariumDataHandling.StellariumData()  # Data conversion object
         self.reConnectSigS.connect(self.connectStell)  # Connect the signal to the connection function
         self.connectStell()  # Start the Stellarium server
+        mut.unlock()  # Unlock the thread, since it has started successfully
 
     @QtCore.pyqtSlot(name='reConnectStell')
     def connectStell(self):

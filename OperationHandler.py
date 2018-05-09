@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore
 from functools import partial
 import logging
 
@@ -74,7 +74,7 @@ class OpHandler(QtCore.QObject):
     # Dta received from the client connected to the RPi server
     @QtCore.pyqtSlot(str, name='dataClientRX')
     def clientDataRx(self, data: str):
-        self.logD.info("Data received from client (Connected to remote RPi server): %s" % data)
+        self.logD.debug("Data received from client (Connected to remote RPi server): %s" % data)
 
     # Send the appropriate command according to the selected mode. Data is received from Stellarium (sendClientConn)
     @QtCore.pyqtSlot(list, name='clientCommandSendStell')
@@ -145,5 +145,4 @@ class OpHandler(QtCore.QObject):
         self.tcpStelThread.wait()
         self.tcpStellarium.deleteLater()
         self.tcpStelThread.deleteLater()
-        self.logD.debug("Stellarium server thread is closed for sure")
-        self.logD.info("Operations handler thread closed")
+        self.logD.debug("Stellarium server thread is closed for sure and operations handler thread closed")

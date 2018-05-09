@@ -9,10 +9,12 @@ import OperationHandler
 import configData
 import logging.config
 import logging
+import yaml
 import sys
 
 
-logging.config.fileConfig('log_config.ini')  # Get the and apply the logger configuration
+config = yaml.safe_load(open('log_config.yaml', 'r'))
+logging.config.dictConfig(config)  # Get the and apply the logger configuration
 
 
 def main():
@@ -88,7 +90,8 @@ def main():
 
 
 if __name__ == '__main__':
+    log = logging.getLogger(__name__)  # Create the logger for the program
     try:
         main()  # Run the main program
     except (Exception, OSError):
-        logdata.log("EXCEPT", "Some problem occurred. See the traceback below.")
+        log.exception("An major error occurred. See the traceback below.")

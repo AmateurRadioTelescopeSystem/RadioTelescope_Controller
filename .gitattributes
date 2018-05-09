@@ -10,6 +10,7 @@
 *.log text
 *.ui text
 *.ini text
+*.yaml text
 
 # Declare files that should have CRLF line endings on checkout.
 

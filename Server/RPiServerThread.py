@@ -17,10 +17,13 @@ class RPiServerThread(QtCore.QObject):
 
     # This method is called in every thread start and if the re-connect signal is fired
     def start(self):
+        mut = QtCore.QMutex()  # Create a QMutex object
+        mut.lock()  # Lock the thread until it has started, to avoid any overlapping problems
         self.logD.info("Raspberry Pi connection server thread started")
         self.socket = None  # Create a variable to hold the socket
         self.reConnectSigR.connect(self.connectServ)
         self.connectServ()  # Start the server
+        mut.unlock()  # Unlock the thread, since it has started successfully
 
     @QtCore.pyqtSlot(name='reConnectServer')
     def connectServ(self):
@@ -66,7 +69,7 @@ class RPiServerThread(QtCore.QObject):
             while self.socket.bytesAvailable() > 0:  # Read all data in que
                 recData = self.socket.readLine().data().decode('utf-8').rstrip('\n')  # Get the data as a string
                 self.dataRxFromServ.emit(recData)  # Send a signal to indicate that the server received some data
-                self.logD.info("RPi server received: %s" % recData)
+                self.logD.debug("RPi server received: %s" % recData)
         except Exception:
             # If data is sent fast, then an exception will occur
             self.logD.exception("Some problem occurred while receiving server data. See traceback")
