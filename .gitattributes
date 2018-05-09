@@ -14,7 +14,7 @@
 # Declare files that should have CRLF line endings on checkout.
 
 # Declare files that should have LF line endings on checkout.
-*.py eol=lf
+*.py text
 
 # Declare files that are truly binary and shouldn't be modified.
 *.jpeg binary
