@@ -67,8 +67,8 @@ class StellThread(QtCore.QObject):
     # Should we have data pending to be received, this method is called
     def _receive(self):
         try:
-            if self.socket.bytesAvailable() > 0:
-                recData = self.socket.readAll()  # Get the data sa a binary array
+            while self.socket.bytesAvailable() > 0:
+                recData = self.socket.read(20)  # Get the data as a binary array (we expect 20 bytes each time)
                 recData = self.dataHandle.decodeStell(recData)  # Decode the Stellarium data to get coordinates
                 self.dataShowSigS.emit(recData[0], recData[1])  # Send the data to be shown on the GUI widget
                 self.sendClientConn.emit(recData)  # Emit the signal to send the data to the raspberry pi
@@ -102,7 +102,6 @@ class StellThread(QtCore.QObject):
 
     # This method is called whenever the thread exits
     def close(self):
-        self.tcpServer.close()  # Close the TCP server
         if self.socket is not None:
             self.socket.disconnected.disconnect()  # Close the disconnect signal first to avoid firing
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:

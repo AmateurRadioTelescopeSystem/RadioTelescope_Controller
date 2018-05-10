@@ -97,7 +97,6 @@ class RPiServerThread(QtCore.QObject):
 
     # This method is called whenever the thread exits
     def close(self):
-        self.tcpServer.close()  # Close the TCP server
         if self.socket is not None:
             self.socket.disconnected.disconnect()  # Close the disconnect signal first to avoid firing
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:  # Check if socket is connected
