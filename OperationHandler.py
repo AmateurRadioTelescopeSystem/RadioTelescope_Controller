@@ -98,6 +98,29 @@ class OpHandler(QtCore.QObject):
                 self.posDataShow.emit(float(ra), float(dec))  # Send the updated values if they are different
             self.prev_pos = [ra, dec]  # Save the values for later comparison
 
+    # Functions to connect with the manual control widget
+    # TODO add comments to the functions
+    def manCont_movRA(self):
+        freq = self.ui.uiManContWin.frequncyInputBox.text()
+        step = self.ui.uiManContWin.raStepsField.text()
+        string = "MANCONT_MOVRA_FRQ_%s_STP_%s" %(freq, step)
+        self.tcpClient.sendData.emit(string)
+
+    def manCont_movDEC(self):
+        freq = self.ui.uiManContWin.frequncyInputBox.text()
+        step = self.ui.uiManContWin.decStepsField.text()
+        string = "MANCONT_MOVDEC_FRQ_%s_STP_%s" %(freq, step)
+        print(string)
+        self.tcpClient.sendData.emit(string)
+
+    def manCont_movBoth(self):
+        freq = self.ui.uiManContWin.frequncyInputBox.text()
+        step_ra = self.ui.uiManContWin.raStepsField.text()
+        step_dec = self.ui.uiManContWin.decStepsField.text()
+        string = "MANCONT_MOVE_FRQ_%s_RA_%s_DEC_%s" %(freq, step_ra, step_dec)
+        print(string)
+        self.tcpClient.sendData.emit(string)
+
     # Command to stop any motion of the radio telescope dish
     @QtCore.pyqtSlot(name='stopRadioTele')
     def stopMovingRT(self):
@@ -122,6 +145,11 @@ class OpHandler(QtCore.QObject):
         self.ui.mainWin.serverRPiConnBtn.clicked.connect(self.connectButtonRPi)  # TCP server connection button
         self.ui.mainWin.connectStellariumBtn.clicked.connect(
             self.connectButtonS)  # Stellarium TCP server connection button
+
+        self.ui.uiManContWin.movRaBtn.clicked.connect(self.manCont_movRA)
+        self.ui.uiManContWin.movDecBtn.clicked.connect(self.manCont_movDEC)
+        self.ui.uiManContWin.syncMoveBtn.clicked.connect(self.manCont_movBoth)
+
         self.logD.debug("All signal connections made")
 
     # This function is called whenever the app is about to quit

@@ -15,11 +15,13 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     def __init__(self, parent=None):
         super(Ui_RadioTelescopeControl, self).__init__(parent)
         self.logD = logging.getLogger(__name__)  # Create the logger for the file
+
         # Create the main GUI window and the other windows
         self.mainWin = QtWidgets.QMainWindow()  # Create the main window of the GUI
         self.uiManContWin = QtWidgets.QMainWindow()  # Create the Manual control window
         self.uiTCPWin = QtWidgets.QMainWindow()  # Create the TCP settings window object
 
+        # Set the icons for the GUI windows
         self.mainWin.setWindowIcon(QtGui.QIcon('Icons/radiotelescope.png'))
         self.uiManContWin.setWindowIcon(QtGui.QIcon('Icons/manControl.png'))
         self.uiTCPWin.setWindowIcon(QtGui.QIcon('Icons/Net.png'))
