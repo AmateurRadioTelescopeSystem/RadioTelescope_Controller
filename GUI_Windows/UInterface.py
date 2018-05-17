@@ -48,8 +48,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         fnt.setStyleHint(QtGui.QFont.Monospace)  # Set the a default font in case some of the following is not found
         if sys.platform.startswith('linux'):
             fnt.setFamily("Ubuntu")  # Set the font for Ubuntu/linux
+            fnt.setPointSize(11)
         elif sys.platform.startswith('win32'):
             fnt.setFamily("Segoe UI")  # Set the font for Windows
+            fnt.setPointSize(8)
 
         # Set the font in the widgets
         self.main_widg.setFont(fnt)

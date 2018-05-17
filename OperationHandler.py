@@ -74,16 +74,23 @@ class OpHandler(QtCore.QObject):
     # Dta received from the client connected to the RPi server
     @QtCore.pyqtSlot(str, name='dataClientRX')
     def clientDataRx(self, data: str):
-        self.logD.debug("Data received from client (Connected to remote RPi server): %s" % data)
+        splt_str = data.split("_")
+        if len(splt_str) > 0:
+            if splt_str[0] == "RASTEPS":
+                self.ui.uiManContWin.raStepText.setText(splt_str[1])
+            elif splt_str[0] == "DECSTEPS":
+                self.ui.uiManContWin.decStepText.setText(splt_str[1])
+        else:
+            self.logD.debug("Data received from client (Connected to remote RPi server): %s" % data)
 
     # Send the appropriate command according to the selected mode. Data is received from Stellarium (sendClientConn)
     @QtCore.pyqtSlot(list, name='clientCommandSendStell')
     def stellCommSend(self, radec: list):
         if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
-            command = "TRNST_RA_%.5f_DEC_%.5f" % (radec[0], radec[1])
+            command = "TRNST_RA_%.5f_DEC_%.5f\n" % (radec[0], radec[1])
             self.tcpClient.sendData.emit(command)
         elif self.ui.mainWin.stellariumOperationSelect.currentText() == "Aim and track":
-            command = "TRK %f %f" % (radec[0], radec[1])
+            command = "TRK %f %f\n" % (radec[0], radec[1])
             self.tcpClient.sendData.emit(command)
 
     # Received data from the server that the RPi is connected as a client. Signal is (dataRxFromServ)
@@ -103,24 +110,24 @@ class OpHandler(QtCore.QObject):
     def manCont_movRA(self):
         freq = self.ui.uiManContWin.frequncyInputBox.text()
         step = self.ui.uiManContWin.raStepsField.text()
-        string = "MANCONT_MOVRA_%s_%s_0" %(freq, step)
+        string = "MANCONT_MOVRA_%s_%s_0\n" %(freq, step)
         self.tcpClient.sendData.emit(string)
 
     def manCont_movDEC(self):
         freq = self.ui.uiManContWin.frequncyInputBox.text()
         step = self.ui.uiManContWin.decStepsField.text()
-        string = "MANCONT_MOVDEC_%s_0_%s" %(freq, step)
+        string = "MANCONT_MOVDEC_%s_0_%s\n" %(freq, step)
         self.tcpClient.sendData.emit(string)
 
     def manCont_movBoth(self):
         freq = self.ui.uiManContWin.frequncyInputBox.text()
         step_ra = self.ui.uiManContWin.raStepsField.text()
         step_dec = self.ui.uiManContWin.decStepsField.text()
-        string = "MANCONT_MOVE_%s_%s_%s" %(freq, step_ra, step_dec)
+        string = "MANCONT_MOVE_%s_%s_%s\n" %(freq, step_ra, step_dec)
         self.tcpClient.sendData.emit(string)
 
     def manCont_stop(self):
-        string ="MANCONT_STOP"
+        string ="MANCONT_STOP\n"
         self.tcpClient.sendData.emit(string)  # Send the stop request in manual control
 
     # Command to stop any motion of the radio telescope dish
