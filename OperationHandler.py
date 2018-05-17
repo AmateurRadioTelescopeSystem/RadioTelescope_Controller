@@ -103,23 +103,25 @@ class OpHandler(QtCore.QObject):
     def manCont_movRA(self):
         freq = self.ui.uiManContWin.frequncyInputBox.text()
         step = self.ui.uiManContWin.raStepsField.text()
-        string = "MANCONT_MOVRA_FRQ_%s_STP_%s" %(freq, step)
+        string = "MANCONT_MOVRA_%s_%s_0" %(freq, step)
         self.tcpClient.sendData.emit(string)
 
     def manCont_movDEC(self):
         freq = self.ui.uiManContWin.frequncyInputBox.text()
         step = self.ui.uiManContWin.decStepsField.text()
-        string = "MANCONT_MOVDEC_FRQ_%s_STP_%s" %(freq, step)
-        print(string)
+        string = "MANCONT_MOVDEC_%s_0_%s" %(freq, step)
         self.tcpClient.sendData.emit(string)
 
     def manCont_movBoth(self):
         freq = self.ui.uiManContWin.frequncyInputBox.text()
         step_ra = self.ui.uiManContWin.raStepsField.text()
         step_dec = self.ui.uiManContWin.decStepsField.text()
-        string = "MANCONT_MOVE_FRQ_%s_RA_%s_DEC_%s" %(freq, step_ra, step_dec)
-        print(string)
+        string = "MANCONT_MOVE_%s_%s_%s" %(freq, step_ra, step_dec)
         self.tcpClient.sendData.emit(string)
+
+    def manCont_stop(self):
+        string ="MANCONT_STOP"
+        self.tcpClient.sendData.emit(string)  # Send the stop request in manual control
 
     # Command to stop any motion of the radio telescope dish
     @QtCore.pyqtSlot(name='stopRadioTele')
@@ -149,6 +151,7 @@ class OpHandler(QtCore.QObject):
         self.ui.uiManContWin.movRaBtn.clicked.connect(self.manCont_movRA)
         self.ui.uiManContWin.movDecBtn.clicked.connect(self.manCont_movDEC)
         self.ui.uiManContWin.syncMoveBtn.clicked.connect(self.manCont_movBoth)
+        self.ui.uiManContWin.stopMotMotionBtn.clicked.connect(self.manCont_stop)
 
         self.logD.debug("All signal connections made")
 
