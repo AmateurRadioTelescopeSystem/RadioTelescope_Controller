@@ -24,6 +24,7 @@ class OpHandler(QtCore.QObject):
 
     def start(self):
         self.logD.info("Operations handler thread started")
+
         self.prev_pos = ["", ""]  # The dish position is saved for change comparison
         self.signalConnectios()  # Make all the necessary signal connections
 
