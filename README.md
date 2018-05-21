@@ -1,29 +1,19 @@
-# README #
+# Radio Telescope Controller Software #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Below you will find installation instructions to get the controller up and running on your own system.
+This installation information are not the final ones, since more packages may be used and/or a different approach will be used.
 
 ### What is this repository for? ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* In this repository you will find the necessary files to get the telescope controller software up and running on your system.
+* This is still a beta version and it is relatively unstable, but usable.
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
+* In the setup process the important part is to install the required package/packages
+* Use the `pip install -r requirements.txt` command to install the necessary packages for python.
+* Currently the only package used is PyQt5 version 5.10
 
 ### Who do I talk to? ###
 
 * Repo owner or admin
-* Other community or team contact
