@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# The GUI code is automatically generated from the PyQt5 package
-# by running the pyuic5 command on the ui file from QtDesigner
+# IP address regex: https://stackoverflow.com/questions/10086572/ip-address-validation-in-python-using-regex
 
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from functools import partial
@@ -73,6 +71,27 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.stellPrevPageBtn.clicked.connect(lambda: self.mainWin.stackedWidget.setCurrentIndex(0))
         self.mainWin.stellariumOperationSelect.currentIndexChanged.connect(self.commandListText)
 
+        # Connect the functions on index change for the settings window
+        self.uiTCPWin.telServBox.currentIndexChanged.connect(self.ipSelectionBoxes)
+        self.uiTCPWin.telClientBox.currentIndexChanged.connect(self.ipSelectionBoxes)
+        self.uiTCPWin.stellIPServBox.currentIndexChanged.connect(self.ipSelectionBoxes)
+
+        # Create validators for the TCP port settings entries
+        ipPortValidator = QtGui.QIntValidator()  # Create an integer validator
+        ipPortValidator.setRange(0, 65535)  # Set the validator range
+        self.uiTCPWin.telescopeIPPortServ.setValidator(ipPortValidator)
+        self.uiTCPWin.telescopeIPPortClient.setValidator(ipPortValidator)
+        self.uiTCPWin.stellPortServ.setValidator(ipPortValidator)
+
+        # Create validators for the TCP IP settings entries
+        ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])"  # A regular expression for one numeric IP part
+        ipAddrRegEx = QtCore.QRegExp("^" + ipRange + "\\." + ipRange + "\\." + ipRange + "\\." + ipRange + "$")
+        ipAddrRegEx = QtGui.QRegExpValidator(ipAddrRegEx)  # Regular expression validator object
+        self.uiTCPWin.telescopeIPAddrServ.setValidator(ipAddrRegEx)
+        self.uiTCPWin.telescopeIPAddrClient.setValidator(ipAddrRegEx)
+        self.uiTCPWin.stellServInpIP.setValidator(ipAddrRegEx)
+
+
     # Function called every time the corresponding checkbox is selected
     def checkBoxTCPRTClient(self, state):
         if state == QtCore.Qt.Checked:
@@ -97,6 +116,27 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     # Set the label of the command on change
     def commandListText(self):
         self.mainWin.commandStellIndLabel.setText(self.mainWin.stellariumOperationSelect.currentText())
+
+    # Change the IP fields according to choice
+    def ipSelectionBoxes(self):
+        if self.uiTCPWin.telServBox.currentText() == "Custom":
+            self.uiTCPWin.telescopeIPAddrServ.setEnabled(True)
+        else:
+            self.uiTCPWin.telescopeIPAddrServ.setEnabled(False)
+
+        if self.uiTCPWin.telClientBox.currentText() == "Remote":
+            self.uiTCPWin.telescopeIPAddrClient.setEnabled(True)
+            # self.uiTCPWin.telescopeIPAddrClient.setText("")
+        else:
+            self.uiTCPWin.telescopeIPAddrClient.setEnabled(False)
+            self.uiTCPWin.telescopeIPAddrClient.setText("127.0.0.1")
+
+        if self.uiTCPWin.stellIPServBox.currentText() == "Remote":
+            self.uiTCPWin.stellServInpIP.setEnabled(True)
+            # self.uiTCPWin.stellServInpIP.setText("")
+        else:
+            self.uiTCPWin.stellServInpIP.setEnabled(False)
+            self.uiTCPWin.stellServInpIP.setText("127.0.0.1")
 
     # Handle the motion stop request
     def stopMotion(self, objec):

@@ -27,17 +27,17 @@ class OpHandler(QtCore.QObject):
 
         self.prev_pos = ["", ""]  # The dish position is saved for change comparison
         self.signalConnectios()  # Make all the necessary signal connections
+        self.ui.mainWin.actionSettings.triggered.connect(self.TCPSettingsHandle)  # Update settings each time
 
         autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
         autoconRPi = self.cfgData.getTCPAutoConnStatus()  # Auto-connection preference for the RPi server and client
+
         # If auto-connection is selected for thr TCP section, then do as requested
         if autoconStell == "yes":
             self.tcpStelThread.start()  # Start the server thread, since auto start is enabled
         if autoconRPi == "yes":
             self.tcpClThread.start()  # Start the client thread, since auto start is enabled
             self.tcpServThread.start()  # Start the RPi server thread, since auto start is enabled
-
-        self.val = 0.0
 
     # Client connection button handling method
     def connectButtonR(self):
@@ -137,6 +137,44 @@ class OpHandler(QtCore.QObject):
         # TODO change the command to the appropriate one
         self.tcpClient.sendData.emit("STOP")  # Send the request to stop moving to the RPi server
         self.logD.warning("A dish motion halt was requested")
+
+    def TCPSettingsHandle(self):
+        autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
+        autoconRPi = self.cfgData.getTCPAutoConnStatus()  # Auto-connection preference for the RPi server and client
+        clientIP = self.cfgData.getHost()
+        servRPiIP = self.cfgData.getRPiHost()
+        stellServIP = self.cfgData.getStellHost()
+
+        # If auto-connection is selected for thr TCP section, then do as requested
+        if autoconStell == "yes":
+            self.ui.uiTCPWin.stellServAutoStartBtn.setChecked(True)
+        if autoconRPi == "yes":
+            self.ui.uiTCPWin.teleAutoConChoice.setChecked(True)
+
+        if clientIP == "localhost" or clientIP == "127.0.0.1":
+            self.ui.uiTCPWin.telClientBox.setCurrentIndex(0)
+        else:
+            self.ui.uiTCPWin.telClientBox.setCurrentIndex(1)
+
+        if servRPiIP == "localhost" or servRPiIP == "127.0.0.1":
+            self.ui.uiTCPWin.telServBox.setCurrentIndex(0)
+        elif servRPiIP == "remote":
+            self.ui.uiTCPWin.telServBox.setCurrentIndex(1)
+        else:
+            self.ui.uiTCPWin.telServBox.setCurrentIndex(2)
+
+        if stellServIP == "localhost" or stellServIP == "127.0.0.1":
+            self.ui.uiTCPWin.stellIPServBox.setCurrentIndex(0)
+        else:
+            self.ui.uiTCPWin.stellIPServBox.setCurrentIndex(1)
+
+        # Set all the text fields with the correct data
+        self.ui.uiTCPWin.telescopeIPAddrClient.setText(clientIP)
+        self.ui.uiTCPWin.telescopeIPPortClient.setText(self.cfgData.getPort())
+        self.ui.uiTCPWin.telescopeIPAddrServ.setText(servRPiIP)
+        self.ui.uiTCPWin.telescopeIPPortServ.setText(self.cfgData.getRPiPort())
+        self.ui.uiTCPWin.stellServInpIP.setText(stellServIP)
+        self.ui.uiTCPWin.stellPortServ.setText(self.cfgData.getStellPort())
 
     # Make all the necessary signal connections
     def signalConnectios(self):
