@@ -18,7 +18,6 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin = QtWidgets.QMainWindow()  # Create the main window of the GUI
         self.uiManContWin = QtWidgets.QMainWindow()  # Create the Manual control window
         self.uiTCPWin = QtWidgets.QMainWindow()  # Create the TCP settings window object
-        self.uiLocationWin = QtWidgets.QDialog()  # Create the location settings window object
 
         # Set the icons for the GUI windows
         self.mainWin.setWindowIcon(QtGui.QIcon('Icons/radiotelescope.png'))
@@ -29,7 +28,6 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.main_widg = uic.loadUi('GUI_Windows/RadioTelescope.ui', self.mainWin)
             self.man_cn_widg = uic.loadUi('GUI_Windows/ManualControl.ui', self.uiManContWin)
             self.tcp_widg = uic.loadUi('GUI_Windows/TCPSettings.ui', self.uiTCPWin)
-            self.loc_widg = uic.loadUi('GUI_Windows/Location.ui', self.uiLocationWin)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
@@ -65,7 +63,6 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.checkBoxTCPStel)  # Assign functionality to the checkbox
         self.mainWin.actionSettings.triggered.connect(self.uiTCPWin.show)  # Show the TCP settings window
         self.mainWin.actionManual_Control.triggered.connect(self.uiManContWin.show)  # Show the manual control window
-        self.mainWin.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
         self.mainWin.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
         self.mainWin.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
 
@@ -79,12 +76,9 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.uiTCPWin.telClientBox.currentIndexChanged.connect(self.ipSelectionBoxes)
         self.uiTCPWin.stellIPServBox.currentIndexChanged.connect(self.ipSelectionBoxes)
 
-        # Make connections for the location settings dialog
-        self.uiLocationWin.exitBtn.clicked.connect(self.uiLocationWin.close)  # Close the settings window when requested
-
         # Create validators for the TCP port settings entries
         ipPortValidator = QtGui.QIntValidator()  # Create an integer validator
-        ipPortValidator.setRange(1025, 65535)  # Set the validator range (lower than 1024 usually they are taken)
+        ipPortValidator.setRange(0, 65535)  # Set the validator range
         self.uiTCPWin.telescopeIPPortServ.setValidator(ipPortValidator)
         self.uiTCPWin.telescopeIPPortClient.setValidator(ipPortValidator)
         self.uiTCPWin.stellPortServ.setValidator(ipPortValidator)
@@ -97,15 +91,6 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.uiTCPWin.telescopeIPAddrClient.setValidator(ipAddrRegEx)
         self.uiTCPWin.stellServInpIP.setValidator(ipAddrRegEx)
 
-        # Location settings dialog input fields validation declaration
-        locValidator = QtGui.QDoubleValidator()  # Create a double validator object
-        locValidator.setDecimals(5)
-        # locValidator.setRange(-90.0, 90.0, 5)
-        self.uiLocationWin.latEntry.setValidator(locValidator)
-        # locValidator.setRange(-180.0, 180.0, 5)
-        self.uiLocationWin.lonEntry.setValidator(locValidator)
-        # locValidator.setRange(0.0, 7000.0, 2)
-        self.uiLocationWin.altEntry.setValidator(locValidator)
 
     # Function called every time the corresponding checkbox is selected
     def checkBoxTCPRTClient(self, state):

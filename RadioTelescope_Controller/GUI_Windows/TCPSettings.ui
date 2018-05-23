@@ -9,9 +9,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>293</width>
-    <height>346</height>
+    <width>267</width>
+    <height>291</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Segoe UI</family>
+   </font>
   </property>
   <property name="windowTitle">
    <string>TCP Settings</string>
@@ -70,12 +75,6 @@
             <property name="enabled">
              <bool>false</bool>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>120</width>
-              <height>16777215</height>
-             </size>
-            </property>
            </widget>
           </item>
          </layout>
@@ -117,12 +116,6 @@
             <property name="enabled">
              <bool>false</bool>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>120</width>
-              <height>16777215</height>
-             </size>
-            </property>
            </widget>
           </item>
          </layout>
@@ -143,14 +136,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="telescopeIPPortServ">
-            <property name="maximumSize">
-             <size>
-              <width>120</width>
-              <height>16777215</height>
-             </size>
-            </property>
-           </widget>
+           <widget class="QLineEdit" name="telescopeIPPortServ"/>
           </item>
          </layout>
         </item>
@@ -177,26 +163,14 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>120</width>
-              <height>16777215</height>
-             </size>
-            </property>
            </widget>
           </item>
          </layout>
         </item>
-        <item row="2" column="0" colspan="2">
+        <item row="2" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
            <widget class="QLabel" name="label_7">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
             <property name="text">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Start-up auto connect&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
@@ -204,12 +178,6 @@
           </item>
           <item>
            <widget class="QCheckBox" name="teleAutoConChoice">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
             <property name="cursor">
              <cursorShape>PointingHandCursor</cursorShape>
             </property>
@@ -231,8 +199,6 @@
          </widget>
         </item>
        </layout>
-       <zorder>telescopeSaveBtn</zorder>
-       <zorder>label_3</zorder>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
@@ -276,12 +242,6 @@
             <property name="enabled">
              <bool>false</bool>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>120</width>
-              <height>16777215</height>
-             </size>
-            </property>
            </widget>
           </item>
          </layout>
@@ -308,12 +268,6 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>120</width>
-              <height>16777215</height>
-             </size>
             </property>
            </widget>
           </item>
@@ -361,8 +315,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>293</width>
-     <height>25</height>
+     <width>267</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
