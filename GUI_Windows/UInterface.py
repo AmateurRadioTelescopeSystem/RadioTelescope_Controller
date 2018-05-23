@@ -20,6 +20,9 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.uiTCPWin = QtWidgets.QMainWindow()  # Create the TCP settings window object
         self.uiLocationWin = QtWidgets.QDialog()  # Create the location settings window object
 
+        # Extra dialogs
+        self.mapDialog = QtWidgets.QDialog()  # Create the location selection from map dialog
+
         # Set the icons for the GUI windows
         self.mainWin.setWindowIcon(QtGui.QIcon('Icons/radiotelescope.png'))
         self.uiManContWin.setWindowIcon(QtGui.QIcon('Icons/manControl.png'))
@@ -30,6 +33,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.man_cn_widg = uic.loadUi('GUI_Windows/ManualControl.ui', self.uiManContWin)
             self.tcp_widg = uic.loadUi('GUI_Windows/TCPSettings.ui', self.uiTCPWin)
             self.loc_widg = uic.loadUi('GUI_Windows/Location.ui', self.uiLocationWin)
+            uic.loadUi('GUI_Windows/MapsDialog.ui', self.mapDialog)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
@@ -81,6 +85,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
         # Make connections for the location settings dialog
         self.uiLocationWin.exitBtn.clicked.connect(self.uiLocationWin.close)  # Close the settings window when requested
+        self.uiLocationWin.locationTypeChoose.currentIndexChanged.connect(self.showMapSelection)
 
         # Create validators for the TCP port settings entries
         ipPortValidator = QtGui.QIntValidator()  # Create an integer validator
@@ -152,6 +157,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         else:
             self.uiTCPWin.stellServInpIP.setEnabled(False)
             self.uiTCPWin.stellServInpIP.setText("127.0.0.1")
+
+    def showMapSelection(self):
+        if self.uiLocationWin.locationTypeChoose.currentText() == "Google Maps":
+            self.mapDialog.show()
 
     # Handle the motion stop request
     def stopMotion(self, objec):
