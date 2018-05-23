@@ -7,8 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>235</width>
-    <height>221</height>
+    <height>184</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Segoe UI</family>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Location Settings</string>

@@ -27,13 +27,14 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.setWindowIcon(QtGui.QIcon('Icons/radiotelescope.png'))
         self.uiManContWin.setWindowIcon(QtGui.QIcon('Icons/manControl.png'))
         self.uiTCPWin.setWindowIcon(QtGui.QIcon('Icons/Net.png'))
+        self.uiLocationWin.setWindowIcon(QtGui.QIcon('Icons/location.png'))
 
         try:
             self.main_widg = uic.loadUi('GUI_Windows/RadioTelescope.ui', self.mainWin)
             self.man_cn_widg = uic.loadUi('GUI_Windows/ManualControl.ui', self.uiManContWin)
             self.tcp_widg = uic.loadUi('GUI_Windows/TCPSettings.ui', self.uiTCPWin)
             self.loc_widg = uic.loadUi('GUI_Windows/Location.ui', self.uiLocationWin)
-            uic.loadUi('GUI_Windows/MapsDialog.ui', self.mapDialog)
+            # uic.loadUi('GUI_Windows/MapsDialog.ui', self.mapDialog)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
