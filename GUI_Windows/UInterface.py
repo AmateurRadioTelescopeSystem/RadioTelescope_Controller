@@ -73,6 +73,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
         self.mainWin.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
         self.mainWin.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
+        self.mainWin.locatChangeBtn.clicked.connect(self.uiLocationWin.show)
 
         # Change between widgets
         self.mainWin.stellNextPageBtn.clicked.connect(lambda: self.mainWin.stackedWidget.setCurrentIndex(1))
@@ -80,9 +81,9 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.stellariumOperationSelect.currentIndexChanged.connect(self.commandListText)
 
         # Connect the functions on index change for the settings window
-        self.uiTCPWin.telServBox.currentIndexChanged.connect(self.ipSelectionBoxes)
-        self.uiTCPWin.telClientBox.currentIndexChanged.connect(self.ipSelectionBoxes)
-        self.uiTCPWin.stellIPServBox.currentIndexChanged.connect(self.ipSelectionBoxes)
+        self.uiTCPWin.telServBox.currentIndexChanged.connect(self.ipSelectionBoxRPiServer)
+        self.uiTCPWin.telClientBox.currentIndexChanged.connect(self.ipSelectionBoxClient)
+        self.uiTCPWin.stellIPServBox.currentIndexChanged.connect(self.ipSelectionBoxStellServer)
 
         # Make connections for the location settings dialog
         self.uiLocationWin.exitBtn.clicked.connect(self.uiLocationWin.close)  # Close the settings window when requested
@@ -145,27 +146,36 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.commandStellIndLabel.setText(self.mainWin.stellariumOperationSelect.currentText())
 
     # Change the IP fields according to choice
-    def ipSelectionBoxes(self):
+    def ipSelectionBoxRPiServer(self):
         if self.uiTCPWin.telServBox.currentText() == "Localhost":
             self.uiTCPWin.telescopeIPAddrServ.setText("127.0.0.1")
-        else:
-            self.uiTCPWin.telescopeIPAddrServ.setText("")
+        # else:
+            # self.uiTCPWin.telescopeIPAddrServ.setText("")
 
+    def ipSelectionBoxClient(self):
         if self.uiTCPWin.telClientBox.currentText() == "Remote":
             self.uiTCPWin.telescopeIPAddrClient.setEnabled(True)
-            self.uiTCPWin.telescopeIPAddrClient.setText("")
+            # self.uiTCPWin.telescopeIPAddrClient.setText("")
         else:
             self.uiTCPWin.telescopeIPAddrClient.setEnabled(False)
             self.uiTCPWin.telescopeIPAddrClient.setText("127.0.0.1")
 
+    def ipSelectionBoxStellServer(self):
         if self.uiTCPWin.stellIPServBox.currentText() == "Localhost":
             self.uiTCPWin.stellServInpIP.setText("127.0.0.1")
-        else:
-            self.uiTCPWin.stellServInpIP.setText("")
+        # else:
+            # self.uiTCPWin.stellServInpIP.setText("")
 
     def showMapSelection(self):
         if self.uiLocationWin.locationTypeChoose.currentText() == "Google Maps":
+            self.uiLocationWin.latEntry.setEnabled(False)
+            self.uiLocationWin.lonEntry.setEnabled(False)
+            self.uiLocationWin.altEntry.setEnabled(False)
             self.mapDialog.show()
+        else:
+            self.uiLocationWin.latEntry.setEnabled(True)
+            self.uiLocationWin.lonEntry.setEnabled(True)
+            self.uiLocationWin.altEntry.setEnabled(True)
 
     # Handle the motion stop request
     def stopMotion(self, objec):

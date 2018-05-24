@@ -35,6 +35,13 @@ class confData(object):
             else:
                 continue
 
+    def getMapsSelect(self):
+        return self.root.find("location").get("gmaps")
+
+    def setMapsSelect(self, stat):
+        self.root.find("location").set("gmaps", stat)
+        self.tree.write(self.filename)
+
     def getServRemote(self, element):
         return self.root.find(element).get("remote")
 

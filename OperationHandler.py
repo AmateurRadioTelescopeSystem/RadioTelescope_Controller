@@ -1,4 +1,4 @@
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtNetwork
 from functools import partial
 import logging
 
@@ -27,7 +27,6 @@ class OpHandler(QtCore.QObject):
 
         self.prev_pos = ["", ""]  # The dish position is saved for change comparison
         self.signalConnectios()  # Make all the necessary signal connections
-        self.ui.mainWin.actionSettings.triggered.connect(self.TCPSettingsHandle)  # Update settings each time
 
         autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
         autoconRPi = self.cfgData.getTCPAutoConnStatus()  # Auto-connection preference for the RPi server and client
@@ -142,8 +141,7 @@ class OpHandler(QtCore.QObject):
         autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
         autoconRPi = self.cfgData.getTCPAutoConnStatus()  # Auto-connection preference for the RPi server and client
         clientIP = self.cfgData.getHost()
-        servRPiIP = self.cfgData.getRPiHost()
-        stellServIP = self.cfgData.getStellHost()
+        remoteIP = "0.0.0.0"
         servRPiRemote = self.cfgData.getServRemote("TCPRPiServ")
         stellServRemote = self.cfgData.getServRemote("TCPStell")
 
@@ -158,16 +156,23 @@ class OpHandler(QtCore.QObject):
         else:
             self.ui.uiTCPWin.telClientBox.setCurrentIndex(1)
 
+        if servRPiRemote == "yes" or stellServRemote == "yes":
+            for ipAddress in QtNetwork.QNetworkInterface.allAddresses():
+                if ipAddress != QtNetwork.QHostAddress.LocalHost and ipAddress.toIPv4Address() != 0:
+                    break  # If we found an IP then we exit the loop
+                else:
+                    ipAddress = QtNetwork.QHostAddress.LocalHost  # If no IP is found, assign localhost
+            remoteIP = ipAddress.toString()  # Assign the IP address that wa found above
+
         if servRPiRemote == "no":
             self.ui.uiTCPWin.telServBox.setCurrentIndex(0)
-        elif servRPiRemote == "yes":
-            servRPiIP = self.tcpServer.host.toString()
+        else:
             self.ui.uiTCPWin.telServBox.setCurrentIndex(1)
+            self.ui.uiTCPWin.telescopeIPAddrServ.setText(remoteIP)
 
         if stellServRemote == "no":
             self.ui.uiTCPWin.stellIPServBox.setCurrentIndex(0)
         else:
-            stellServIP = self.tcpStellarium.host.toString()
             self.ui.uiTCPWin.stellIPServBox.setCurrentIndex(1)
 
         # Set all the text fields with the correct data
@@ -175,10 +180,9 @@ class OpHandler(QtCore.QObject):
         self.ui.uiTCPWin.telescopeIPAddrClient.setText(clientIP)
         self.ui.uiTCPWin.telescopeIPPortClient.setText(self.cfgData.getPort())
 
-        self.ui.uiTCPWin.telescopeIPAddrServ.setText(servRPiIP)
         self.ui.uiTCPWin.telescopeIPPortServ.setText(self.cfgData.getRPiPort())
 
-        self.ui.uiTCPWin.stellServInpIP.setText(stellServIP)
+        self.ui.uiTCPWin.stellServInpIP.setText(remoteIP)
         self.ui.uiTCPWin.stellPortServ.setText(self.cfgData.getStellPort())
 
     # Save the settings when the save button is pressed
@@ -220,6 +224,35 @@ class OpHandler(QtCore.QObject):
         self.tcpServer.reConnectSigR.emit()
         self.tcpStellarium.reConnectSigS.emit()
 
+    def locationSettingsHandle(self):
+        s_latlon = self.cfgData.getLatLon()  # First element is latitude and second element is longitude
+        s_alt = self.cfgData.getAltitude()  # Get the altitude from the settings file
+
+        self.ui.uiLocationWin.latEntry.setText(s_latlon[0])
+        self.ui.uiLocationWin.lonEntry.setText(s_latlon[1])
+        self.ui.uiLocationWin.altEntry.setText(s_alt)
+
+        if self.cfgData.getMapsSelect() == "no":
+            self.ui.uiLocationWin.locationTypeChoose.setCurrentIndex(0)
+
+    def saveLocationSettings(self):
+        coords = [self.ui.uiLocationWin.latEntry.text(), self.ui.uiLocationWin.lonEntry.text()]
+        altd = self.ui.uiLocationWin.altEntry.text()
+        self.cfgData.setLatLon(coords)
+        self.cfgData.setAltitude(altd)
+
+        if self.ui.uiLocationWin.locationTypeChoose.currentText() == "Google Maps":
+            self.cfgData.setMapsSelect("yes")
+        else:
+            self.cfgData.setMapsSelect("no")
+
+        # Show location on the GUI
+        self.ui.mainWin.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
+                                      "vertical-align:super;\">o</span></p></body></html>" % coords[1])
+        self.ui.mainWin.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
+                                      "vertical-align:super;\">o</span></p></body></html>" % coords[0])
+        self.ui.mainWin.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % altd)
+
     # Make all the necessary signal connections
     def signalConnectios(self):
         self.tcpStellarium.sendClientConn.connect(self.stellCommSend)  # Send data from Stellarium to the RPi
@@ -244,6 +277,11 @@ class OpHandler(QtCore.QObject):
         self.ui.uiManContWin.stopMotMotionBtn.clicked.connect(self.manCont_stop)
 
         self.ui.uiTCPWin.telescopeSaveBtn.clicked.connect(self.saveTCPSettings)
+        self.ui.uiLocationWin.saveBtn.clicked.connect(self.saveLocationSettings)
+
+        self.ui.mainWin.actionSettings.triggered.connect(self.TCPSettingsHandle)  # Update settings each time
+        self.ui.mainWin.actionLocation.triggered.connect(self.locationSettingsHandle)  # Update location fields
+        self.ui.mainWin.locatChangeBtn.clicked.connect(self.locationSettingsHandle)
 
         self.logD.debug("All signal connections made")
 

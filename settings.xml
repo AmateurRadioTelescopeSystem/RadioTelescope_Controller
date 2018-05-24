@@ -1,5 +1,5 @@
 <settings>
-    <location>
+    <location gmaps="no">
         <altitude>50</altitude>
         <latitude>40.6436100</latitude>
         <longitude>22.9308600</longitude>
