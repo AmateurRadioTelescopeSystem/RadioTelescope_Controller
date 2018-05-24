@@ -1,19 +1,19 @@
 <settings>
-    <location updated="no">
+    <location>
         <altitude>50</altitude>
         <latitude>40.6436100</latitude>
         <longitude>22.9308600</longitude>
     </location>
-    <TCP autoconnect="yes" updated="no">
+    <TCP autoconnect="yes">
         <host>192.168.1.13</host>
         <port>10001</port>
     </TCP>
-    <TCPStell remote="no" autoconnect="yes" updated="no">
+    <TCPStell autoconnect="yes" remote="no">
         <host>127.0.0.1</host>
         <port>10002</port>
     </TCPStell>
-    <TCPRPiServ remote ="yes" updated="no">
-        <host>remote</host>
+    <TCPRPiServ remote="yes">
+        <host>192.168.0.133</host>
         <port>10003</port>
     </TCPRPiServ>
     <object stationary="yes">

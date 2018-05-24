@@ -146,24 +146,22 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
     # Change the IP fields according to choice
     def ipSelectionBoxes(self):
-        if self.uiTCPWin.telServBox.currentText() == "Custom":
-            self.uiTCPWin.telescopeIPAddrServ.setEnabled(True)
+        if self.uiTCPWin.telServBox.currentText() == "Localhost":
+            self.uiTCPWin.telescopeIPAddrServ.setText("127.0.0.1")
         else:
-            self.uiTCPWin.telescopeIPAddrServ.setEnabled(False)
+            self.uiTCPWin.telescopeIPAddrServ.setText("")
 
         if self.uiTCPWin.telClientBox.currentText() == "Remote":
             self.uiTCPWin.telescopeIPAddrClient.setEnabled(True)
-            # self.uiTCPWin.telescopeIPAddrClient.setText("")
+            self.uiTCPWin.telescopeIPAddrClient.setText("")
         else:
             self.uiTCPWin.telescopeIPAddrClient.setEnabled(False)
             self.uiTCPWin.telescopeIPAddrClient.setText("127.0.0.1")
 
-        if self.uiTCPWin.stellIPServBox.currentText() == "Remote":
-            self.uiTCPWin.stellServInpIP.setEnabled(True)
-            # self.uiTCPWin.stellServInpIP.setText("")
-        else:
-            self.uiTCPWin.stellServInpIP.setEnabled(False)
+        if self.uiTCPWin.stellIPServBox.currentText() == "Localhost":
             self.uiTCPWin.stellServInpIP.setText("127.0.0.1")
+        else:
+            self.uiTCPWin.stellServInpIP.setText("")
 
     def showMapSelection(self):
         if self.uiLocationWin.locationTypeChoose.currentText() == "Google Maps":

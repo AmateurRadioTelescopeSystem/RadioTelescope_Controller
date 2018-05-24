@@ -163,8 +163,6 @@ class OpHandler(QtCore.QObject):
         elif servRPiRemote == "yes":
             servRPiIP = self.tcpServer.host.toString()
             self.ui.uiTCPWin.telServBox.setCurrentIndex(1)
-        else:
-            self.ui.uiTCPWin.telServBox.setCurrentIndex(2)
 
         if stellServRemote == "no":
             self.ui.uiTCPWin.stellIPServBox.setCurrentIndex(0)
@@ -182,6 +180,45 @@ class OpHandler(QtCore.QObject):
 
         self.ui.uiTCPWin.stellServInpIP.setText(stellServIP)
         self.ui.uiTCPWin.stellPortServ.setText(self.cfgData.getStellPort())
+
+    # Save the settings when the save button is pressed
+    def saveTCPSettings(self):
+        # Save the ports entered for each setting
+        self.cfgData.setPort(self.ui.uiTCPWin.telescopeIPPortClient.text())
+        self.cfgData.setStellPort(self.ui.uiTCPWin.stellPortServ.text())
+        self.cfgData.setRPiPort(self.ui.uiTCPWin.telescopeIPPortServ.text())
+
+        # Save the auto start/enable option
+        if self.ui.uiTCPWin.teleAutoConChoice.isChecked():
+            self.cfgData.TCPAutoConnEnable()
+        else:
+            self.cfgData.TCPAutoConnDisable()
+
+        if self.ui.uiTCPWin.stellServAutoStartBtn.isChecked():
+            self.cfgData.TCPStellAutoConnEnable()
+        else:
+            self.cfgData.TCPStellAutoConnDisable()
+
+        # Save the IP addresses
+        if self.ui.uiTCPWin.telServBox.currentText() == "Localhost":
+            self.cfgData.setRPiHost("127.0.0.1")
+        else:
+            self.cfgData.setRPiHost(self.ui.uiTCPWin.telescopeIPAddrServ.text())
+
+        if self.ui.uiTCPWin.telClientBox.currentText() == "Localhost":
+            self.cfgData.setHost("127.0.0.1")
+        else:
+            self.cfgData.setHost(self.ui.uiTCPWin.telescopeIPAddrClient.text())
+
+        if self.ui.uiTCPWin.stellIPServBox.currentText() == "Localhost":
+            self.cfgData.setStellHost("127.0.0.1")
+        else:
+            self.cfgData.setStellHost(self.ui.uiTCPWin.stellServInpIP.text())
+
+        # Send a reconnect signal to all TCP operations (No effect if some is not active)
+        self.tcpClient.reConnectSigC.emit()
+        self.tcpServer.reConnectSigR.emit()
+        self.tcpStellarium.reConnectSigS.emit()
 
     # Make all the necessary signal connections
     def signalConnectios(self):
@@ -205,6 +242,8 @@ class OpHandler(QtCore.QObject):
         self.ui.uiManContWin.movDecBtn.clicked.connect(self.manCont_movDEC)
         self.ui.uiManContWin.syncMoveBtn.clicked.connect(self.manCont_movBoth)
         self.ui.uiManContWin.stopMotMotionBtn.clicked.connect(self.manCont_stop)
+
+        self.ui.uiTCPWin.telescopeSaveBtn.clicked.connect(self.saveTCPSettings)
 
         self.logD.debug("All signal connections made")
 

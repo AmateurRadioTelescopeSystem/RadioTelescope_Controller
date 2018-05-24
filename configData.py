@@ -30,19 +30,10 @@ class confData(object):
         for item in children:
             if item.tag == child:
                 item.text = value
-                if (element == "TCP") or (element == "location"):
-                    elm.set("updated", "yes")
                 self.tree.write(self.filename)
                 break
             else:
                 continue
-
-    def getUpdateStatus(self, element):
-        return self.root.find(element).get("updated")
-
-    def setUpdateStatus(self, element, status):
-        self.root.find(element).set("updated", status)
-        self.tree.write(self.filename)
 
     def getServRemote(self, element):
         return self.root.find(element).get("remote")
