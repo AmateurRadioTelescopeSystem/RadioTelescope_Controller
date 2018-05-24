@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # IP address regex: https://stackoverflow.com/questions/10086572/ip-address-validation-in-python-using-regex
 
-from PyQt5 import QtCore, QtGui, QtWidgets, uic
+from PyQt5 import QtCore, QtGui, QtWidgets, uic, QtWebEngineWidgets
 from functools import partial
 import logging
 import sys
@@ -34,7 +34,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.man_cn_widg = uic.loadUi('GUI_Windows/ManualControl.ui', self.uiManContWin)
             self.tcp_widg = uic.loadUi('GUI_Windows/TCPSettings.ui', self.uiTCPWin)
             self.loc_widg = uic.loadUi('GUI_Windows/Location.ui', self.uiLocationWin)
-            # uic.loadUi('GUI_Windows/MapsDialog.ui', self.mapDialog)
+            self.map_diag = uic.loadUi('GUI_Windows/MapsDialog.ui', self.mapDialog)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
@@ -87,6 +87,12 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         # Make connections for the location settings dialog
         self.uiLocationWin.exitBtn.clicked.connect(self.uiLocationWin.close)  # Close the settings window when requested
         self.uiLocationWin.locationTypeChoose.currentIndexChanged.connect(self.showMapSelection)
+
+        # Make the webview widget for the map
+        self.webView = QtWebEngineWidgets.QWebEngineView(self.map_diag.widget)
+        self.webView.setUrl(QtCore.QUrl("https://www.google.com/maps"))
+        self.webView.setObjectName("webView")
+        self.map_diag.formLayout.addWidget(self.webView)
 
         # Create validators for the TCP port settings entries
         ipPortValidator = QtGui.QIntValidator()  # Create an integer validator

@@ -30,10 +30,11 @@ class RPiServerThread(QtCore.QObject):
         # Get the saved data from the settings file
         self.host = self.cfgData.getRPiHost()  # Get the TCP connection host
         self.port = self.cfgData.getRPiPort()  # Get the TCP connection port
+        rem_stat = self.cfgData.getServRemote("TCPRPiServ")
 
-        if self.host == "localhost" or self.host == "127.0.0.1":
+        if rem_stat == "no":
             self.host = QtNetwork.QHostAddress.LocalHost
-        else:
+        elif rem_stat == "yes":
             for ipAddress in QtNetwork.QNetworkInterface.allAddresses():
                 if ipAddress != QtNetwork.QHostAddress.LocalHost and ipAddress.toIPv4Address() != 0:
                     break  # If we found an IP then we exit the loop

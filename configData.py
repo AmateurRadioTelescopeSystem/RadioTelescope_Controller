@@ -44,6 +44,13 @@ class confData(object):
         self.root.find(element).set("updated", status)
         self.tree.write(self.filename)
 
+    def getServRemote(self, element):
+        return self.root.find(element).get("remote")
+
+    def setServRemote(self, element, status):
+        self.root.find(element).set("remote", status)
+        self.tree.write(self.filename)
+
     def getLatLon(self):
         lat = self.getConfig("location", "latitude")
         lon = self.getConfig("location", "longitude")

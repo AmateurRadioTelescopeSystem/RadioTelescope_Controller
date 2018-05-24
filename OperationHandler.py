@@ -144,6 +144,8 @@ class OpHandler(QtCore.QObject):
         clientIP = self.cfgData.getHost()
         servRPiIP = self.cfgData.getRPiHost()
         stellServIP = self.cfgData.getStellHost()
+        servRPiRemote = self.cfgData.getServRemote("TCPRPiServ")
+        stellServRemote = self.cfgData.getServRemote("TCPStell")
 
         # If auto-connection is selected for thr TCP section, then do as requested
         if autoconStell == "yes":
@@ -156,23 +158,28 @@ class OpHandler(QtCore.QObject):
         else:
             self.ui.uiTCPWin.telClientBox.setCurrentIndex(1)
 
-        if servRPiIP == "localhost" or servRPiIP == "127.0.0.1":
+        if servRPiRemote == "no":
             self.ui.uiTCPWin.telServBox.setCurrentIndex(0)
-        elif servRPiIP == "remote":
+        elif servRPiRemote == "yes":
+            servRPiIP = self.tcpServer.host.toString()
             self.ui.uiTCPWin.telServBox.setCurrentIndex(1)
         else:
             self.ui.uiTCPWin.telServBox.setCurrentIndex(2)
 
-        if stellServIP == "localhost" or stellServIP == "127.0.0.1":
+        if stellServRemote == "no":
             self.ui.uiTCPWin.stellIPServBox.setCurrentIndex(0)
         else:
+            stellServIP = self.tcpStellarium.host.toString()
             self.ui.uiTCPWin.stellIPServBox.setCurrentIndex(1)
 
         # Set all the text fields with the correct data
+        # TODO handle what happens when server is not initialized at start
         self.ui.uiTCPWin.telescopeIPAddrClient.setText(clientIP)
         self.ui.uiTCPWin.telescopeIPPortClient.setText(self.cfgData.getPort())
+
         self.ui.uiTCPWin.telescopeIPAddrServ.setText(servRPiIP)
         self.ui.uiTCPWin.telescopeIPPortServ.setText(self.cfgData.getRPiPort())
+
         self.ui.uiTCPWin.stellServInpIP.setText(stellServIP)
         self.ui.uiTCPWin.stellPortServ.setText(self.cfgData.getStellPort())
 
