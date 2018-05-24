@@ -141,6 +141,7 @@ class OpHandler(QtCore.QObject):
         autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
         autoconRPi = self.cfgData.getTCPAutoConnStatus()  # Auto-connection preference for the RPi server and client
         clientIP = self.cfgData.getHost()
+        stellIP = "127.0.0.1"
         remoteIP = "0.0.0.0"
         servRPiRemote = self.cfgData.getServRemote("TCPRPiServ")
         stellServRemote = self.cfgData.getServRemote("TCPStell")
@@ -168,11 +169,11 @@ class OpHandler(QtCore.QObject):
             self.ui.uiTCPWin.telServBox.setCurrentIndex(0)
         else:
             self.ui.uiTCPWin.telServBox.setCurrentIndex(1)
-            self.ui.uiTCPWin.telescopeIPAddrServ.setText(remoteIP)
 
         if stellServRemote == "no":
             self.ui.uiTCPWin.stellIPServBox.setCurrentIndex(0)
         else:
+            stellIP = remoteIP
             self.ui.uiTCPWin.stellIPServBox.setCurrentIndex(1)
 
         # Set all the text fields with the correct data
@@ -180,9 +181,10 @@ class OpHandler(QtCore.QObject):
         self.ui.uiTCPWin.telescopeIPAddrClient.setText(clientIP)
         self.ui.uiTCPWin.telescopeIPPortClient.setText(self.cfgData.getPort())
 
+        self.ui.uiTCPWin.telescopeIPAddrServ.setText(remoteIP)
         self.ui.uiTCPWin.telescopeIPPortServ.setText(self.cfgData.getRPiPort())
 
-        self.ui.uiTCPWin.stellServInpIP.setText(remoteIP)
+        self.ui.uiTCPWin.stellServInpIP.setText(stellIP)
         self.ui.uiTCPWin.stellPortServ.setText(self.cfgData.getStellPort())
 
     # Save the settings when the save button is pressed

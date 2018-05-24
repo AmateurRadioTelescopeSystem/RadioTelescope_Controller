@@ -789,6 +789,7 @@
     </property>
     <addaction name="actionAbout"/>
     <addaction name="actionLicense"/>
+    <addaction name="actionCheck_for_updates"/>
    </widget>
    <widget class="QMenu" name="menuTCP">
     <property name="title">
@@ -890,6 +891,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+M</string>
+   </property>
+  </action>
+  <action name="actionCheck_for_updates">
+   <property name="text">
+    <string>Check for updates...</string>
    </property>
   </action>
  </widget>
