@@ -23,6 +23,9 @@ class OpHandler(QtCore.QObject):
         self.logD = logging.getLogger(__name__)  # Data logger object
 
     def start(self):
+        """Initializer of the thread.
+        Make all the necessary initializations when the thread starts
+        """
         self.logD.info("Operations handler thread started")
 
         self.prev_pos = ["", ""]  # The dish position is saved for change comparison
@@ -74,6 +77,9 @@ class OpHandler(QtCore.QObject):
     # Dta received from the client connected to the RPi server
     @QtCore.pyqtSlot(str, name='dataClientRX')
     def clientDataRx(self, data: str):
+        """Data reception from the TCP client.
+        Receive the data sent from client and decide how to act
+        """
         splt_str = data.split("_")
         if len(splt_str) > 0:
             if splt_str[0] == "RASTEPS":
@@ -96,6 +102,9 @@ class OpHandler(QtCore.QObject):
     # Received data from the server that the RPi is connected as a client. Signal is (dataRxFromServ)
     @QtCore.pyqtSlot(str, name='rpiServDataRx')
     def rpiServRcvData(self, data: str):
+        """Get the data sent from the RPi client.
+        Mainly the dish position will be sent
+        """
         spltData = data.split("_")  # Split the string with the set delimiter
         if spltData[0] == "DISHPOS" or spltData[0] == "POSUPDATE":
             ra = spltData[2]  # Get the RA from the received position

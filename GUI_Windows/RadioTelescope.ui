@@ -782,6 +782,8 @@
     <addaction name="actionCalibration"/>
     <addaction name="actionLocation"/>
     <addaction name="actionManual_Control"/>
+    <addaction name="separator"/>
+    <addaction name="actionObject"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -827,7 +829,7 @@
   </action>
   <action name="actionLicense">
    <property name="text">
-    <string>License</string>
+    <string>License...</string>
    </property>
    <property name="statusTip">
     <string>View the application licensing</string>
@@ -896,6 +898,20 @@
   <action name="actionCheck_for_updates">
    <property name="text">
     <string>Check for updates...</string>
+   </property>
+   <property name="statusTip">
+    <string>Check for a new version release</string>
+   </property>
+  </action>
+  <action name="actionObject">
+   <property name="text">
+    <string>Planetary Object</string>
+   </property>
+   <property name="statusTip">
+    <string>Choose a planetary object to track</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
    </property>
   </action>
  </widget>
