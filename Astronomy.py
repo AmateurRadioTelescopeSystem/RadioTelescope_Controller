@@ -4,11 +4,11 @@ import ephem
 import time
 
 _rad_to_deg = 57.2957795131  # Radians to degrees conversion factor
-_sec_to_day = 1.1574074e-5
+_sec_to_day = 1.1574074e-5  # How many days a second has
 
 # TODO add them to a file to be easily changed
-_motor_RA_steps_per_deg = 43200.0
-_motor_DEC_steps_per_deg = 10000.0
+_motor_RA_steps_per_deg = 43200.0/15.0  # 43200 is in steps per hour of right ascension
+_motor_DEC_steps_per_deg = 10000.0  # Steps per degree
 _max_step_frq = 400.0  # Maximum stepping frequency of the motors in Hz
 
 
@@ -26,7 +26,8 @@ class Calculations(QtCore.QObject):
 
     def hour_angle(self, date: tuple, obj_ra: float):
         self.observer.date = date
-        return float(self.observer.sidereal_time())*_rad_to_deg - obj_ra  # Ephem sidereal returns in rad
+        calculated_ha = float(self.observer.sidereal_time())*_rad_to_deg - obj_ra  # Ephem sidereal returns in rad
+        return calculated_ha
 
     def current_time(self):
         """
@@ -39,7 +40,7 @@ class Calculations(QtCore.QObject):
         hour = gmt.tm_hour  # Save the current hour
         mint = gmt.tm_min  # Save the current minute
         decimal_day = float(day) + float(hour)/24.0 + float(mint)/(24.0*60.0) + float(gmt.tm_sec)/(24.0*60.0*60.0)
-        time_tuple = (gmt.tm_yday, gmt.tm_mon, decimal_day)
+        time_tuple = (gmt.tm_year, gmt.tm_mon, decimal_day)
 
         return time_tuple
 
@@ -48,20 +49,56 @@ class Calculations(QtCore.QObject):
         Transit final hour angle calculation.
         The final hour angle is calculated for a stationary object. We add the maximum time taken by any motor
         to go to the desired position, to the current time and then the hour angle at the latter position is calculated.
+        Home position of the dish is considered to be 0h hour angle and 0 degrees declination.
         :param obj_ra: Provide the objects right ascension in degrees
         :param obj_dec: Provide the objects declination in degrees
         :param stp_to_home_ra: Give the number o steps away from home position for the right ascension motor
         :param stp_to_home_dec: Enter the number of steps away from home for the declination motor
         :return: A list containing the hour angle at the target location and the dec of the object
         """
-        step_distance_ra = abs(stp_to_home_ra + obj_ra*_motor_RA_steps_per_deg)  # Negative signs are included in values
-        step_distance_dec = abs(stp_to_home_dec + obj_dec*_motor_DEC_steps_per_deg)
-        max_distance = max(step_distance_ra, step_distance_dec)  # Calculate the maximum distance, to calculate max time
-        max_move_time = max_distance/_max_step_frq  # Maximum time required for any motor, calculated in seconds
         # TODO may be needed to add some "safety" seconds
         cur_time = self.current_time()  # Get the current time in tuple
-        target_time = (cur_time[0], cur_time[1], cur_time[2] + max_move_time*_sec_to_day)  # Add the necessary time
-        hour_angl = self.hour_angle(target_time, obj_ra)  # Calculate the hour angle at the target location
+        cur_ha = self.hour_angle(cur_time, obj_ra)  # Get the current object hour angle
+        step_distance_ra = abs(stp_to_home_ra + cur_ha * _motor_RA_steps_per_deg)
+        step_distance_dec = abs(stp_to_home_dec + obj_dec * _motor_DEC_steps_per_deg)
 
-        return [hour_angl, obj_dec]
+        max_distance = max(step_distance_ra, step_distance_dec)  # Calculate the maximum distance, to calculate max time
+        max_move_time = max_distance / _max_step_frq  # Maximum time required for any motor, calculated in seconds
+        target_time = (cur_time[0], cur_time[1], cur_time[2] + max_move_time * _sec_to_day)  # Add the necessary time
+        target_ha = self.hour_angle(target_time, obj_ra)  # Calculate the hour angle at the target location
 
+        return [target_ha, obj_dec]
+
+    def transit_planetary(self, objec, stp_to_home_ra: int, stp_to_home_dec: int):
+        """
+        Calculate object's position when the dish arrives at position.
+        This function calculates the coordinates of the requested object, taking into account the delay of the dish
+        until it moves to the desired position.
+        :param objec: pyephem object type, which is the object of interest (e.g. ephem.Jupiter())
+        :param stp_to_home_ra: Number of steps from home position for the right ascension motor
+        :param stp_to_home_dec: Number of steps from home position for the declination motor
+        :return: Object's coordinates at the dish arrival position
+        """
+        cur_time = self.current_time()  # Get the current time in tuple
+        date = "%.0f/%.0f/%.0f" % (cur_time[0], cur_time[1], cur_time[2])  # Get the current date
+        objec.compute(cur_time, epoch=date)  # Compute the object's coordinates
+
+        # Get the current coordinates for the planetary body
+        obj_ra = float(objec.a_ra)*_rad_to_deg
+        obj_dec = float(objec.a_dec)*_rad_to_deg
+
+        cur_ha = self.hour_angle(cur_time, obj_ra)  # Get the current object hour angle
+        step_distance_ra = abs(stp_to_home_ra + cur_ha * _motor_RA_steps_per_deg)
+        step_distance_dec = abs(stp_to_home_dec + obj_dec * _motor_DEC_steps_per_deg)
+
+        max_distance = max(step_distance_ra, step_distance_dec)  # Calculate the maximum distance, to calculate max time
+        max_move_time = max_distance / _max_step_frq  # Maximum time required for any motor, calculated in seconds
+        target_time = (cur_time[0], cur_time[1], cur_time[2] + max_move_time * _sec_to_day)  # Add the necessary time
+
+        # Recalculate the coordinates for the new time
+        objec.compute(cur_time, epoch=date)
+        obj_ra = float(objec.a_ra) * _rad_to_deg
+        obj_dec = float(objec.a_dec) * _rad_to_deg
+        target_ha = self.hour_angle(target_time, obj_ra)  # Calculate the hour angle at the target location
+
+        return [target_ha, obj_dec]
