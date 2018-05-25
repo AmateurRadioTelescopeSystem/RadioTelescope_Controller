@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtNetwork
 from functools import partial
+import Astronomy
 import logging
 
 
@@ -33,6 +34,7 @@ class OpHandler(QtCore.QObject):
         self.ui = ui  # User interface handling object
         self.cfgData = cfgData
         self.logD = logging.getLogger(__name__)  # Data logger object
+        self.astronomy = Astronomy.Calculations(cfg_data=cfgData)  # Astronomy calculations object
 
     def start(self):
         """
@@ -106,13 +108,20 @@ class OpHandler(QtCore.QObject):
         else:
             self.logD.debug("Data received from client (Connected to remote RPi server): %s" % data)
 
-    # Send the appropriate command according to the selected mode. Data is received from Stellarium (sendClientConn)
     @QtCore.pyqtSlot(list, name='clientCommandSendStell')
     def stellCommSend(self, radec: list):
+        """
+        Send the appropriate command according to the selected mode. Data is received from Stellarium (sendClientConn)
+        :param radec: A list containing the data received from Stellarium
+        :return: Nothing
+        """
         if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
-            command = "TRNST_RA_%.5f_DEC_%.5f\n" % (radec[0], radec[1])
+            # TODO add the steps from home in the function
+            transit_coords = self.astronomy.transit(radec[0], radec[1], 0, 0)  # Calculate transit coordinates
+            command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
             self.tcpClient.sendData.emit(command)
         elif self.ui.mainWin.stellariumOperationSelect.currentText() == "Aim and track":
+            # TODO implement the tracking function in the correct way
             command = "TRK %f %f\n" % (radec[0], radec[1])
             self.tcpClient.sendData.emit(command)
 
@@ -133,6 +142,13 @@ class OpHandler(QtCore.QObject):
                 self.tcpStellarium.sendDataStell.emit(float(ra), float(dec))  # Send the position to Stellarium
                 self.posDataShow.emit(float(ra), float(dec))  # Send the updated values if they are different
             self.prev_pos = [ra, dec]  # Save the values for later comparison
+
+    # Command to stop any motion of the radio telescope dish
+    @QtCore.pyqtSlot(name='stopRadioTele')
+    def stopMovingRT(self):
+        # TODO change the command to the appropriate one
+        self.tcpClient.sendData.emit("STOP")  # Send the request to stop moving to the RPi server
+        self.logD.warning("A dish motion halt was requested")
 
     # Functions to connect with the manual control widget
     # TODO add comments to the functions
@@ -158,13 +174,6 @@ class OpHandler(QtCore.QObject):
     def manCont_stop(self):
         string ="MANCONT_STOP\n"
         self.tcpClient.sendData.emit(string)  # Send the stop request in manual control
-
-    # Command to stop any motion of the radio telescope dish
-    @QtCore.pyqtSlot(name='stopRadioTele')
-    def stopMovingRT(self):
-        # TODO change the command to the appropriate one
-        self.tcpClient.sendData.emit("STOP")  # Send the request to stop moving to the RPi server
-        self.logD.warning("A dish motion halt was requested")
 
     def TCPSettingsHandle(self):
         autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
