@@ -8,6 +8,18 @@ class OpHandler(QtCore.QObject):
 
     def __init__(self, tcpClient, tcpServer, tcpStellarium, tcpClThread, tcpServThread,
                  tcpStelThread, ui, cfgData, parent=None):
+        """
+        Operations handler class constructor.
+        :param tcpClient:
+        :param tcpServer:
+        :param tcpStellarium:
+        :param tcpClThread:
+        :param tcpServThread:
+        :param tcpStelThread:
+        :param ui:
+        :param cfgData:
+        :param parent:
+        """
         super(OpHandler, self).__init__(parent)
         self.tcpClient = tcpClient  # TCP client object
         self.tcpServer = tcpServer  # TCP RPi server object
@@ -23,8 +35,10 @@ class OpHandler(QtCore.QObject):
         self.logD = logging.getLogger(__name__)  # Data logger object
 
     def start(self):
-        """Initializer of the thread.
+        """
+        Initializer of the thread.
         Make all the necessary initializations when the thread starts
+        :return: Nothing
         """
         self.logD.info("Operations handler thread started")
 
@@ -77,8 +91,11 @@ class OpHandler(QtCore.QObject):
     # Dta received from the client connected to the RPi server
     @QtCore.pyqtSlot(str, name='dataClientRX')
     def clientDataRx(self, data: str):
-        """Data reception from the TCP client.
+        """
+        Data reception from the TCP client.
         Receive the data sent from client and decide how to act
+        :param data: Data received from the client
+        :return:
         """
         splt_str = data.split("_")
         if len(splt_str) > 0:
@@ -102,8 +119,11 @@ class OpHandler(QtCore.QObject):
     # Received data from the server that the RPi is connected as a client. Signal is (dataRxFromServ)
     @QtCore.pyqtSlot(str, name='rpiServDataRx')
     def rpiServRcvData(self, data: str):
-        """Get the data sent from the RPi client.
+        """
+        Get the data sent from the RPi client.
         Mainly the dish position will be sent
+        :param data: Data received from the TCP connection
+        :return: Nothing
         """
         spltData = data.split("_")  # Split the string with the set delimiter
         if spltData[0] == "DISHPOS" or spltData[0] == "POSUPDATE":
@@ -296,11 +316,14 @@ class OpHandler(QtCore.QObject):
 
         self.logD.debug("All signal connections made")
 
-    # This function is called whenever the app is about to quit
-    # First quit from the thread and then delete both the thread and the corresponding object
-    # Quit exits the thread and then wait is waiting for the thread exit
-    # deleteLater, deletes the thread object and the threaded object
     def appExitRequest(self):
+        """
+        #This function is called whenever the app is about to quit.
+        First quit from the thread and then delete both the thread and the corresponding object
+        Quit exits the thread and then wait is waiting for the thread exit
+        deleteLater, deletes the thread object and the threaded object
+        :return: Nothing
+        """
         self.tcpClThread.quit()
         self.tcpClThread.wait()
         self.tcpClient.deleteLater()
