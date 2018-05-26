@@ -1,8 +1,8 @@
 <settings>
     <location gmaps="no">
         <altitude>50</altitude>
-        <latitude>40.6436100</latitude>
-        <longitude>22.9308600</longitude>
+        <latitude>40.6306</latitude>
+        <longitude>22.9589</longitude>
     </location>
     <TCP autoconnect="yes">
         <host>192.168.1.13</host>
@@ -21,5 +21,5 @@
         <RA>83.63308333</RA>
         <DEC>22.0145</DEC>
     </object>
-    <Steps dec_to_home="0" ra_to_home="45" />
+    <Steps dec_to_home="0" ra_to_home="0" />
 </settings>

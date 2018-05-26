@@ -124,7 +124,8 @@ class OpHandler(QtCore.QObject):
         """
         home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
         if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
-            transit_coords = self.astronomy.transit(radec[0], radec[1], int(home_steps[0]), int(home_steps[1]))
+            ra_degrees = radec[0]*15.0  # Stellarium returns right ascension is hours, so we convert to degrees
+            transit_coords = self.astronomy.transit(ra_degrees, radec[1], int(home_steps[0]), int(home_steps[1]))
             command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
             self.tcpClient.sendData.emit(command)
         elif self.ui.mainWin.stellariumOperationSelect.currentText() == "Aim and track":
@@ -142,13 +143,20 @@ class OpHandler(QtCore.QObject):
         :return: Nothing
         """
         spltData = data.split("_")  # Split the string with the set delimiter
-        if spltData[0] == "DISHPOS" or spltData[0] == "POSUPDATE":
+        if spltData[0] == "POSUPDATE":
             ra = spltData[2]  # Get the RA from the received position
             dec = spltData[4]  # Get the DEC from the received position
             if not (self.prev_pos[0] == ra and self.prev_pos[1] == dec and spltData[0] != "POSUPDATE"):
                 self.tcpStellarium.sendDataStell.emit(float(ra), float(dec))  # Send the position to Stellarium
                 self.posDataShow.emit(float(ra), float(dec))  # Send the updated values if they are different
             self.prev_pos = [ra, dec]  # Save the values for later comparison
+        elif spltData[0] == "DISHPOS":
+            ra_degrees = spltData[2]  # Get the RA from the received position
+            dec_degrees = spltData[4]  # Get the DEC from the received position
+            ra_steps = spltData[7]
+            dec_steps = spltData[9]
+            self.tcpStellarium.sendDataStell.emit(float(ra_degrees), float(dec_degrees))
+            self.posDataShow.emit(float(ra_degrees), float(dec_degrees))
 
     # Command to stop any motion of the radio telescope dish
     @QtCore.pyqtSlot(name='stopRadioTele')
