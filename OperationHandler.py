@@ -111,7 +111,7 @@ class OpHandler(QtCore.QObject):
             elif splt_str[0] == "DECSTEPS":
                 self.ui.uiManContWin.decStepText.setText(splt_str[1])
             elif splt_str[0] == "STEPS-FROM-HOME":
-                self.cfgData.setHomeSteps(splt_str[0], splt_str[1])  # Set the current away from home position steps
+                self.cfgData.setHomeSteps(splt_str[1], splt_str[2])  # Set the current away from home position steps
         else:
             self.logD.debug("Data received from client (Connected to remote RPi server): %s" % data)
 
