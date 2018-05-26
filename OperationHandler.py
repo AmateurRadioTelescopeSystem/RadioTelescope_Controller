@@ -90,6 +90,11 @@ class OpHandler(QtCore.QObject):
             # If the thread is running and it is not yet connected, attempt a reconnection
             self.tcpServer.reConnectSigR.emit()
 
+    @QtCore.pyqtSlot(name='sendNewConCommands')
+    def initialCommands(self):
+        # TODO add more commands to send, like system check reports and others
+        self.tcpClient.sendData.emit("SEND-STEPS-FROM-HOME")  # Get the steps from home for each motor
+
     # Dta received from the client connected to the RPi server
     @QtCore.pyqtSlot(str, name='dataClientRX')
     def clientDataRx(self, data: str):
@@ -99,12 +104,14 @@ class OpHandler(QtCore.QObject):
         :param data: Data received from the client
         :return:
         """
-        splt_str = data.split("_")
+        splt_str = data.split("_")  # Try to split the string, and if it splits then a command is sent
         if len(splt_str) > 0:
             if splt_str[0] == "RASTEPS":
                 self.ui.uiManContWin.raStepText.setText(splt_str[1])
             elif splt_str[0] == "DECSTEPS":
                 self.ui.uiManContWin.decStepText.setText(splt_str[1])
+            elif splt_str[0] == "STEPS-FROM-HOME":
+                self.cfgData.setHomeSteps(splt_str[0], splt_str[1])  # Set the current away from home position steps
         else:
             self.logD.debug("Data received from client (Connected to remote RPi server): %s" % data)
 
@@ -115,9 +122,9 @@ class OpHandler(QtCore.QObject):
         :param radec: A list containing the data received from Stellarium
         :return: Nothing
         """
+        home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
         if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
-            # TODO add the steps from home in the function
-            transit_coords = self.astronomy.transit(radec[0], radec[1], 0, 0)  # Calculate transit coordinates
+            transit_coords = self.astronomy.transit(radec[0], radec[1], int(home_steps[0]), int(home_steps[1]))
             command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
             self.tcpClient.sendData.emit(command)
         elif self.ui.mainWin.stellariumOperationSelect.currentText() == "Aim and track":
@@ -297,6 +304,7 @@ class OpHandler(QtCore.QObject):
     def signalConnectios(self):
         self.tcpStellarium.sendClientConn.connect(self.stellCommSend)  # Send data from Stellarium to the RPi
         self.tcpClient.dataRcvSigC.connect(self.clientDataRx)  # Receive pending data from RPi connected client
+        self.tcpClient.newConInitComms.connect(self.initialCommands)
 
         self.tcpServer.dataRxFromServ.connect(self.rpiServRcvData)  # Receive data from the RPi server
         self.tcpServer.clientNotice.connect(self.tcpClient.connect)  # Tell the client to reconnect

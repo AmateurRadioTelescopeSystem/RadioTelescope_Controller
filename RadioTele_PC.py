@@ -11,7 +11,6 @@ import logging.config
 import logging
 import sys
 
-
 logging.config.fileConfig('log_config.ini')  # Get the and apply the logger configuration
 
 
@@ -75,9 +74,9 @@ def main():
 
     # Show location on the GUI
     ui.mainWin.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
-                          "vertical-align:super;\">o</span></p></body></html>" % s_latlon[1])
+                                  "vertical-align:super;\">o</span></p></body></html>" % s_latlon[1])
     ui.mainWin.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
-                          "vertical-align:super;\">o</span></p></body></html>" % s_latlon[0])
+                                  "vertical-align:super;\">o</span></p></body></html>" % s_latlon[0])
     ui.mainWin.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % s_alt)
 
     # We quit from the operation handle thread and then we exit. All handling is done there

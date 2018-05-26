@@ -147,6 +147,16 @@ class confData(object):
             self.setConfig("object", "name", name)
             self.setConfig("object", "RA", str(ra))
             self.setConfig("object", "DEC", str(dec))
+    
+    def getHomeSteps(self):
+        ra = self.root.find("Steps").get("ra_to_home")
+        dec = self.root.find("Steps").get("dec_to_home")
+        return [ra, dec]
+
+    def setHomeSteps(self, ra, dec):
+        self.root.find("Steps").set("ra_to_home", str(ra))
+        self.root.find("Steps").set("dec_to_home", str(dec))
+        self.tree.write(self.filename)
 
     def getAllConfiguration(self):
         loc = list(self.root.find("location"))

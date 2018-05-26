@@ -8,6 +8,7 @@ class ClientThread(QtCore.QObject):
     dataRcvSigC = QtCore.pyqtSignal(str, name='dataClientRX')  # Send the received data out
     sendData = QtCore.pyqtSignal(str, name='sendDataClient')  # Data to be sent to the server
     reConnectSigC = QtCore.pyqtSignal(name='reConnectClient')  # A reconnection signal originating from a button press
+    newConInitComms = QtCore.pyqtSignal(name='sendNewConCommands')  # Send the initial commands on each new connection
 
     def __init__(self, cfgData, parent=None):
         super(ClientThread, self).__init__(parent)  # Get the parent of the class
