@@ -35,6 +35,7 @@ class OpHandler(QtCore.QObject):
         self.cfgData = cfgData
         self.logD = logging.getLogger(__name__)  # Data logger object
         self.astronomy = Astronomy.Calculations(cfg_data=cfgData)  # Astronomy calculations object
+        self.prev_pos = ["", ""]  # The dish position is saved for change comparison
 
     def start(self):
         """
@@ -43,8 +44,6 @@ class OpHandler(QtCore.QObject):
         :return: Nothing
         """
         self.logD.info("Operations handler thread started")
-
-        self.prev_pos = ["", ""]  # The dish position is saved for change comparison
         self.signalConnectios()  # Make all the necessary signal connections
 
         autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
@@ -60,7 +59,8 @@ class OpHandler(QtCore.QObject):
     # Client connection button handling method
     def connectButtonR(self):
         if self.tcpClThread.isRunning() and \
-                (self.ui.mainWin.connectRadioTBtn.text() == "Disconnect" or self.ui.mainWin.connectRadioTBtn.text() == "Stop"):
+                (self.ui.mainWin.connectRadioTBtn.text() == "Disconnect" or
+                 self.ui.mainWin.connectRadioTBtn.text() == "Stop"):
             self.tcpClThread.quit()  # Disconnect from the client
         elif not self.tcpClThread.isRunning():
             self.tcpClThread.start()  # Attempt a connection with the client
@@ -71,7 +71,8 @@ class OpHandler(QtCore.QObject):
     # Stellarium server connection handling method
     def connectButtonS(self):
         if self.tcpStelThread.isRunning() and \
-                (self.ui.mainWin.connectStellariumBtn.text() == "Disable" or self.ui.mainWin.connectStellariumBtn.text() == "Stop"):
+                (self.ui.mainWin.connectStellariumBtn.text() == "Disable" or
+                 self.ui.mainWin.connectStellariumBtn.text() == "Stop"):
             self.tcpStelThread.quit()  # Quit the currently running thread
         elif not self.tcpStelThread.isRunning():
             self.tcpStelThread.start()  # Attempt a connection with the client
@@ -82,13 +83,18 @@ class OpHandler(QtCore.QObject):
     # RPi server connection handling method
     def connectButtonRPi(self):
         if self.tcpServThread.isRunning() and \
-                (self.ui.mainWin.serverRPiConnBtn.text() == "Disable" or self.ui.mainWin.serverRPiConnBtn.text() == "Stop"):
+                (self.ui.mainWin.serverRPiConnBtn.text() == "Disable" or
+                 self.ui.mainWin.serverRPiConnBtn.text() == "Stop"):
             self.tcpServThread.quit()  # Quit the currently running thread
         elif not self.tcpServThread.isRunning():
             self.tcpServThread.start()  # Attempt a connection with the client
         else:
             # If the thread is running and it is not yet connected, attempt a reconnection
             self.tcpServer.reConnectSigR.emit()
+
+    def testConnButton(self):
+        if self.ui.uiTCPWin.clientConTestChkBox.isChecked():
+            self.tcpClient.sendData.emit("Test")
 
     @QtCore.pyqtSlot(name='sendNewConCommands')
     def initialCommands(self):
@@ -124,7 +130,7 @@ class OpHandler(QtCore.QObject):
         """
         home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
         if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
-            ra_degrees = radec[0]*15.0  # Stellarium returns right ascension is hours, so we convert to degrees
+            ra_degrees = radec[0] * 15.0  # Stellarium returns right ascension is hours, so we convert to degrees
             transit_coords = self.astronomy.transit(ra_degrees, radec[1], int(home_steps[0]), int(home_steps[1]))
             command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
             self.tcpClient.sendData.emit(command)
@@ -170,24 +176,24 @@ class OpHandler(QtCore.QObject):
     def manCont_movRA(self):
         freq = self.ui.uiManContWin.frequncyInputBox.text()
         step = self.ui.uiManContWin.raStepsField.text()
-        string = "MANCONT_MOVRA_%s_%s_0\n" %(freq, step)
+        string = "MANCONT_MOVRA_%s_%s_0\n" % (freq, step)
         self.tcpClient.sendData.emit(string)
 
     def manCont_movDEC(self):
         freq = self.ui.uiManContWin.frequncyInputBox.text()
         step = self.ui.uiManContWin.decStepsField.text()
-        string = "MANCONT_MOVDEC_%s_0_%s\n" %(freq, step)
+        string = "MANCONT_MOVDEC_%s_0_%s\n" % (freq, step)
         self.tcpClient.sendData.emit(string)
 
     def manCont_movBoth(self):
         freq = self.ui.uiManContWin.frequncyInputBox.text()
         step_ra = self.ui.uiManContWin.raStepsField.text()
         step_dec = self.ui.uiManContWin.decStepsField.text()
-        string = "MANCONT_MOVE_%s_%s_%s\n" %(freq, step_ra, step_dec)
+        string = "MANCONT_MOVE_%s_%s_%s\n" % (freq, step_ra, step_dec)
         self.tcpClient.sendData.emit(string)
 
     def manCont_stop(self):
-        string ="MANCONT_STOP\n"
+        string = "MANCONT_STOP\n"
         self.tcpClient.sendData.emit(string)  # Send the stop request in manual control
 
     def TCPSettingsHandle(self):
@@ -239,6 +245,44 @@ class OpHandler(QtCore.QObject):
 
         self.ui.uiTCPWin.stellServInpIP.setText(stellIP)
         self.ui.uiTCPWin.stellPortServ.setText(self.cfgData.getStellPort())
+
+        # Set the settings for the connection test tab
+        if self.tcpClient.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
+            self.ui.uiTCPWin.clientConTestChkBox.setEnabled(True)
+            self.ui.uiTCPWin.clientStatLbl.setEnabled(True)
+            self.ui.uiTCPWin.clientStatus.setEnabled(True)
+        else:
+            self.ui.uiTCPWin.clientConTestChkBox.setEnabled(False)
+            self.ui.uiTCPWin.clientStatLbl.setEnabled(False)
+            self.ui.uiTCPWin.clientStatus.setEnabled(False)
+
+        if self.tcpServer.socket is not None:
+            if self.tcpServer.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
+                self.ui.uiTCPWin.serverConTestChkBox.setEnabled(True)
+                self.ui.uiTCPWin.servStatLbl.setEnabled(True)
+                self.ui.uiTCPWin.serverStatus.setEnabled(True)
+            else:
+                self.ui.uiTCPWin.serverConTestChkBox.setEnabled(False)
+                self.ui.uiTCPWin.servStatLbl.setEnabled(False)
+                self.ui.uiTCPWin.serverStatus.setEnabled(False)
+        else:
+            self.ui.uiTCPWin.serverConTestChkBox.setEnabled(False)
+            self.ui.uiTCPWin.servStatLbl.setEnabled(False)
+            self.ui.uiTCPWin.serverStatus.setEnabled(False)
+
+        if self.tcpStellarium.socket is not None:
+            if self.tcpStellarium.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
+                self.ui.uiTCPWin.stellConTestChkBox.setEnabled(True)
+                self.ui.uiTCPWin.stellStatLbl.setEnabled(True)
+                self.ui.uiTCPWin.stellariumStatus.setEnabled(True)
+            else:
+                self.ui.uiTCPWin.stellConTestChkBox.setEnabled(False)
+                self.ui.uiTCPWin.stellStatLbl.setEnabled(False)
+                self.ui.uiTCPWin.stellariumStatus.setEnabled(False)
+        else:
+            self.ui.uiTCPWin.stellConTestChkBox.setEnabled(False)
+            self.ui.uiTCPWin.stellStatLbl.setEnabled(False)
+            self.ui.uiTCPWin.stellariumStatus.setEnabled(False)
 
     # Save the settings when the save button is pressed
     def saveTCPSettings(self):
@@ -303,9 +347,9 @@ class OpHandler(QtCore.QObject):
 
         # Show location on the GUI
         self.ui.mainWin.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
-                                      "vertical-align:super;\">o</span></p></body></html>" % coords[1])
+                                           "vertical-align:super;\">o</span></p></body></html>" % coords[1])
         self.ui.mainWin.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
-                                      "vertical-align:super;\">o</span></p></body></html>" % coords[0])
+                                           "vertical-align:super;\">o</span></p></body></html>" % coords[0])
         self.ui.mainWin.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % altd)
 
     # Make all the necessary signal connections
@@ -320,6 +364,8 @@ class OpHandler(QtCore.QObject):
         self.ui.stopMovingRTSig.connect(self.stopMovingRT)  # Send a motion stop command, once this signal is triggered
         self.ui.mainWin.stellPosUpdtBtn.clicked.connect(partial(self.tcpClient.sendData.emit, "SEND_POS_UPDATE"))
         self.posDataShow.connect(self.ui.posDataShow)  # Show the dish position data, when available
+
+        self.ui.uiTCPWin.conTestBtn.clicked.connect(self.testConnButton)
 
         # Give functionality to the buttons
         self.ui.mainWin.connectRadioTBtn.clicked.connect(self.connectButtonR)  # TCP client connection button
