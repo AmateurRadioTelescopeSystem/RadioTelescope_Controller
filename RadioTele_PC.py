@@ -19,11 +19,12 @@ try:
         os.makedirs('logs')
 except Exception as excep:
     print("There is a problem with the log directory. See tracback: \n%s" % excep, file=sys.stderr)
+    sys.exit(-1)  # Exit the program if an error occurred
 
 # Open the configuration and apply it on the logging module
 with open('configuration_settings.yaml') as config_file:
-    dictionary = yaml.load(config_file)
-    logging.config.dictConfig(dictionary['Logging'])
+    dictionary = yaml.load(config_file)  # Load the dictionary configuration
+    logging.config.dictConfig(dictionary['Logging'])  # Select the logging settings from the dictionary
 
 
 def main():
