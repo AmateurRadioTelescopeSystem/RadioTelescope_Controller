@@ -110,13 +110,12 @@ class OpHandler(QtCore.QObject):
         :param data: Data received from the client
         :return:
         """
+        if data == "OK":
+            self.ui.uiTCPWin.clientStatus.setText("OK")  # Set the response if the client responded correctly
+
         splt_str = data.split("_")  # Try to split the string, and if it splits then a command is sent
         if len(splt_str) > 0:
-            if splt_str[0] == "RASTEPS":
-                self.ui.uiManContWin.raStepText.setText(splt_str[1])
-            elif splt_str[0] == "DECSTEPS":
-                self.ui.uiManContWin.decStepText.setText(splt_str[1])
-            elif splt_str[0] == "STEPS-FROM-HOME":
+            if splt_str[0] == "STEPS-FROM-HOME":
                 self.cfgData.setHomeSteps(splt_str[1], splt_str[2])  # Set the current away from home position steps
         else:
             self.logD.debug("Data received from client (Connected to remote RPi server): %s" % data)
@@ -161,6 +160,8 @@ class OpHandler(QtCore.QObject):
             dec_degrees = spltData[4]  # Get the DEC from the received position
             ra_steps = spltData[7]
             dec_steps = spltData[9]
+            self.ui.uiManContWin.raStepText.setText(ra_steps)  # Update the manual control window
+            self.ui.uiManContWin.decStepText.setText(dec_steps)  # Update the manual control window
             self.tcpStellarium.sendDataStell.emit(float(ra_degrees), float(dec_degrees))
             self.posDataShow.emit(float(ra_degrees), float(dec_degrees))
 

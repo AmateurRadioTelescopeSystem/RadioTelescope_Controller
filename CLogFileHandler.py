@@ -17,12 +17,12 @@ class CustomLogHandler(logging.Handler):
     to log to the same file by using a queue.
 
     """
-    def __init__(self, fname, whn, enc, utc):
+    def __init__(self, filename, when, enc, utc):
         logging.Handler.__init__(self)
 
         self.queue = multiprocessing.Queue(-1)
-        self.fname = fname
-        self.when = whn
+        self.fname = filename
+        self.when = when
         self.encoding = enc
         self.utc = utc
         self._handler = None
