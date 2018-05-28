@@ -21,23 +21,12 @@ Logging:
       formatter: debugging
       level: DEBUG
       filename: logs/debugging_info.log
-    radioTelescope:
-      class: logging.handlers.TimedRotatingFileHandler
-      formatter: mainFile
-      level: WARNING
-      filename: logs/RadioTelescope_Logger
-      backupCount: 0
-      atTime: None
-      when: 'D'  # Rotate the file creation every day
-      interval: 1
-      encoding: 'utf-8'  # Set the file encoding to utf-8
-      utc: True  # Set the time of file creation to be UTC
     radioTelescopeThread:
       class: CLogFileHandler.CustomLogHandler
       formatter: mainFile
       level: INFO
       filename: logs/RadioTelescope_Logger.log
-      when: 'D'  # Rotate the file creation every day
+      when: 'midnight'  # Rotate the file creation every midnight
       enc: 'utf-8'  # Set the file encoding to utf-8
       utc: True  # Set the time of file creation to be UTC
 
