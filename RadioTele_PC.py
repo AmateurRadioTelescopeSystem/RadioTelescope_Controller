@@ -9,9 +9,21 @@ import OperationHandler
 import configData
 import logging.config
 import logging
+import yaml
 import sys
+import os
 
-logging.config.fileConfig('log_config.ini')  # Get the and apply the logger configuration
+# Create the directory for the log files if it does not exist already
+try:
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+except Exception as excep:
+    print("There is a problem with the log directory. See tracback: \n%s" % excep, file=sys.stderr)
+
+# Open the configuration and apply it on the logging module
+with open('log_config.yaml') as config_file:
+    dictionary = yaml.load(config_file)
+    logging.config.dictConfig(dictionary['Logging'])
 
 
 def main():
