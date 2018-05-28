@@ -90,10 +90,13 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.uiLocationWin.locationTypeChoose.currentIndexChanged.connect(self.showMapSelection)
 
         # Make the webview widget for the map
+        # Disabled for the moment because it gives an error on Ubuntu
+        '''
         self.webView = QtWebEngineWidgets.QWebEngineView(self.map_diag.widget)
         self.webView.setUrl(QtCore.QUrl("https://www.google.com/maps"))
         self.webView.setObjectName("webView")
         self.map_diag.formLayout.addWidget(self.webView)
+        '''
 
         # Create validators for the TCP port settings entries
         ipPortValidator = QtGui.QIntValidator()  # Create an integer validator
