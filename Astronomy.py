@@ -9,7 +9,7 @@ _sec_to_day = 1.1574074e-5  # How many days a second has
 # TODO add them to a file to be easily changed
 _motor_RA_steps_per_deg = 43200.0/15.0  # 43200 is in steps per hour of right ascension
 _motor_DEC_steps_per_deg = 10000.0  # Steps per degree
-_max_step_frq = 400.0  # Maximum stepping frequency of the motors in Hz
+_max_step_frq = 200.0  # Maximum stepping frequency of the motors in Hz
 
 
 class Calculations(QtCore.QObject):
@@ -66,6 +66,8 @@ class Calculations(QtCore.QObject):
         max_move_time = max_distance / _max_step_frq  # Maximum time required for any motor, calculated in seconds
         target_time = (cur_time[0], cur_time[1], cur_time[2] + max_move_time * _sec_to_day)  # Add the necessary time
         target_ha = self.hour_angle(target_time, obj_ra)  # Calculate the hour angle at the target location
+
+        # self.logD.debug("RA %f, DEC %f, time %f" % (target_ha, obj_dec, cur_time[1]))  # Debugging log
 
         return [target_ha, obj_dec]
 

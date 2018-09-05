@@ -6,6 +6,7 @@ from Stellarium import StellariumThread
 from Client import ClientThread
 from Server import RPiServerThread
 import OperationHandler
+import defaultData
 import configData
 import logging.config
 import logging
@@ -19,6 +20,28 @@ try:
         os.makedirs('logs')
 except Exception as excep:
     print("There is a problem with the log directory. See tracback: \n%s" % excep, file=sys.stderr)
+    sys.exit(-1)  # Exit the program if an error occurred
+
+# Check if the logging configuration file exists
+try:
+    if not os.path.exists('configuration_settings.yaml'):
+        print("Logging configuration file not found. Creating the default.")
+        log_file = open("configuration_settings.yaml", "w+")  # Open the logging configuration file in writing mode
+        log_file.write(defaultData.log_config_str)  # Write the default dat to the file
+        log_file.close()  # Close the file, since no other operation required
+except Exception as excep:
+    print("There is a problem creating the configuration file. See tracback: \n%s" % excep, file=sys.stderr)
+    sys.exit(-1)  # Exit the program if an error occurred
+
+# Check if the settings XML file exists
+try:
+    if not os.path.exists('settings.xml'):
+        print("Settings file not found. Creating the default.")
+        setngs_file = open("settings.xml", "w+")  # Open the settings file in writing mode
+        setngs_file.write(defaultData.settings_xml_str)  # Write the default dat to the file
+        setngs_file.close()  # Close the file, since no other operation required
+except Exception as excep:
+    print("There is a problem creating the settings file. See tracback: \n%s" % excep, file=sys.stderr)
     sys.exit(-1)  # Exit the program if an error occurred
 
 # Open the configuration and apply it on the logging module

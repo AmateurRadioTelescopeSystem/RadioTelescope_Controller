@@ -128,6 +128,7 @@ class OpHandler(QtCore.QObject):
         :return: Nothing
         """
         home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
+        home_steps = [25431, 63663]
         if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
             ra_degrees = radec[0] * 15.0  # Stellarium returns right ascension is hours, so we convert to degrees
             transit_coords = self.astronomy.transit(ra_degrees, radec[1], int(home_steps[0]), int(home_steps[1]))
