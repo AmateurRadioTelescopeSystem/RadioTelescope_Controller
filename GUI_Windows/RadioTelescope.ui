@@ -11,7 +11,7 @@
     <x>0</x>
     <y>0</y>
     <width>432</width>
-    <height>526</height>
+    <height>533</height>
    </rect>
   </property>
   <property name="font">
@@ -157,6 +157,33 @@
                 </layout>
                </item>
                <item row="5" column="0">
+                <layout class="QVBoxLayout" name="verticalLayout_4">
+                 <item>
+                  <widget class="QCheckBox" name="checkBox">
+                   <property name="cursor">
+                    <cursorShape>PointingHandCursor</cursorShape>
+                   </property>
+                   <property name="text">
+                    <string>Home Position</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="HomePositionButton">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="cursor">
+                    <cursorShape>PointingHandCursor</cursorShape>
+                   </property>
+                   <property name="text">
+                    <string>Return</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="6" column="0">
                 <widget class="QLabel" name="nextPageLabel">
                  <property name="enabled">
                   <bool>false</bool>
@@ -166,7 +193,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="1">
+               <item row="6" column="1">
                 <widget class="QToolButton" name="stellNextPageBtn">
                  <property name="enabled">
                   <bool>false</bool>
@@ -571,6 +598,13 @@
           </layout>
          </widget>
         </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QLabel" name="dateAndTimeLabel">
+          <property name="text">
+           <string>Date and Time</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0">
          <widget class="QGroupBox" name="groupBox_3">
           <property name="title">
@@ -734,13 +768,6 @@
             </widget>
            </item>
           </layout>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="dateAndTimeLabel">
-          <property name="text">
-           <string>Date and Time</string>
-          </property>
          </widget>
         </item>
        </layout>
