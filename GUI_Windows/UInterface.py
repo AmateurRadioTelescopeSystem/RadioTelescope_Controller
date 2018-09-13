@@ -19,6 +19,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.uiManContWin = QtWidgets.QMainWindow()  # Create the Manual control window
         self.uiTCPWin = QtWidgets.QMainWindow()  # Create the TCP settings window object
         self.uiLocationWin = QtWidgets.QDialog()  # Create the location settings window object
+        self.uiCalibrationWin = QtWidgets.QMainWindow()  # Create the calibration window object
 
         # Extra dialogs
         self.mapDialog = QtWidgets.QDialog()  # Create the location selection from map dialog
@@ -29,6 +30,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.uiManContWin.setWindowIcon(QtGui.QIcon('Icons/manControl.png'))
             self.uiTCPWin.setWindowIcon(QtGui.QIcon('Icons/Net.png'))
             self.uiLocationWin.setWindowIcon(QtGui.QIcon('Icons/location.png'))
+            self.uiCalibrationWin.setWindowIcon(QtGui.QIcon('Icons/calibration.png'))
         except Exception:
             self.logD.exception("Problem setting window icons. See traceback below.")
 
@@ -38,6 +40,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.tcp_widg = uic.loadUi('GUI_Windows/TCPSettings.ui', self.uiTCPWin)
             self.loc_widg = uic.loadUi('GUI_Windows/Location.ui', self.uiLocationWin)
             self.map_diag = uic.loadUi('GUI_Windows/MapsDialog.ui', self.mapDialog)
+            self.calib_win = uic.loadUi('GUI_Windows/Calibration.ui', self.uiCalibrationWin)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
@@ -75,6 +78,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.actionSettings.triggered.connect(self.uiTCPWin.show)  # Show the TCP settings window
         self.mainWin.actionManual_Control.triggered.connect(self.uiManContWin.show)  # Show the manual control window
         self.mainWin.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
+        self.mainWin.actionCalibration.triggered.connect(self.uiCalibrationWin.show)
         self.mainWin.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
         self.mainWin.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
         self.mainWin.locatChangeBtn.clicked.connect(self.uiLocationWin.show)

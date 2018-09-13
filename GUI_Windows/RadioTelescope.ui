@@ -900,6 +900,9 @@
    <property name="statusTip">
     <string>Calibrate the radio telescope's dish positioning</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+K</string>
+   </property>
   </action>
   <action name="actionLocation">
    <property name="text">
