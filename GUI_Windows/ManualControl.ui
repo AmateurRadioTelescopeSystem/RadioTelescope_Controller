@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>216</width>
-    <height>239</height>
+    <width>280</width>
+    <height>288</height>
    </rect>
   </property>
   <property name="font">
@@ -33,6 +33,13 @@
         <widget class="QLabel" name="label_3">
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Total Steps&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Frequency&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -65,6 +72,16 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="1" column="1">
+        <widget class="QSpinBox" name="frequncyInputBox">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>400</number>
+         </property>
+        </widget>
        </item>
        <item row="2" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -229,23 +246,6 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Frequency&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="frequncyInputBox">
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>400</number>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
     </item>
@@ -256,8 +256,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>216</width>
-     <height>21</height>
+     <width>280</width>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

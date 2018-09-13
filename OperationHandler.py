@@ -99,7 +99,7 @@ class OpHandler(QtCore.QObject):
     @QtCore.pyqtSlot(name='sendNewConCommands')
     def initialCommands(self):
         # TODO add more commands to send, like system check reports and others
-        self.tcpClient.sendData.emit("SEND-STEPS-FROM-HOME")  # Get the steps from home for each motor
+        self.tcpClient.sendData.emit("SEND_HOME_STEPS")  # Get the steps from home for each motor
 
     # Dta received from the client connected to the RPi server
     @QtCore.pyqtSlot(str, name='dataClientRX')
@@ -117,6 +117,8 @@ class OpHandler(QtCore.QObject):
         if len(splt_str) > 0:
             if splt_str[0] == "STEPS-FROM-HOME":
                 self.cfgData.setHomeSteps(splt_str[1], splt_str[2])  # Set the current away from home position steps
+                self.ui.uiManContWin.raStepText.setText(splt_str[1])
+                self.ui.uiManContWin.decStepText.setText(splt_str[2])
         else:
             self.logD.debug("Data received from client (Connected to remote RPi server): %s" % data)
 
@@ -386,6 +388,7 @@ class OpHandler(QtCore.QObject):
 
         self.ui.mainWin.actionSettings.triggered.connect(self.TCPSettingsHandle)  # Update settings each time
         self.ui.mainWin.actionLocation.triggered.connect(self.locationSettingsHandle)  # Update location fields
+        self.ui.mainWin.actionManual_Control.triggered.connect(partial(self.tcpClient.sendData.emit, "SEND_HOME_STEPS"))
         self.ui.mainWin.locatChangeBtn.clicked.connect(self.locationSettingsHandle)
         self.ui.mainWin.homePositionButton.clicked.connect(partial(self.tcpClient.sendData.emit, "RETURN_HOME"))
 
