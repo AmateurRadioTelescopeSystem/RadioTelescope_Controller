@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>432</width>
-    <height>533</height>
+    <width>552</width>
+    <height>629</height>
    </rect>
   </property>
   <property name="font">
@@ -159,7 +159,7 @@
                <item row="5" column="0">
                 <layout class="QVBoxLayout" name="verticalLayout_4">
                  <item>
-                  <widget class="QCheckBox" name="checkBox">
+                  <widget class="QCheckBox" name="homePositioncheckBox">
                    <property name="cursor">
                     <cursorShape>PointingHandCursor</cursorShape>
                    </property>
@@ -169,7 +169,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="HomePositionButton">
+                  <widget class="QPushButton" name="homePositionButton">
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
@@ -789,8 +789,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>432</width>
-     <height>21</height>
+     <width>552</width>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuThis_is_a_menu">
@@ -810,7 +810,8 @@
     <addaction name="actionLocation"/>
     <addaction name="actionManual_Control"/>
     <addaction name="separator"/>
-    <addaction name="actionObject"/>
+    <addaction name="actionPlanetaryObject"/>
+    <addaction name="actionSky_Scanning"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -930,7 +931,7 @@
     <string>Check for a new version release</string>
    </property>
   </action>
-  <action name="actionObject">
+  <action name="actionPlanetaryObject">
    <property name="text">
     <string>Planetary Object</string>
    </property>
@@ -939,6 +940,20 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="actionSky_Scanning">
+   <property name="text">
+    <string>Sky Scanning</string>
+   </property>
+   <property name="statusTip">
+    <string>Scan a source</string>
+   </property>
+   <property name="whatsThis">
+    <string>Get to the sky scanning feature menu</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
  </widget>

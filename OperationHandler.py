@@ -127,6 +127,7 @@ class OpHandler(QtCore.QObject):
         :param radec: A list containing the data received from Stellarium
         :return: Nothing
         """
+        # TODO Add the recall steps from home from RPi
         home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
         home_steps = [25431, 63663]
         if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
@@ -386,6 +387,7 @@ class OpHandler(QtCore.QObject):
         self.ui.mainWin.actionSettings.triggered.connect(self.TCPSettingsHandle)  # Update settings each time
         self.ui.mainWin.actionLocation.triggered.connect(self.locationSettingsHandle)  # Update location fields
         self.ui.mainWin.locatChangeBtn.clicked.connect(self.locationSettingsHandle)
+        self.ui.mainWin.homePositionButton.clicked.connect(partial(self.tcpClient.sendData.emit, "RETURN_HOME"))
 
         self.logD.debug("All signal connections made")
 

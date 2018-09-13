@@ -24,10 +24,13 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mapDialog = QtWidgets.QDialog()  # Create the location selection from map dialog
 
         # Set the icons for the GUI windows
-        self.mainWin.setWindowIcon(QtGui.QIcon('Icons/radiotelescope.png'))
-        self.uiManContWin.setWindowIcon(QtGui.QIcon('Icons/manControl.png'))
-        self.uiTCPWin.setWindowIcon(QtGui.QIcon('Icons/Net.png'))
-        self.uiLocationWin.setWindowIcon(QtGui.QIcon('Icons/location.png'))
+        try:
+            self.mainWin.setWindowIcon(QtGui.QIcon('Icons/radiotelescope.png'))
+            self.uiManContWin.setWindowIcon(QtGui.QIcon('Icons/manControl.png'))
+            self.uiTCPWin.setWindowIcon(QtGui.QIcon('Icons/Net.png'))
+            self.uiLocationWin.setWindowIcon(QtGui.QIcon('Icons/location.png'))
+        except Exception:
+            self.logD.exception("Problem setting window icons. See traceback below.")
 
         try:
             self.main_widg = uic.loadUi('GUI_Windows/RadioTelescope.ui', self.mainWin)
@@ -68,6 +71,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.serverRPiEnableLabel.stateChanged.connect(self.checkBoxTCPRTServer)
         self.mainWin.tcpStelServChkBox.stateChanged.connect(
             self.checkBoxTCPStel)  # Assign functionality to the checkbox
+        self.mainWin.homePositioncheckBox.stateChanged.connect(self.checkBoxReturnHome)
         self.mainWin.actionSettings.triggered.connect(self.uiTCPWin.show)  # Show the TCP settings window
         self.mainWin.actionManual_Control.triggered.connect(self.uiManContWin.show)  # Show the manual control window
         self.mainWin.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
@@ -143,6 +147,13 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.mainWin.connectStellariumBtn.setEnabled(True)
         else:
             self.mainWin.connectStellariumBtn.setEnabled(False)
+
+    # Function called when the enable/disable checkbox is pressed
+    def checkBoxReturnHome(self, state):
+        if state == QtCore.Qt.Checked:
+            self.mainWin.homePositionButton.setEnabled(True)
+        else:
+            self.mainWin.homePositionButton.setEnabled(False)
 
     # Set the label of the command on change
     def commandListText(self):

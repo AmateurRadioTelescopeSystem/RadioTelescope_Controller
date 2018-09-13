@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as etree
+import logging
 
 # TODO we have to add exception handling for every occasion, so the program does not crash
 # TODO especially exception handling related to file errors
@@ -8,15 +9,21 @@ class confData(object):
     # Class constructor
     def __init__(self, filename):
         self.filename = filename  # Create a variable with the given filename
-        self.parse()  # Parse the XML file
+        self.log = logging.getLogger(__name__)  # Create the logger for this module
+        try:
+            self.tree = etree.parse(self.filename)  # Try to parse the given file
+            self.root = self.tree.getroot()  # Get the root from the XML file
+        except Exception:
+            self.log.exception("There is an issue with the XML settings file. See traceback below.")
 
     def parse(self):
-        # Add a handling code for the case parsing fails
-        self.tree = etree.parse(self.filename)
-        self.root = self.tree.getroot()
+        try:
+            self.tree = etree.parse(self.filename)  # Try to parse the given file
+            self.root = self.tree.getroot()  # Get the root from the XML file
+        except Exception:
+            self.log.exception("There is an issue with the XML settings file. See traceback below.")
 
     def getConfig(self, child, subchild):
-        # self.parse()
         children = list(self.root.find(child))
         for item in children:
             if item.tag == subchild:
