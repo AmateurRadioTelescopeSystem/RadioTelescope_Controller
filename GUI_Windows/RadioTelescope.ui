@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>565</width>
-    <height>629</height>
+    <width>477</width>
+    <height>535</height>
    </rect>
   </property>
   <property name="font">
@@ -64,7 +64,7 @@
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="stackedWidgetPage1">
               <layout class="QFormLayout" name="formLayout">
@@ -836,8 +836,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>565</width>
-     <height>23</height>
+     <width>477</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuThis_is_a_menu">
