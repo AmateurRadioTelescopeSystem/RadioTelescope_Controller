@@ -280,6 +280,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.mainWin.serverRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
             self.mainWin.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
                                                       "color:#ffb400;\">Waiting...</span></p></body></html>")
+            self.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
+                                            "color:#ff0000;\">No</span></p></body></html>")
         elif data == "Connected":
             self.mainWin.serverRPiConnBtn.setText("Disable")
             self.mainWin.serverRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
@@ -290,6 +292,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.mainWin.serverRPiEnableLabel.setCheckState(QtCore.Qt.Checked)  # Set the checkbox to checked state
             self.mainWin.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
                                                       "color:#ff0000;\">Disconnected</span></p></body></html>")
+            self.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
+                                            "color:#ff0000;\">No</span></p></body></html>")
 
     @QtCore.pyqtSlot(float, float, name='posDataShow')
     def posDataShow(self, ra: float, dec: float):

@@ -112,15 +112,21 @@ class OpHandler(QtCore.QObject):
         """
         if data == "OK":
             self.ui.uiTCPWin.clientStatus.setText("OK")  # Set the response if the client responded correctly
-
-        splt_str = data.split("_")  # Try to split the string, and if it splits then a command is sent
-        if len(splt_str) > 0:
-            if splt_str[0] == "STEPS-FROM-HOME":
-                self.cfgData.setHomeSteps(splt_str[1], splt_str[2])  # Set the current away from home position steps
-                self.ui.uiManContWin.raStepText.setText(splt_str[1])
-                self.ui.uiManContWin.decStepText.setText(splt_str[2])
+        elif data == "STOPPED_MOVING":
+            self.ui.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
+                                               "color:#ff0000;\">No</span></p></body></html>")
+        elif data == "STARTED_MOVING":
+            self.ui.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
+                                               "color:#00ff00;\">Yes</span></p></body></html>")
         else:
-            self.logD.debug("Data received from client (Connected to remote RPi server): %s" % data)
+            splt_str = data.split("_")  # Try to split the string, and if it splits then a command is sent
+            if len(splt_str) > 0:
+                if splt_str[0] == "STEPS-FROM-HOME":
+                    self.cfgData.setHomeSteps(splt_str[1], splt_str[2])  # Set the current away from home position steps
+                    self.ui.uiManContWin.raStepText.setText(splt_str[1])
+                    self.ui.uiManContWin.decStepText.setText(splt_str[2])
+            else:
+                self.logD.debug("Data received from client (Connected to remote RPi server): %s" % data)
 
     @QtCore.pyqtSlot(list, name='clientCommandSendStell')
     def stellCommSend(self, radec: list):
