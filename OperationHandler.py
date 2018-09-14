@@ -129,12 +129,11 @@ class OpHandler(QtCore.QObject):
         :param radec: A list containing the data received from Stellarium
         :return: Nothing
         """
-        # TODO Add the recall steps from home from RPi
         home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
-        home_steps = [25431, 63663]
+        tr_time = int(self.ui.mainWin.transitTimeValue.currentText())
         if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
             ra_degrees = radec[0] * 15.0  # Stellarium returns right ascension is hours, so we convert to degrees
-            transit_coords = self.astronomy.transit(ra_degrees, radec[1], int(home_steps[0]), int(home_steps[1]))
+            transit_coords = self.astronomy.transit(ra_degrees, radec[1], -int(home_steps[0]), -int(home_steps[1]), tr_time)
             command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
             self.tcpClient.sendData.emit(command)
         elif self.ui.mainWin.stellariumOperationSelect.currentText() == "Aim and track":

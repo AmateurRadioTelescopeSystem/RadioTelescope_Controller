@@ -162,6 +162,12 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     # Set the label of the command on change
     def commandListText(self):
         self.mainWin.commandStellIndLabel.setText(self.mainWin.stellariumOperationSelect.currentText())
+        if self.mainWin.stellariumOperationSelect.currentText() == "Transit":
+            self.mainWin.transitTimeValue.setEnabled(True)
+            self.mainWin.transitTimeLablel.setEnabled(True)
+        else:
+            self.mainWin.transitTimeValue.setEnabled(False)
+            self.mainWin.transitTimeLablel.setEnabled(False)
 
     # Change the IP fields according to choice
     def ipSelectionBoxRPiServer(self):
@@ -234,6 +240,12 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.mainWin.stackedWidget.setCurrentIndex(0)
         self.mainWin.commandStellIndLabel.setText(
             self.mainWin.stellariumOperationSelect.currentText())  # Set the text initially
+        if self.mainWin.stellariumOperationSelect.currentText() == "Transit":
+            self.mainWin.transitTimeValue.setEnabled(True)
+            self.mainWin.transitTimeLablel.setEnabled(True)
+        else:
+            self.mainWin.transitTimeValue.setEnabled(False)
+            self.mainWin.transitTimeLablel.setEnabled(False)
 
     # Signal handler to show the received data fro Stellarium on the GUI
     @QtCore.pyqtSlot(float, float, name='dataStellShow')

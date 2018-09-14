@@ -44,7 +44,7 @@ class Calculations(QtCore.QObject):
 
         return time_tuple
 
-    def transit(self, obj_ra: float, obj_dec: float, stp_to_home_ra: int, stp_to_home_dec: int):
+    def transit(self, obj_ra: float, obj_dec: float, stp_to_home_ra: int, stp_to_home_dec: int, transit_time: int):
         """
         Transit final hour angle calculation.
         The final hour angle is calculated for a stationary object. We add the maximum time taken by any motor
@@ -54,6 +54,7 @@ class Calculations(QtCore.QObject):
         :param obj_dec: Provide the objects declination in degrees
         :param stp_to_home_ra: Give the number o steps away from home position for the right ascension motor
         :param stp_to_home_dec: Enter the number of steps away from home for the declination motor
+        :param transit_time: Enter the time to transit is seconds
         :return: A list containing the hour angle at the target location and the dec of the object
         """
         # TODO may be needed to add some "safety" seconds
@@ -64,14 +65,14 @@ class Calculations(QtCore.QObject):
 
         max_distance = max(step_distance_ra, step_distance_dec)  # Calculate the maximum distance, to calculate max time
         max_move_time = max_distance / _max_step_frq  # Maximum time required for any motor, calculated in seconds
-        target_time = (cur_time[0], cur_time[1], cur_time[2] + max_move_time * _sec_to_day)  # Add the necessary time
+        target_time = (cur_time[0], cur_time[1], cur_time[2] + (max_move_time + transit_time) * _sec_to_day)
         target_ha = self.hour_angle(target_time, obj_ra)  # Calculate the hour angle at the target location
 
         # self.logD.debug("RA %f, DEC %f, time %f" % (target_ha, obj_dec, cur_time[1]))  # Debugging log
 
         return [target_ha, obj_dec]
 
-    def transit_planetary(self, objec, stp_to_home_ra: int, stp_to_home_dec: int):
+    def transit_planetary(self, objec, stp_to_home_ra: int, stp_to_home_dec: int, transit_time: int):
         """
         Calculate object's position when the dish arrives at position.
         This function calculates the coordinates of the requested object, taking into account the delay of the dish
@@ -79,6 +80,7 @@ class Calculations(QtCore.QObject):
         :param objec: pyephem object type, which is the object of interest (e.g. ephem.Jupiter())
         :param stp_to_home_ra: Number of steps from home position for the right ascension motor
         :param stp_to_home_dec: Number of steps from home position for the declination motor
+        :param transit_time: Enter the time to transit is seconds
         :return: Object's coordinates at the dish arrival position
         """
         cur_time = self.current_time()  # Get the current time in tuple
@@ -95,7 +97,7 @@ class Calculations(QtCore.QObject):
 
         max_distance = max(step_distance_ra, step_distance_dec)  # Calculate the maximum distance, to calculate max time
         max_move_time = max_distance / _max_step_frq  # Maximum time required for any motor, calculated in seconds
-        target_time = (cur_time[0], cur_time[1], cur_time[2] + max_move_time * _sec_to_day)  # Add the necessary time
+        target_time = (cur_time[0], cur_time[1], cur_time[2] + (max_move_time + transit_time) * _sec_to_day)
 
         # Recalculate the coordinates for the new time
         objec.compute(cur_time, epoch=date)
