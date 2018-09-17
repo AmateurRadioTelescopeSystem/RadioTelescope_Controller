@@ -29,6 +29,16 @@ class Calculations(QtCore.QObject):
         calculated_ha = float(self.observer.sidereal_time())*_rad_to_deg - obj_ra  # Ephem sidereal returns in rad
         return calculated_ha
 
+    def hour_angle_to_ra(self, obj_ha: float):
+        """
+        Return the current RA of an object provided its HA and having properly calibrated ephem.
+        :param obj_ha: Hour angle of the desired object
+        :return: The current right ascension of the object in JNOW
+        """
+        self.observer.date = self.current_time()  # Get the current time and date as needed by ephem
+        calculated_ra = float(self.observer.sidereal_time())*_rad_to_deg - obj_ha  # Calculate the right ascension
+        return calculated_ra
+
     def current_time(self):
         """
         Get the current time in GMT without daylight saving.

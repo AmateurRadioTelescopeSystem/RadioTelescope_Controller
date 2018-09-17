@@ -156,23 +156,24 @@ class OpHandler(QtCore.QObject):
         :param data: Data received from the TCP connection
         :return: Nothing
         """
+        # TODO Remove the degree conversion for the RA, since MPU will send in degrees and not hours
         spltData = data.split("_")  # Split the string with the set delimiter
         if spltData[0] == "POSUPDATE":
-            ra = spltData[2]  # Get the RA from the received position
+            ra = self.astronomy.hour_angle_to_ra(float(spltData[2])*15.0)  # Get the RA from the received position
             dec = spltData[4]  # Get the DEC from the received position
             if not (self.prev_pos[0] == ra and self.prev_pos[1] == dec and spltData[0] != "POSUPDATE"):
-                self.tcpStellarium.sendDataStell.emit(float(ra), float(dec))  # Send the position to Stellarium
-                self.posDataShow.emit(float(ra), float(dec))  # Send the updated values if they are different
+                self.tcpStellarium.sendDataStell.emit(float(ra)/15.0, float(dec))  # Send the position to Stellarium
+                self.posDataShow.emit(float(ra)/15.0, float(dec))  # Send the updated values if they are different
             self.prev_pos = [ra, dec]  # Save the values for later comparison
         elif spltData[0] == "DISHPOS":
-            ra_degrees = spltData[2]  # Get the RA from the received position
+            ra_degrees = self.astronomy.hour_angle_to_ra(float(spltData[2])*15.0)  # Get the RA from the received HA
             dec_degrees = spltData[4]  # Get the DEC from the received position
             ra_steps = spltData[7]
             dec_steps = spltData[9]
             self.ui.uiManContWin.raStepText.setText(ra_steps)  # Update the manual control window
             self.ui.uiManContWin.decStepText.setText(dec_steps)  # Update the manual control window
-            self.tcpStellarium.sendDataStell.emit(float(ra_degrees), float(dec_degrees))
-            self.posDataShow.emit(float(ra_degrees), float(dec_degrees))
+            self.tcpStellarium.sendDataStell.emit(float(ra_degrees)/15.0, float(dec_degrees))
+            self.posDataShow.emit(float(ra_degrees)/15.0, float(dec_degrees))
 
     # Command to stop any motion of the radio telescope dish
     @QtCore.pyqtSlot(name='stopRadioTele')
