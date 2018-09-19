@@ -80,6 +80,11 @@
               <string>Remote</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>Custom</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>
@@ -92,9 +97,6 @@
               <width>120</width>
               <height>16777215</height>
              </size>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
