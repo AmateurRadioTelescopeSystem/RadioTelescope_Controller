@@ -171,10 +171,14 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
     # Change the IP fields according to choice
     def ipSelectionBoxRPiServer(self):
-        if self.uiTCPWin.telServBox.currentText() == "Localhost":
+        stat = self.uiTCPWin.telServBox.currentText()
+        if stat == "Localhost":
             self.uiTCPWin.telescopeIPAddrServ.setText("127.0.0.1")
-        # else:
-            # self.uiTCPWin.telescopeIPAddrServ.setText("")
+            self.uiTCPWin.telescopeIPAddrServ.setEnabled(False)
+        elif stat == "Remote":
+            self.uiTCPWin.telescopeIPAddrServ.setEnabled(False)
+        elif stat == "Custom":
+            self.uiTCPWin.telescopeIPAddrServ.setEnabled(True)
 
     def ipSelectionBoxClient(self):
         if self.uiTCPWin.telClientBox.currentText() == "Remote":
