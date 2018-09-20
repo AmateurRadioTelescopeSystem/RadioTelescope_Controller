@@ -41,6 +41,7 @@ class RPiServerThread(QtCore.QObject):
                 else:
                     ipAddress = QtNetwork.QHostAddress.LocalHost  # If no IP is found, assign localhost
             self.host = ipAddress  # Assign the IP address that wa found above
+        # TODO Add the ability to incorporate custom IP addresses
 
         self.tcpServer = QtNetwork.QTcpServer()  # Create a server object
         self.tcpServer.newConnection.connect(self._new_connection)  # Handler for a new connection

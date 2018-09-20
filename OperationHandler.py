@@ -94,12 +94,12 @@ class OpHandler(QtCore.QObject):
 
     def testConnButton(self):
         if self.ui.uiTCPWin.clientConTestChkBox.isChecked():
-            self.tcpClient.sendData.emit("Test")
+            self.tcpClient.sendData.emit("Test\n")
 
     @QtCore.pyqtSlot(name='sendNewConCommands')
     def initialCommands(self):
         # TODO add more commands to send, like system check reports and others
-        self.tcpClient.sendData.emit("SEND_HOME_STEPS")  # Get the steps from home for each motor
+        self.tcpClient.sendData.emit("SEND_HOME_STEPS\n")  # Get the steps from home for each motor
 
     # Dta received from the client connected to the RPi server
     @QtCore.pyqtSlot(str, name='dataClientRX')
@@ -179,7 +179,7 @@ class OpHandler(QtCore.QObject):
     @QtCore.pyqtSlot(name='stopRadioTele')
     def stopMovingRT(self):
         # TODO change the command to the appropriate one
-        self.tcpClient.sendData.emit("STOP")  # Send the request to stop moving to the RPi server
+        self.tcpClient.sendData.emit("STOP\n")  # Send the request to stop moving to the RPi server
         self.logD.warning("A dish motion halt was requested")
 
     # Functions to connect with the manual control widget
@@ -237,8 +237,10 @@ class OpHandler(QtCore.QObject):
 
         if servRPiRemote == "no":
             self.ui.uiTCPWin.telServBox.setCurrentIndex(0)
-        else:
+        elif servRPiRemote == "yes":
             self.ui.uiTCPWin.telServBox.setCurrentIndex(1)
+        elif servRPiRemote == "custom":
+            self.ui.uiTCPWin.telServBox.setCurrentIndex(2)
 
         if stellServRemote == "no":
             self.ui.uiTCPWin.stellIPServBox.setCurrentIndex(0)
@@ -316,17 +318,26 @@ class OpHandler(QtCore.QObject):
         # Save the IP addresses
         if self.ui.uiTCPWin.telServBox.currentText() == "Localhost":
             self.cfgData.setRPiHost("127.0.0.1")
-        else:
+            self.cfgData.setServRemote("TCPRPiServ", "no")
+        elif self.ui.uiTCPWin.telServBox.currentText() == "Remote":
+            self.cfgData.setServRemote("TCPRPiServ", "yes")
+            self.cfgData.setRPiHost(self.ui.uiTCPWin.telescopeIPAddrServ.text())
+        elif self.ui.uiTCPWin.telServBox.currentText() == "Custom":
+            self.cfgData.setServRemote("TCPRPiServ", "custom")
             self.cfgData.setRPiHost(self.ui.uiTCPWin.telescopeIPAddrServ.text())
 
         if self.ui.uiTCPWin.telClientBox.currentText() == "Localhost":
             self.cfgData.setHost("127.0.0.1")
+            self.cfgData.setServRemote("TCP", "no")
         else:
+            self.cfgData.setServRemote("TCP", "yes")
             self.cfgData.setHost(self.ui.uiTCPWin.telescopeIPAddrClient.text())
 
         if self.ui.uiTCPWin.stellIPServBox.currentText() == "Localhost":
             self.cfgData.setStellHost("127.0.0.1")
+            self.cfgData.setServRemote("TCPStell", "no")
         else:
+            self.cfgData.setServRemote("TCPStell", "yes")
             self.cfgData.setStellHost(self.ui.uiTCPWin.stellServInpIP.text())
 
         # Send a reconnect signal to all TCP operations (No effect if some is not active)
@@ -365,6 +376,11 @@ class OpHandler(QtCore.QObject):
 
     # Make all the necessary signal connections
     def signalConnectios(self):
+        """
+        Connect all the necessary signals from the different modules.
+        This function is called at the start of the Operation handling thread.
+        :return: Nothing
+        """
         self.tcpStellarium.sendClientConn.connect(self.stellCommSend)  # Send data from Stellarium to the RPi
         self.tcpClient.dataRcvSigC.connect(self.clientDataRx)  # Receive pending data from RPi connected client
         self.tcpClient.newConInitComms.connect(self.initialCommands)
@@ -373,7 +389,7 @@ class OpHandler(QtCore.QObject):
         self.tcpServer.clientNotice.connect(self.tcpClient.connect)  # Tell the client to reconnect
 
         self.ui.stopMovingRTSig.connect(self.stopMovingRT)  # Send a motion stop command, once this signal is triggered
-        self.ui.mainWin.stellPosUpdtBtn.clicked.connect(partial(self.tcpClient.sendData.emit, "SEND_POS_UPDATE"))
+        self.ui.mainWin.stellPosUpdtBtn.clicked.connect(partial(self.tcpClient.sendData.emit, "SEND_POS_UPDATE\n"))
         self.posDataShow.connect(self.ui.posDataShow)  # Show the dish position data, when available
 
         self.ui.uiTCPWin.conTestBtn.clicked.connect(self.testConnButton)
@@ -394,9 +410,9 @@ class OpHandler(QtCore.QObject):
 
         self.ui.mainWin.actionSettings.triggered.connect(self.TCPSettingsHandle)  # Update settings each time
         self.ui.mainWin.actionLocation.triggered.connect(self.locationSettingsHandle)  # Update location fields
-        self.ui.mainWin.actionManual_Control.triggered.connect(partial(self.tcpClient.sendData.emit, "SEND_HOME_STEPS"))
+        self.ui.mainWin.actionManual_Control.triggered.connect(partial(self.tcpClient.sendData.emit, "SEND_HOME_STEPS\n"))
         self.ui.mainWin.locatChangeBtn.clicked.connect(self.locationSettingsHandle)
-        self.ui.mainWin.homePositionButton.clicked.connect(partial(self.tcpClient.sendData.emit, "RETURN_HOME"))
+        self.ui.mainWin.homePositionButton.clicked.connect(partial(self.tcpClient.sendData.emit, "RETURN_HOME\n"))
 
         self.logD.debug("All signal connections made")
 
