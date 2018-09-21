@@ -25,9 +25,9 @@ except Exception as excep:
 
 # Check if the logging configuration file exists
 try:
-    if not os.path.exists(os.path.abspath('Settings/configuration_settings.yaml')):
-        print("Logging configuration file not found. Creating the default.")
-        log_file = open(os.path.abspath('Settings/configuration_settings.yaml'), "w+")  # Open the logging configuration file in writing mode
+    if not os.path.exists(os.path.abspath('Settings/logging_settings.yaml')):
+        print("Logging configuration file not found. Creating the default.", file==sys.stderr)
+        log_file = open(os.path.abspath('Settings/logging_settings.yaml'), "w+")  # Open file in writing mode
         log_file.write(defaultData.log_config_str)  # Write the default dat to the file
         log_file.close()  # Close the file, since no other operation required
 except Exception as excep:
@@ -37,7 +37,7 @@ except Exception as excep:
 # Check if the settings XML file exists
 try:
     if not os.path.exists(os.path.abspath('Settings/settings.xml')):
-        print("Settings file not found. Creating the default.")
+        print("Settings file not found. Creating the default.", file=sys.stderr)
         setngs_file = open(os.path.abspath('Settings/settings.xml'), "w+")  # Open the settings file in writing mode
         setngs_file.write(defaultData.settings_xml_str)  # Write the default dat to the file
         setngs_file.close()  # Close the file, since no other operation required
@@ -46,7 +46,7 @@ except Exception as excep:
     sys.exit(-1)  # Exit the program if an error occurred
 
 # Open the configuration and apply it on the logging module
-with open(os.path.abspath('Settings/configuration_settings.yaml')) as config_file:
+with open(os.path.abspath('Settings/logging_settings.yaml')) as config_file:
     dictionary = yaml.load(config_file)  # Load the dictionary configuration
     logging.config.dictConfig(dictionary['Logging'])  # Select the logging settings from the dictionary
 
