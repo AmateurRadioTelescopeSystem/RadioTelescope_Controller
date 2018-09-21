@@ -6,11 +6,11 @@ log_config_str = """Logging:
 
   formatters:
     debugging:
-      format: "%(asctime)s  [%(thread)12d] %(levelname)-8s - %(name)30s.%(funcName)-20s - %(message)s"
+      format: "%(asctime)s  [%(thread)12d] %(levelname)-8s - %(name)35s.%(funcName)-20s - %(message)s"
     mainFile:
-      format: "%(asctime)s  [%(name)30s.%(funcName)-18s]  %(levelname)-8s -  %(message)s"
+      format: "%(asctime)s  [%(name)35s.%(funcName)-20s]  %(levelname)-8s -  %(message)s"
     brief:
-      format: "%(levelname)-8s [%(thread)d] - %(name)30s.%(funcName)-20s - %(message)s"
+      format: "%(levelname)-8s [%(thread)d] - %(name)35s.%(funcName)-20s - %(message)s"
 
   handlers:
     console:
@@ -24,7 +24,7 @@ log_config_str = """Logging:
       level: DEBUG
       filename: logs/debugging_info.log
     radioTelescopeThread:
-      class: CLogFileHandler.CustomLogHandler
+      class: Core.Handlers.CLogFileHandler.CustomLogHandler
       formatter: mainFile
       level: INFO
       filename: logs/RadioTelescope_Logger.log
@@ -45,16 +45,16 @@ settings_xml_str = """<settings>
         <latitude>40.6306</latitude>
         <longitude>22.9589</longitude>
     </location>
-    <TCP autoconnect="yes">
-        <host>10.42.0.158</host>
+    <TCP autoconnect="yes" remote="yes">
+        <host>155.207.50.36</host>
         <port>10001</port>
     </TCP>
     <TCPStell autoconnect="yes" remote="no">
         <host>127.0.0.1</host>
         <port>10002</port>
     </TCPStell>
-    <TCPRPiServ remote="yes">
-        <host>10.42.0.1</host>
+    <TCPRPiServ remote="no">
+        <host>127.0.0.1</host>
         <port>10003</port>
     </TCPRPiServ>
     <object stationary="yes">

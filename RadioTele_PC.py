@@ -25,9 +25,9 @@ except Exception as excep:
 
 # Check if the logging configuration file exists
 try:
-    if not os.path.exists('configuration_settings.yaml'):
+    if not os.path.exists(os.path.abspath('Settings/configuration_settings.yaml')):
         print("Logging configuration file not found. Creating the default.")
-        log_file = open("configuration_settings.yaml", "w+")  # Open the logging configuration file in writing mode
+        log_file = open(os.path.abspath('Settings/configuration_settings.yaml'), "w+")  # Open the logging configuration file in writing mode
         log_file.write(defaultData.log_config_str)  # Write the default dat to the file
         log_file.close()  # Close the file, since no other operation required
 except Exception as excep:
@@ -36,9 +36,9 @@ except Exception as excep:
 
 # Check if the settings XML file exists
 try:
-    if not os.path.exists('settings.xml'):
+    if not os.path.exists(os.path.abspath('Settings/settings.xml')):
         print("Settings file not found. Creating the default.")
-        setngs_file = open("settings.xml", "w+")  # Open the settings file in writing mode
+        setngs_file = open(os.path.abspath('Settings/settings.xml'), "w+")  # Open the settings file in writing mode
         setngs_file.write(defaultData.settings_xml_str)  # Write the default dat to the file
         setngs_file.close()  # Close the file, since no other operation required
 except Exception as excep:
@@ -46,7 +46,7 @@ except Exception as excep:
     sys.exit(-1)  # Exit the program if an error occurred
 
 # Open the configuration and apply it on the logging module
-with open('configuration_settings.yaml') as config_file:
+with open(os.path.abspath('Settings/configuration_settings.yaml')) as config_file:
     dictionary = yaml.load(config_file)  # Load the dictionary configuration
     logging.config.dictConfig(dictionary['Logging'])  # Select the logging settings from the dictionary
 
@@ -61,7 +61,7 @@ def main():
 
     # Exception handling code for the XML file process
     try:
-        cfgData = configData.confData("settings.xml")
+        cfgData = configData.confData(os.path.abspath('Settings/settings.xml'))
     except:
         logdata.exception("There is a problem with the XML file handling. Program terminates.")
         sys.exit(1)  # Terminate the script
