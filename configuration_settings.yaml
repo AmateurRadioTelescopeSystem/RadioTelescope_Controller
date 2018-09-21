@@ -4,11 +4,11 @@ Logging:
 
   formatters:
     debugging:
-      format: "%(asctime)s  [%(thread)12d] %(levelname)-8s - %(name)30s.%(funcName)-20s - %(message)s"
+      format: "%(asctime)s  [%(thread)12d] %(levelname)-8s - %(name)35s.%(funcName)-20s - %(message)s"
     mainFile:
-      format: "%(asctime)s  [%(name)30s.%(funcName)-18s]  %(levelname)-8s -  %(message)s"
+      format: "%(asctime)s  [%(name)35s.%(funcName)-20s]  %(levelname)-8s -  %(message)s"
     brief:
-      format: "%(levelname)-8s [%(thread)d] - %(name)30s.%(funcName)-20s - %(message)s"
+      format: "%(levelname)-8s [%(thread)d] - %(name)35s.%(funcName)-20s - %(message)s"
 
   handlers:
     console:
