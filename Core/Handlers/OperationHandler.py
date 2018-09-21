@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtNetwork
+from Core.Astronomy import Astronomy
 from functools import partial
-import Astronomy
 import logging
 
 

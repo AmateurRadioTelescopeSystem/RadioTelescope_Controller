@@ -22,7 +22,7 @@ Logging:
       level: DEBUG
       filename: logs/debugging_info.log
     radioTelescopeThread:
-      class: CLogFileHandler.CustomLogHandler
+      class: Core.Handlers.CLogFileHandler.CustomLogHandler
       formatter: mainFile
       level: INFO
       filename: logs/RadioTelescope_Logger.log

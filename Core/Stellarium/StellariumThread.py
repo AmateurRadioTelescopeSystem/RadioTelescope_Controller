@@ -1,4 +1,4 @@
-from Stellarium import StellariumDataHandling
+from Core.Stellarium import StellariumDataHandling
 from PyQt5 import QtCore, QtNetwork
 import logging
 

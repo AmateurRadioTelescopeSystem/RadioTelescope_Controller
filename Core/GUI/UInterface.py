@@ -5,6 +5,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, uic, QtWebEngineWidgets
 from functools import partial
 import logging
 import sys
+import os
 
 
 class Ui_RadioTelescopeControl(QtCore.QObject):
@@ -26,21 +27,21 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
         # Set the icons for the GUI windows
         try:
-            self.mainWin.setWindowIcon(QtGui.QIcon('Icons/radiotelescope.png'))
-            self.uiManContWin.setWindowIcon(QtGui.QIcon('Icons/manControl.png'))
-            self.uiTCPWin.setWindowIcon(QtGui.QIcon('Icons/Net.png'))
-            self.uiLocationWin.setWindowIcon(QtGui.QIcon('Icons/location.png'))
-            self.uiCalibrationWin.setWindowIcon(QtGui.QIcon('Icons/calibration.png'))
+            self.mainWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/radiotelescope.png')))
+            self.uiManContWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/manControl.png')))
+            self.uiTCPWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/Net.png')))
+            self.uiLocationWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/location.png')))
+            self.uiCalibrationWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/calibration.png')))
         except Exception:
             self.logD.exception("Problem setting window icons. See traceback below.")
 
         try:
-            self.main_widg = uic.loadUi('GUI_Windows/RadioTelescope.ui', self.mainWin)
-            self.man_cn_widg = uic.loadUi('GUI_Windows/ManualControl.ui', self.uiManContWin)
-            self.tcp_widg = uic.loadUi('GUI_Windows/TCPSettings.ui', self.uiTCPWin)
-            self.loc_widg = uic.loadUi('GUI_Windows/Location.ui', self.uiLocationWin)
-            self.map_diag = uic.loadUi('GUI_Windows/MapsDialog.ui', self.mapDialog)
-            self.calib_win = uic.loadUi('GUI_Windows/Calibration.ui', self.uiCalibrationWin)
+            self.main_widg = uic.loadUi(os.path.abspath('UI_Files/RadioTelescope.ui'), self.mainWin)
+            self.man_cn_widg = uic.loadUi(os.path.abspath('UI_Files/ManualControl.ui'), self.uiManContWin)
+            self.tcp_widg = uic.loadUi(os.path.abspath('UI_Files/TCPSettings.ui'), self.uiTCPWin)
+            self.loc_widg = uic.loadUi(os.path.abspath('UI_Files/Location.ui'), self.uiLocationWin)
+            self.map_diag = uic.loadUi(os.path.abspath('UI_Files/MapsDialog.ui'), self.mapDialog)
+            self.calib_win = uic.loadUi(os.path.abspath('UI_Files/Calibration.ui'), self.uiCalibrationWin)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
