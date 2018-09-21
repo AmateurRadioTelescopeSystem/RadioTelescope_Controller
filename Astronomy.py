@@ -37,6 +37,9 @@ class Calculations(QtCore.QObject):
         """
         self.observer.date = self.current_time()  # Get the current time and date as needed by ephem
         calculated_ra = float(self.observer.sidereal_time())*_rad_to_deg - obj_ha  # Calculate the right ascension
+
+        if calculated_ra < 0.0:
+            calculated_ra = calculated_ra + 359.9955
         return calculated_ra
 
     def current_time(self):
