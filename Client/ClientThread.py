@@ -66,7 +66,7 @@ class ClientThread(QtCore.QObject):
     def _hostConnected(self):
         self.sendData.connect(self.sendC)  # Send the data to the server when this signal is fired
         self.sendData.emit("CONNECT_CLIENT\n")  # Tell the RPi to connect the client, since the local server should be running
-        #self.sendData.emit("START_SENDING_POS")  # Send the position report request
+        self.sendData.emit("SEND_POS_UPDATE\n")  # Send the position report request
         self.conStatSigC.emit("Connected")  # If we have a connection send the signal
         self.newConInitComms.emit()  # Send the signal to send the initial commands
         self.log.info("Client connected to server")
