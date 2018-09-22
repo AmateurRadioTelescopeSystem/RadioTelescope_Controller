@@ -36,6 +36,7 @@ class OpHandler(QtCore.QObject):
         self.logD = logging.getLogger(__name__)  # Data logger object
         self.astronomy = Astronomy.Calculations(cfg_data=cfgData)  # Astronomy calculations object
         self.prev_pos = ["", ""]  # The dish position is saved for change comparison
+        self.motors_enabled = False  # Keep the motor status
 
     def start(self):
         """
@@ -96,6 +97,14 @@ class OpHandler(QtCore.QObject):
         if self.ui.uiTCPWin.clientConTestChkBox.isChecked():
             self.tcpClient.sendData.emit("Test\n")
 
+    def motorsEnableButton(self):
+        if self.motors_enabled:
+            self.tcpClient.sendData.emit("DISABLE_MOTORS\n")
+            self.ui.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Checked)
+        else:
+            self.tcpClient.sendData.emit("ENABLE_MOTORS\n")
+            self.ui.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Unchecked)
+
     @QtCore.pyqtSlot(name='sendNewConCommands')
     def initialCommands(self):
         # TODO add more commands to send, like system check reports and others
@@ -118,6 +127,16 @@ class OpHandler(QtCore.QObject):
         elif data == "STARTED_MOVING":
             self.ui.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
                                                "color:#00ff00;\">Yes</span></p></body></html>")
+        elif data == "MOTORS_ENABLED":
+            self.motors_enabled = True
+            self.ui.mainWin.motorStatusText.setText("<html><head/><body><p><span style=\" "
+                                                    "color:#00ff00;\">Enabled</span></p></body></html>")
+            self.ui.mainWin.motorCommandButton.setText("Disable")
+        elif data == "MOTORS_DISABLED":
+            self.motors_enabled = False
+            self.ui.mainWin.motorStatusText.setText("<html><head/><body><p><span style=\" "
+                                                    "color:#ff0000;\">Disabled</span></p></body></html>")
+            self.ui.mainWin.motorCommandButton.setText("Enable")
         else:
             splt_str = data.split("_")  # Try to split the string, and if it splits then a command is sent
             if len(splt_str) > 0:
@@ -399,6 +418,7 @@ class OpHandler(QtCore.QObject):
         self.ui.mainWin.serverRPiConnBtn.clicked.connect(self.connectButtonRPi)  # TCP server connection button
         self.ui.mainWin.connectStellariumBtn.clicked.connect(
             self.connectButtonS)  # Stellarium TCP server connection button
+        self.ui.mainWin.motorCommandButton.clicked.connect(self.motorsEnableButton)  # Enable/Disable the motors on RPi
 
         self.ui.uiManContWin.movRaBtn.clicked.connect(self.manCont_movRA)
         self.ui.uiManContWin.movDecBtn.clicked.connect(self.manCont_movDEC)

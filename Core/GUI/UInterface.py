@@ -76,11 +76,15 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.tcpStelServChkBox.stateChanged.connect(
             self.checkBoxTCPStel)  # Assign functionality to the checkbox
         self.mainWin.homePositioncheckBox.stateChanged.connect(self.checkBoxReturnHome)
+        self.mainWin.dishHaultCommandCheckBox.stateChanged.connect(self.checkBoxDishHault)
+        self.mainWin.motorCommandCheckBox.stateChanged.connect(self.checkBoxMotors)
+
         self.mainWin.actionSettings.triggered.connect(self.uiTCPWin.show)  # Show the TCP settings window
         self.mainWin.actionManual_Control.triggered.connect(self.uiManContWin.show)  # Show the manual control window
         self.mainWin.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
         self.mainWin.actionCalibration.triggered.connect(self.uiCalibrationWin.show)
         self.mainWin.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
+
         self.mainWin.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
         self.mainWin.locatChangeBtn.clicked.connect(self.uiLocationWin.show)
 
@@ -159,6 +163,18 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.mainWin.homePositionButton.setEnabled(True)
         else:
             self.mainWin.homePositionButton.setEnabled(False)
+
+    def checkBoxDishHault(self, state):
+        if state == QtCore.Qt.Checked:
+            self.mainWin.stopMovingBtn.setEnabled(True)
+        else:
+            self.mainWin.stopMovingBtn.setEnabled(False)
+
+    def checkBoxMotors(self, state):
+        if state == QtCore.Qt.Checked:
+            self.mainWin.motorCommandButton.setEnabled(True)
+        else:
+            self.mainWin.motorCommandButton.setEnabled(False)
 
     # Set the label of the command on change
     def commandListText(self):
