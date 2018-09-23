@@ -29,6 +29,7 @@ log_config_str = """Logging:
       level: INFO
       filename: logs/RadioTelescope_Logger.log
       when: 'midnight'  # Rotate the file creation every midnight
+      backup_count: 7  # Keep 7 days old files and delete older
       enc: 'utf-8'  # Set the file encoding to utf-8
       utc: True  # Set the time of file creation to be UTC
 
