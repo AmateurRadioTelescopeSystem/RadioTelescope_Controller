@@ -158,13 +158,15 @@ class OpHandler(QtCore.QObject):
         tr_time = int(self.ui.mainWin.transitTimeValue.text())
         if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
             ra_degrees = radec[0] * 15.0  # Stellarium returns right ascension is hours, so we convert to degrees
-            transit_coords = self.astronomy.transit(ra_degrees, radec[1], -int(home_steps[0]), -int(home_steps[1]), tr_time)
+            transit_coords = self.astronomy.transit(ra_degrees, radec[1], -int(home_steps[0]), -int(home_steps[1]),
+                                                    tr_time)
             command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
-            self.tcpClient.sendData.emit(command)
+            self.tcpClient.sendData.emit(command)  # Send the transit command to the RPi
         elif self.ui.mainWin.stellariumOperationSelect.currentText() == "Aim and track":
-            # TODO implement the tracking function in the correct way
-            command = "TRK %f %f\n" % (radec[0], radec[1])
-            self.tcpClient.sendData.emit(command)
+            ra_degrees = radec[0] * 15.0  # Stellarium returns right ascension is hours, so we convert to degrees
+            trk_coords = self.astronomy.transit(ra_degrees, radec[1], -int(home_steps[0]), -int(home_steps[1]), 0)
+            command = "TRK_RA_%.5f_DEC_%.5f_RA-SPEEDD_%.5f_DEC-SPEED_%.5f\n" % (trk_coords[0], trk_coords[1], 0, 0)
+            self.tcpClient.sendData.emit(command)  # Send the tracking command to the RPi
 
     # Received data from the server that the RPi is connected as a client. Signal is (dataRxFromServ)
     @QtCore.pyqtSlot(str, name='rpiServDataRx')
