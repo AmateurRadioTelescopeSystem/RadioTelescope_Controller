@@ -124,9 +124,11 @@ class OpHandler(QtCore.QObject):
         elif data == "STOPPED_MOVING":
             self.ui.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
                                                "color:#ff0000;\">No</span></p></body></html>")
+            self.ui.mainWin.onTargetProgress.setVisible(False)  # Make the progress bar invisible
         elif data == "STARTED_MOVING":
             self.ui.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
                                                "color:#00ff00;\">Yes</span></p></body></html>")
+            self.ui.mainWin.onTargetProgress.setVisible(True)  # Make the progress bar visible
         elif data == "MOTORS_ENABLED":
             self.motors_enabled = True
             self.ui.mainWin.motorStatusText.setText("<html><head/><body><p><span style=\" "
@@ -154,19 +156,22 @@ class OpHandler(QtCore.QObject):
         :param radec: A list containing the data received from Stellarium
         :return: Nothing
         """
-        home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
-        tr_time = int(self.ui.mainWin.transitTimeValue.text())
-        if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
-            ra_degrees = radec[0] * 15.0  # Stellarium returns right ascension is hours, so we convert to degrees
-            transit_coords = self.astronomy.transit(ra_degrees, radec[1], -int(home_steps[0]), -int(home_steps[1]),
-                                                    tr_time)
-            command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
-            self.tcpClient.sendData.emit(command)  # Send the transit command to the RPi
-        elif self.ui.mainWin.stellariumOperationSelect.currentText() == "Aim and track":
-            ra_degrees = radec[0] * 15.0  # Stellarium returns right ascension is hours, so we convert to degrees
-            trk_coords = self.astronomy.transit(ra_degrees, radec[1], -int(home_steps[0]), -int(home_steps[1]), 0)
-            command = "TRK_RA_%.5f_DEC_%.5f_RA-SPEEDD_%.5f_DEC-SPEED_%.5f\n" % (trk_coords[0], trk_coords[1], 0, 0)
-            self.tcpClient.sendData.emit(command)  # Send the tracking command to the RPi
+        if not self.motors_enabled:
+            self.ui.motorsDisabledSig.emit()
+        else:
+            home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
+            tr_time = int(self.ui.mainWin.transitTimeValue.text())
+            if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
+                ra_degrees = radec[0] * 15.0  # Stellarium returns right ascension is hours, so we convert to degrees
+                transit_coords = self.astronomy.transit(ra_degrees, radec[1], -int(home_steps[0]), -int(home_steps[1]),
+                                                        tr_time)
+                command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
+                self.tcpClient.sendData.emit(command)  # Send the transit command to the RPi
+            elif self.ui.mainWin.stellariumOperationSelect.currentText() == "Aim and track":
+                ra_degrees = radec[0] * 15.0  # Stellarium returns right ascension is hours, so we convert to degrees
+                trk_coords = self.astronomy.transit(ra_degrees, radec[1], -int(home_steps[0]), -int(home_steps[1]), 0)
+                command = "TRK_RA_%.5f_DEC_%.5f_RA-SPEEDD_%.5f_DEC-SPEED_%.5f\n" % (trk_coords[0], trk_coords[1], 0, 0)
+                self.tcpClient.sendData.emit(command)  # Send the tracking command to the RPi
 
     # Received data from the server that the RPi is connected as a client. Signal is (dataRxFromServ)
     @QtCore.pyqtSlot(str, name='rpiServDataRx')
@@ -206,27 +211,39 @@ class OpHandler(QtCore.QObject):
     # Functions to connect with the manual control widget
     # TODO add comments to the functions
     def manCont_movRA(self):
-        freq = self.ui.uiManContWin.frequncyInputBox.text()
-        step = self.ui.uiManContWin.raStepsField.text()
-        string = "MANCONT_MOVRA_%s_%s_0\n" % (freq, step)
-        self.tcpClient.sendData.emit(string)
+        if not self.motors_enabled:
+            self.ui.motorsDisabledSig.emit()
+        else:
+            freq = self.ui.uiManContWin.frequncyInputBox.text()
+            step = self.ui.uiManContWin.raStepsField.text()
+            string = "MANCONT_MOVRA_%s_%s_0\n" % (freq, step)
+            self.tcpClient.sendData.emit(string)
 
     def manCont_movDEC(self):
-        freq = self.ui.uiManContWin.frequncyInputBox.text()
-        step = self.ui.uiManContWin.decStepsField.text()
-        string = "MANCONT_MOVDEC_%s_0_%s\n" % (freq, step)
-        self.tcpClient.sendData.emit(string)
+        if not self.motors_enabled:
+            self.ui.motorsDisabledSig.emit()
+        else:
+            freq = self.ui.uiManContWin.frequncyInputBox.text()
+            step = self.ui.uiManContWin.decStepsField.text()
+            string = "MANCONT_MOVDEC_%s_0_%s\n" % (freq, step)
+            self.tcpClient.sendData.emit(string)
 
     def manCont_movBoth(self):
-        freq = self.ui.uiManContWin.frequncyInputBox.text()
-        step_ra = self.ui.uiManContWin.raStepsField.text()
-        step_dec = self.ui.uiManContWin.decStepsField.text()
-        string = "MANCONT_MOVE_%s_%s_%s\n" % (freq, step_ra, step_dec)
-        self.tcpClient.sendData.emit(string)
+        if not self.motors_enabled:
+            self.ui.motorsDisabledSig.emit()
+        else:
+            freq = self.ui.uiManContWin.frequncyInputBox.text()
+            step_ra = self.ui.uiManContWin.raStepsField.text()
+            step_dec = self.ui.uiManContWin.decStepsField.text()
+            string = "MANCONT_MOVE_%s_%s_%s\n" % (freq, step_ra, step_dec)
+            self.tcpClient.sendData.emit(string)
 
     def manCont_stop(self):
-        string = "MANCONT_STOP\n"
-        self.tcpClient.sendData.emit(string)  # Send the stop request in manual control
+        if not self.motors_enabled:
+            self.ui.motorsDisabledSig.emit()
+        else:
+            string = "MANCONT_STOP\n"
+            self.tcpClient.sendData.emit(string)  # Send the stop request in manual control
 
     def TCPSettingsHandle(self):
         autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
@@ -395,6 +412,12 @@ class OpHandler(QtCore.QObject):
                                            "vertical-align:super;\">o</span></p></body></html>" % coords[0])
         self.ui.mainWin.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % altd)
 
+    def homePositionReturn(self):
+        if not self.motors_enabled:
+            self.ui.motorsDisabledSig.emit()
+        else:
+            self.tcpClient.sendData.emit("RETURN_HOME\n")
+
     # Make all the necessary signal connections
     def signalConnectios(self):
         """
@@ -434,7 +457,7 @@ class OpHandler(QtCore.QObject):
         self.ui.mainWin.actionLocation.triggered.connect(self.locationSettingsHandle)  # Update location fields
         self.ui.mainWin.actionManual_Control.triggered.connect(partial(self.tcpClient.sendData.emit, "SEND_HOME_STEPS\n"))
         self.ui.mainWin.locatChangeBtn.clicked.connect(self.locationSettingsHandle)
-        self.ui.mainWin.homePositionButton.clicked.connect(partial(self.tcpClient.sendData.emit, "RETURN_HOME\n"))
+        self.ui.mainWin.homePositionButton.clicked.connect(self.homePositionReturn)
 
         self.logD.debug("All signal connections made")
 
