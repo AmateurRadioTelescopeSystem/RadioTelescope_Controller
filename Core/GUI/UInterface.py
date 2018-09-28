@@ -331,7 +331,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     @QtCore.pyqtSlot(name='motorsDisabledUISignal')
     def motorsDisabled(self):
         QtWidgets.QMessageBox.warning(self.mainWin, 'Motor Warning',
-                                      "<html><head/><body><p><span style = \""
+                                      "<html><head/><body><p align=\"center\"><span style = \""
                                       "font-weight:600\" style = \"color:#ff0000;\">"
                                       "Motors are disabled!!</span></p></body></html>"
                                       "\n<html><head/><body><p><span style = \"font-style:italic\" style = \""
