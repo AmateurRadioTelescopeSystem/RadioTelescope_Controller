@@ -10,6 +10,7 @@ import os
 
 class Ui_RadioTelescopeControl(QtCore.QObject):
     stopMovingRTSig = QtCore.pyqtSignal(name='stopRadioTele')  # Signal to stop dish's motion
+    motorsDisabledSig = QtCore.pyqtSignal(name='motorsDisabledUISignal')
 
     def __init__(self, parent=None):
         super(Ui_RadioTelescopeControl, self).__init__(parent)
@@ -87,6 +88,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
         self.mainWin.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
         self.mainWin.locatChangeBtn.clicked.connect(self.uiLocationWin.show)
+        self.mainWin.onTargetProgress.setVisible(False)  # Have the progrees bar invisible at first
+        self.motorsDisabledSig.connect(self.motorsDisabled)
 
         # Change between widgets
         self.mainWin.stellNextPageBtn.clicked.connect(lambda: self.mainWin.stackedWidget.setCurrentIndex(1))
@@ -324,6 +327,16 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     @QtCore.pyqtSlot(float, name='moveProgress')
     def moveProgress(self, percent: float):
         self.mainWin.onTargetProgress.setValue(percent)  # Set the percentage of the progress according to position
+
+    @QtCore.pyqtSlot(name='motorsDisabledUISignal')
+    def motorsDisabled(self):
+        QtWidgets.QMessageBox.warning(self.mainWin, 'Motor Warning',
+                                      "<html><head/><body><p align=\"center\"><span style = \""
+                                      "font-weight:600\" style = \"color:#ff0000;\">"
+                                      "Motors are disabled!!</span></p></body></html>"
+                                      "\n<html><head/><body><p><span style = \"font-style:italic\" style = \""
+                                      "color:#ffb400\">No moving operation performed.</span></p></body></html>",
+                                      QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
 
     # Show current date and time on the GUI
     def dateTime(self):
