@@ -22,6 +22,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.uiTCPWin = QtWidgets.QMainWindow()  # Create the TCP settings window object
         self.uiLocationWin = QtWidgets.QDialog()  # Create the location settings window object
         self.uiCalibrationWin = QtWidgets.QMainWindow()  # Create the calibration window object
+        self.uiPlanetaryObjWin = QtWidgets.QMainWindow()  # Create the planetary object selection window
 
         # Extra dialogs
         self.mapDialog = QtWidgets.QDialog()  # Create the location selection from map dialog
@@ -43,6 +44,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.loc_widg = uic.loadUi(os.path.abspath('UI_Files/Location.ui'), self.uiLocationWin)
             self.map_diag = uic.loadUi(os.path.abspath('UI_Files/MapsDialog.ui'), self.mapDialog)
             self.calib_win = uic.loadUi(os.path.abspath('UI_Files/Calibration.ui'), self.uiCalibrationWin)
+            self.plan_obj_win = uic.loadUi(os.path.abspath('UI_Files/PlanetaryObject.ui'), self.uiPlanetaryObjWin)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
@@ -84,6 +86,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.actionManual_Control.triggered.connect(self.uiManContWin.show)  # Show the manual control window
         self.mainWin.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
         self.mainWin.actionCalibration.triggered.connect(self.uiCalibrationWin.show)
+        self.mainWin.actionPlanetaryObject.triggered.connect(self.uiPlanetaryObjWin.show)
         self.mainWin.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
 
         self.mainWin.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
@@ -139,6 +142,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         # locValidator.setRange(0.0, 7000.0, 2)
         self.uiLocationWin.altEntry.setValidator(locValidator)
 
+        # Planetary object action window
+        self.uiPlanetaryObjWin.planObjectTransitGroupBox.toggled.connect(self.checkBoxPlanTransit)
+        self.uiPlanetaryObjWin.planObjectTrackingGroupBox.toggled.connect(self.checkBoxPlanTracking)
+
     # Function called every time the corresponding checkbox is selected
     def checkBoxTCPRTClient(self, state):
         if state == QtCore.Qt.Checked:
@@ -178,6 +185,18 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.mainWin.motorCommandButton.setEnabled(True)
         else:
             self.mainWin.motorCommandButton.setEnabled(False)
+
+    def checkBoxPlanTracking(self, state):
+        if state is True:
+            self.uiPlanetaryObjWin.planObjectTransitGroupBox.setChecked(False)
+        else:
+            self.uiPlanetaryObjWin.planObjectTransitGroupBox.setChecked(True)
+
+    def checkBoxPlanTransit(self, state):
+        if state is True:
+            self.uiPlanetaryObjWin.planObjectTrackingGroupBox.setChecked(False)
+        else:
+            self.uiPlanetaryObjWin.planObjectTrackingGroupBox.setChecked(True)
 
     # Set the label of the command on change
     def commandListText(self):

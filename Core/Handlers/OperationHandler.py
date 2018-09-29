@@ -100,10 +100,8 @@ class OpHandler(QtCore.QObject):
     def motorsEnableButton(self):
         if self.motors_enabled:
             self.tcpClient.sendData.emit("DISABLE_MOTORS\n")
-            self.ui.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Checked)
         else:
             self.tcpClient.sendData.emit("ENABLE_MOTORS\n")
-            self.ui.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Unchecked)
 
     @QtCore.pyqtSlot(name='sendNewConCommands')
     def initialCommands(self):
@@ -134,11 +132,13 @@ class OpHandler(QtCore.QObject):
             self.ui.mainWin.motorStatusText.setText("<html><head/><body><p><span style=\" "
                                                     "color:#00ff00;\">Enabled</span></p></body></html>")
             self.ui.mainWin.motorCommandButton.setText("Disable")
+            self.ui.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Unchecked)
         elif data == "MOTORS_DISABLED":
             self.motors_enabled = False
             self.ui.mainWin.motorStatusText.setText("<html><head/><body><p><span style=\" "
                                                     "color:#ff0000;\">Disabled</span></p></body></html>")
             self.ui.mainWin.motorCommandButton.setText("Enable")
+            self.ui.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Checked)
         else:
             splt_str = data.split("_")  # Try to split the string, and if it splits then a command is sent
             if len(splt_str) > 0:
