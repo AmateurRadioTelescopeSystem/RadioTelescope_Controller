@@ -96,8 +96,19 @@ class Calculations(QtCore.QObject):
         :param transit_time: Enter the time to transit is seconds
         :return: Object's coordinates at the dish arrival position
         """
+        if objec == "Sun":
+            objec = ephem.Sun()  # Select the Sun object
+        elif objec == "Jupiter":
+            objec = ephem.Jupiter()  # Select Jupiter as object
+        elif objec == "Mars":
+            objec = ephem.Mars()  # Select Mars as the object
+        elif objec == "Venus":
+            objec = ephem.Venus()  # Select Venus as the object
+        elif objec == "Moon":
+            objec = ephem.Moon()  # Select moon as the object
+
         cur_time = self.current_time()  # Get the current time in tuple
-        date = "%.0f/%.0f/%.0f" % (cur_time[0], cur_time[1], cur_time[2])  # Get the current date
+        date = "%.0f/%.0f/%.6f" % (cur_time[0], cur_time[1], cur_time[2])  # Get the current date
         objec.compute(cur_time, epoch=date)  # Compute the object's coordinates
 
         # Get the current coordinates for the planetary body
@@ -119,3 +130,50 @@ class Calculations(QtCore.QObject):
         target_ha = self.hour_angle(target_time, obj_ra)  # Calculate the hour angle at the target location
 
         return [target_ha, obj_dec]
+
+    def tracking_planetary(self, objec, stp_to_home_ra: int, stp_to_home_dec: int):
+        """
+        Calculate the rate of change for the coordinates of different planetary bodies.
+        :param objec: pyephem object type, which is the object of interest (e.g. ephem.Jupiter())
+        :param stp_to_home_ra: Number of steps from home position for the right ascension motor
+        :param stp_to_home_dec: Number of steps from home position for the declination motor
+        :return: Object's coordinates on transit and the rate of change
+        """
+        sum_ra = sum_dec = 0.0  # Variable to hold the sum for averaging
+        prev_ra = prev_dec = 0.0  # Initialize the variables
+        count = 0  # Counting variable used in the loop and averaging
+        transit_coords = self.transit_planetary(objec, stp_to_home_ra, stp_to_home_dec, 0)  # Calculate transit first
+
+        # Get the right object
+        if objec == "Sun":
+            objec = ephem.Sun()  # Select the Sun object
+        elif objec == "Jupiter":
+            objec = ephem.Jupiter()  # Select Jupiter as object
+        elif objec == "Mars":
+            objec = ephem.Mars()  # Select Mars as the object
+        elif objec == "Venus":
+            objec = ephem.Venus()  # Select Venus as the object
+        elif objec == "Moon":
+            objec = ephem.Moon()  # Select moon as the object
+
+        cur_time = self.current_time()  # Get the current time in tuple
+        epoch_date = "%.0f/%.0f/%.6f" % (cur_time[0], cur_time[1], cur_time[2])  # Get the current date
+        comp_date = epoch_date  # Set the dates to equal at first
+
+        # Iterate for 24 hours to get enough points
+        for count in range(0, 24):
+            objec.compute(comp_date, epoch=epoch_date)
+            cur_ra = float(objec.a_ra)
+            cur_dec = float(objec.a_dec)
+
+            if count > 0:
+                sum_ra += (cur_ra - prev_ra)
+                sum_dec += (cur_dec - prev_dec)
+            prev_ra = cur_ra
+            prev_dec = cur_dec
+            comp_date = "%.0f/%.0f/%.6f" % (cur_time[0], cur_time[1], cur_time[2] + 0.04166666667)  # One hour increment
+
+        roc_ra = ((sum_ra/count)*_rad_to_deg)/3600.0  # Return degrees per second for the RA
+        roc_dec = ((sum_dec/count)*_rad_to_deg)/3600.0  # Return degrees per second for the DEC
+
+        return [transit_coords[0], transit_coords[1], roc_ra, roc_dec]

@@ -418,6 +418,29 @@ class OpHandler(QtCore.QObject):
         else:
             self.tcpClient.sendData.emit("RETURN_HOME\n")
 
+    def planObjCommand(self):
+        if self.motors_enabled:
+            self.ui.motorsDisabledSig.emit()
+        else:
+            home_steps = self.cfgData.getHomeSteps()
+            if self.ui.uiPlanetaryObjWin.planObjectTransitGroupBox.isChecked():
+                objec = self.ui.uiPlanetaryObjWin.objectSelectionComboBox.currentText()
+                tr_time = self.ui.uiPlanetaryObjWin.transitTimeBox.value()
+                transit_coords = self.astronomy.transit_planetary(objec, -int(home_steps[0]), -int(home_steps[1]),
+                                                                  int(tr_time))
+
+                command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
+                self.tcpClient.sendData.emit(command)  # Send the transit command to the RPi
+            elif self.ui.uiPlanetaryObjWin.planObjectTrackingGroupBox.isChecked():
+                # TODO Include the tracking time in the command to be sent to calculate the correct steps
+                objec = self.ui.uiPlanetaryObjWin.objectSelectionComboBox.currentText()
+                track_time = self.ui.uiPlanetaryObjWin.trackingtTimeBox.value()
+                tracking_info = self.astronomy.tracking_planetary(objec, -int(home_steps[0]), -int(home_steps[1]))
+
+                command = "TRK_RA_%.5f_DEC_%.5f_RA-SPEEDD_%.5f_DEC-SPEED_%.5f\n" % (tracking_info[0], tracking_info[1],
+                                                                                    tracking_info[2], tracking_info[3])
+                self.tcpClient.sendData.emit(command)  # Send the tracking command to the RPi
+
     # Make all the necessary signal connections
     def signalConnectios(self):
         """
@@ -458,6 +481,8 @@ class OpHandler(QtCore.QObject):
         self.ui.mainWin.actionManual_Control.triggered.connect(partial(self.tcpClient.sendData.emit, "SEND_HOME_STEPS\n"))
         self.ui.mainWin.locatChangeBtn.clicked.connect(self.locationSettingsHandle)
         self.ui.mainWin.homePositionButton.clicked.connect(self.homePositionReturn)
+
+        self.ui.uiPlanetaryObjWin.commandExecutionBtn.clicked.connect(self.planObjCommand)
 
         self.logD.debug("All signal connections made")
 
