@@ -419,7 +419,7 @@ class OpHandler(QtCore.QObject):
             self.tcpClient.sendData.emit("RETURN_HOME\n")
 
     def planObjCommand(self):
-        if self.motors_enabled:
+        if not self.motors_enabled:
             self.ui.motorsDisabledSig.emit()
         else:
             home_steps = self.cfgData.getHomeSteps()
