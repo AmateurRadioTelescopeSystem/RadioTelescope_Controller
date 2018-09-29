@@ -5,14 +5,6 @@
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>276</width>
-    <height>291</height>
-   </rect>
-  </property>
   <property name="maximumSize">
    <size>
     <width>288</width>
@@ -516,7 +508,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>276</width>
+     <width>284</width>
      <height>21</height>
     </rect>
    </property>
