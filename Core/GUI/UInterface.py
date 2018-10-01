@@ -35,6 +35,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.uiTCPWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/Net.png')))
             self.uiLocationWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/location.png')))
             self.uiCalibrationWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/calibration.png')))
+            self.uiPlanetaryObjWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/planetary.png')))
         except Exception:
             self.logD.exception("Problem setting window icons. See traceback below.")
 
