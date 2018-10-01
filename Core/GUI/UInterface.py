@@ -15,6 +15,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     def __init__(self, parent=None):
         super(Ui_RadioTelescopeControl, self).__init__(parent)
         self.logD = logging.getLogger(__name__)  # Create the logger for the file
+        self.motor_warn_msg_shown = False
 
         # Create the main GUI window and the other windows
         self.mainWin = QtWidgets.QMainWindow()  # Create the main window of the GUI
@@ -349,13 +350,18 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
     @QtCore.pyqtSlot(name='motorsDisabledUISignal')
     def motorsDisabled(self):
-        QtWidgets.QMessageBox.warning(self.mainWin, 'Motor Warning',
-                                      "<html><head/><body><p align=\"center\"><span style = \""
-                                      "font-weight:600\" style = \"color:#ff0000;\">"
-                                      "Motors are disabled!!</span></p></body></html>"
-                                      "\n<html><head/><body><p><span style = \"font-style:italic\" style = \""
-                                      "color:#ffb400\">No moving operation performed.</span></p></body></html>",
-                                      QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
+        if not self.motor_warn_msg_shown:
+            msg = QtWidgets.QMessageBox()  # Create the message box object
+            self.motor_warn_msg_shown = True  # Set the show indicator before showing the window
+            msg.warning(self.mainWin, 'Motor Warning',
+                        "<html><head/><body><p align=\"center\"><span style = \""
+                        "font-weight:600\" style = \"color:#ff0000;\">"
+                        "Motors are disabled!!</span></p></body></html>"
+                        "\n<html><head/><body><p><span style = \"font-style:italic\" style = \""
+                        "color:#ffb000\">No moving operation will be performed.</span></p></body></html>",
+                        QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
+            msg.show()  # Show the message to the user
+            self.motor_warn_msg_shown = False  # It gets here only after the window is closed
 
     # Show current date and time on the GUI
     def dateTime(self):
