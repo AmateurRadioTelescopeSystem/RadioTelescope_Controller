@@ -219,6 +219,7 @@ class OpHandler(QtCore.QObject):
             self.tcpStellarium.sendDataStell.emit(float(ra_degrees)/15.0, float(dec_degrees))
             self.posDataShow.emit(float(ra_degrees)/15.0, float(dec_degrees))
 
+            # Update the progress bar
             if self.max_steps_to_targ_ra is not 0:
                 ratio = int(ra_steps)/self.max_steps_to_targ_ra
                 self.ui.mainWin.onTargetProgress.setValue(ratio)
@@ -462,8 +463,8 @@ class OpHandler(QtCore.QObject):
                 track_time = self.ui.uiPlanetaryObjWin.trackingtTimeBox.value()
                 tracking_info = self.astronomy.tracking_planetary(objec, -int(home_steps[0]), -int(home_steps[1]))
 
-                command = "TRK_RA_%.5f_DEC_%.5f_RA-SPEED_%.5f_DEC-SPEED_%.5f\n" % (tracking_info[0], tracking_info[1],
-                                                                                   tracking_info[2], tracking_info[3])
+                command = "TRK_RA_%.5f_DEC_%.5f_RA-SPEED_%.5f_DEC-SPEED_%.5f_TIME_%.2f\n" % \
+                          (tracking_info[0], tracking_info[1], tracking_info[2], tracking_info[3], track_time)
                 self.tcpClient.sendData.emit(command)  # Send the tracking command to the RPi
 
     def coordinateFormatter(self, num: float, degree: bool):

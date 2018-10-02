@@ -1,9 +1,6 @@
 import xml.etree.ElementTree as etree
 import logging
 
-# TODO we have to add exception handling for every occasion, so the program does not crash
-# TODO especially exception handling related to file errors
-
 
 class confData(object):
     # Class constructor
