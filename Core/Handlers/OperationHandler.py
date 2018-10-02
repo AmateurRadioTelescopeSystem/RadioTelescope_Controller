@@ -38,6 +38,9 @@ class OpHandler(QtCore.QObject):
         self.prev_pos = ["", ""]  # The dish position is saved for change comparison
         self.motors_enabled = False  # Keep the motor status
 
+        self.max_steps_to_targ_ra = 0
+        self.max_steps_to_targ_dec = 0
+
     def start(self):
         """
         Initializer of the thread.
@@ -107,6 +110,7 @@ class OpHandler(QtCore.QObject):
     def initialCommands(self):
         # TODO add more commands to send, like system check reports and others
         self.tcpClient.sendData.emit("SEND_HOME_STEPS\n")  # Get the steps from home for each motor
+        self.tcpClient.sendData.emit("REPORT_MOTOR_STATUS\n")  # Get the current status of the motors
 
     # Dta received from the client connected to the RPi server
     @QtCore.pyqtSlot(str, name='dataClientRX')
@@ -127,6 +131,12 @@ class OpHandler(QtCore.QObject):
             self.ui.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
                                                "color:#00ff00;\">Yes</span></p></body></html>")
             self.ui.mainWin.onTargetProgress.setVisible(True)  # Make the progress bar visible
+        elif data == "TRACKING_STARTED":
+            self.ui.mainWin.trackTextInd.setText("<html><head/><body><p><span style=\" "
+                                                 "color:#00ff00;\">Yes</span></p></body></html>")
+        elif data == "TRACKING_STOPPED":
+            self.ui.mainWin.trackTextInd.setText("<html><head/><body><p><span style=\" "
+                                                 "color:#ff0000;\">No</span></p></body></html>")
         elif data == "MOTORS_ENABLED":
             self.motors_enabled = True
             self.ui.mainWin.motorStatusText.setText("<html><head/><body><p><span style=\" "
@@ -139,6 +149,7 @@ class OpHandler(QtCore.QObject):
                                                     "color:#ff0000;\">Disabled</span></p></body></html>")
             self.ui.mainWin.motorCommandButton.setText("Enable")
             self.ui.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Checked)
+            self.ui.motorsDisabledSig.emit()  # Show the warning window when motors are disabled
         else:
             splt_str = data.split("_")  # Try to split the string, and if it splits then a command is sent
             if len(splt_str) > 0:
@@ -146,6 +157,13 @@ class OpHandler(QtCore.QObject):
                     self.cfgData.setHomeSteps(splt_str[1], splt_str[2])  # Set the current away from home position steps
                     self.ui.uiManContWin.raStepText.setText(splt_str[1])
                     self.ui.uiManContWin.decStepText.setText(splt_str[2])
+                elif splt_str[0] == "MAX-STEPS-TO-DO":
+                    if splt_str[1] == "RA":
+                        self.max_steps_to_targ_ra = int(splt_str[2])
+                        self.max_steps_to_targ_dec = 0
+                    elif splt_str[1] == "DEC":
+                        self.max_steps_to_targ_dec = int(splt_str[2])
+                        self.max_steps_to_targ_ra = 0
             else:
                 self.logD.debug("Data received from client (Connected to remote RPi server): %s" % data)
 
@@ -200,6 +218,13 @@ class OpHandler(QtCore.QObject):
             self.ui.uiManContWin.decStepText.setText(dec_steps)  # Update the manual control window
             self.tcpStellarium.sendDataStell.emit(float(ra_degrees)/15.0, float(dec_degrees))
             self.posDataShow.emit(float(ra_degrees)/15.0, float(dec_degrees))
+
+            if self.max_steps_to_targ_ra is not 0:
+                ratio = int(ra_steps)/self.max_steps_to_targ_ra
+                self.ui.mainWin.onTargetProgress.setValue(ratio)
+            elif self.max_steps_to_targ_dec is not 0:
+                ratio = int(dec_steps)/self.max_steps_to_targ_dec
+                self.ui.mainWin.onTargetProgress.setValue(ratio)
 
     # Command to stop any motion of the radio telescope dish
     @QtCore.pyqtSlot(name='stopRadioTele')
@@ -437,9 +462,19 @@ class OpHandler(QtCore.QObject):
                 track_time = self.ui.uiPlanetaryObjWin.trackingtTimeBox.value()
                 tracking_info = self.astronomy.tracking_planetary(objec, -int(home_steps[0]), -int(home_steps[1]))
 
-                command = "TRK_RA_%.5f_DEC_%.5f_RA-SPEEDD_%.5f_DEC-SPEED_%.5f\n" % (tracking_info[0], tracking_info[1],
-                                                                                    tracking_info[2], tracking_info[3])
+                command = "TRK_RA_%.5f_DEC_%.5f_RA-SPEED_%.5f_DEC-SPEED_%.5f\n" % (tracking_info[0], tracking_info[1],
+                                                                                   tracking_info[2], tracking_info[3])
                 self.tcpClient.sendData.emit(command)  # Send the tracking command to the RPi
+
+    def coordinateFormatter(self, num: float, degree: bool):
+        if degree:
+            formated_coord = "<html><head/><body><p>%.4f<span style=" \
+                             "\" vertical-align:super;\">o</span></p></body></html>" % num
+        else:
+            formated_coord = "<html><head/><body><p>%.4f<span style=\" " \
+                             "vertical-align:super;\">h</span></p></body></html>" % num
+
+        return formated_coord  # Return the formatted coordinate string
 
     # Make all the necessary signal connections
     def signalConnectios(self):
