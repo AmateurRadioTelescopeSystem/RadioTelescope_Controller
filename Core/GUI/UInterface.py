@@ -24,6 +24,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.uiLocationWin = QtWidgets.QDialog()  # Create the location settings window object
         self.uiCalibrationWin = QtWidgets.QMainWindow()  # Create the calibration window object
         self.uiPlanetaryObjWin = QtWidgets.QMainWindow()  # Create the planetary object selection window
+        self.uiSkyScanningWin = QtWidgets.QMainWindow()  # Create the sky scanning control window
 
         # Extra dialogs
         self.mapDialog = QtWidgets.QDialog()  # Create the location selection from map dialog
@@ -47,6 +48,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.map_diag = uic.loadUi(os.path.abspath('UI_Files/MapsDialog.ui'), self.mapDialog)
             self.calib_win = uic.loadUi(os.path.abspath('UI_Files/Calibration.ui'), self.uiCalibrationWin)
             self.plan_obj_win = uic.loadUi(os.path.abspath('UI_Files/PlanetaryObject.ui'), self.uiPlanetaryObjWin)
+            self.sky_scan_win = uic.loadUi(os.path.abspath('UI_Files/SkyScanning.ui'), self.uiSkyScanningWin)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
@@ -89,6 +91,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
         self.mainWin.actionCalibration.triggered.connect(self.uiCalibrationWin.show)
         self.mainWin.actionPlanetaryObject.triggered.connect(self.uiPlanetaryObjWin.show)
+        self.mainWin.actionSky_Scanning.triggered.connect(self.uiSkyScanningWin.show)
         self.mainWin.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
 
         self.mainWin.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))

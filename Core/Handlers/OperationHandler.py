@@ -458,7 +458,6 @@ class OpHandler(QtCore.QObject):
                 command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
                 self.tcpClient.sendData.emit(command)  # Send the transit command to the RPi
             elif self.ui.uiPlanetaryObjWin.planObjectTrackingGroupBox.isChecked():
-                # TODO Include the tracking time in the command to be sent to calculate the correct steps
                 objec = self.ui.uiPlanetaryObjWin.objectSelectionComboBox.currentText()
                 track_time = self.ui.uiPlanetaryObjWin.trackingtTimeBox.value()
                 tracking_info = self.astronomy.tracking_planetary(objec, -int(home_steps[0]), -int(home_steps[1]))

@@ -177,3 +177,12 @@ class Calculations(QtCore.QObject):
         roc_dec = ((sum_dec/count)*_rad_to_deg)/3600.0  # Return degrees per second for the DEC
 
         return [transit_coords[0], transit_coords[1], roc_ra, roc_dec]
+
+    def scanning_map_generator(self, points: tuple, step_size: tuple, direction: str):
+        """
+        Generate a sky map of points to be scanned.
+        :param points: Initial box points at four corners. Counting direction clock-wise (a tuple)
+        :param step_size: Stepping size for each axis (a tuple)
+        :param direction: Direction of scanning with respect to the first point
+        :return: A tuple containing the point map
+        """
