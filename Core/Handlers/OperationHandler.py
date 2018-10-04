@@ -48,7 +48,7 @@ class OpHandler(QtCore.QObject):
         :return: Nothing
         """
         self.logD.info("Operations handler thread started")
-        self.signalConnectios()  # Make all the necessary signal connections
+        self.signalConnections()  # Make all the necessary signal connections
 
         autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
         autoconRPi = self.cfgData.getTCPAutoConnStatus()  # Auto-connection preference for the RPi server and client
@@ -476,8 +476,109 @@ class OpHandler(QtCore.QObject):
 
         return formated_coord  # Return the formatted coordinate string
 
+    def calcScanPoints(self):
+        point_1 = (self.ui.uiSkyScanningWin.point1Coord_1Field.text(),
+                    self.ui.uiSkyScanningWin.point1Coord_2Field.text(), )
+        point_2 = (self.ui.uiSkyScanningWin.point2Coord_1Field.text(),
+                    self.ui.uiSkyScanningWin.point2Coord_2Field.text(), )
+        point_3 = (self.ui.uiSkyScanningWin.point3Coord_1Field.text(),
+                    self.ui.uiSkyScanningWin.point3Coord_2Field.text(), )
+        point_4 = (self.ui.uiSkyScanningWin.point4Coord_1Field.text(),
+                    self.ui.uiSkyScanningWin.point4Coord_2Field.text(), )
+        map_points = ()  # Be sure it is initialized
+
+        # Make boxes red wherever there is no input
+        if point_1[0] == "":
+            self.ui.uiSkyScanningWin.point1Coord_1Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.ui.uiSkyScanningWin.point1Coord_1Field.setStyleSheet("")
+        if point_2[0] == "":
+            self.ui.uiSkyScanningWin.point2Coord_1Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.ui.uiSkyScanningWin.point2Coord_1Field.setStyleSheet("")
+        if point_3[0] == "":
+            self.ui.uiSkyScanningWin.point3Coord_1Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.ui.uiSkyScanningWin.point3Coord_1Field.setStyleSheet("")
+        if point_4[0] == "":
+            self.ui.uiSkyScanningWin.point4Coord_1Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.ui.uiSkyScanningWin.point4Coord_1Field.setStyleSheet("")
+
+        if point_1[1] == "":
+            self.ui.uiSkyScanningWin.point1Coord_2Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.ui.uiSkyScanningWin.point1Coord_2Field.setStyleSheet("")
+        if point_2[1] == "":
+            self.ui.uiSkyScanningWin.point2Coord_2Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.ui.uiSkyScanningWin.point2Coord_2Field.setStyleSheet("")
+        if point_3[1] == "":
+            self.ui.uiSkyScanningWin.point3Coord_2Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.ui.uiSkyScanningWin.point3Coord_2Field.setStyleSheet("")
+        if point_4[1] == "":
+            self.ui.uiSkyScanningWin.point4Coord_2Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.ui.uiSkyScanningWin.point4Coord_2Field.setStyleSheet("")
+
+        check_1 = point_1[0] != "" and point_1[1] != "" and point_2[0] != "" and point_2[1] != ""
+        check_2 = point_3[0] != "" and point_3[1] != "" and point_4[0] != "" and point_4[1] != ""
+
+        if (check_1 and check_2) is True:
+            coord_system = self.ui.uiSkyScanningWin.coordinateSystemComboBx.currentText()
+            epoch = self.ui.uiSkyScanningWin.epochDateSelection.date().toString("yyyy/MM/dd")
+            direction = self.ui.uiSkyScanningWin.directionSelection.currentText()
+
+            step_x = self.ui.uiSkyScanningWin.stepSizeBoxCoord1.value()
+            step_y = self.ui.uiSkyScanningWin.stepSizeBoxCoord2.value()
+            step_size = (step_x, step_y, )  # Step size in each axis
+
+            point_1 = (float(point_1[0]), float(point_1[1]), )
+            point_2 = (float(point_2[0]), float(point_2[1]), )
+            point_3 = (float(point_3[0]), float(point_3[1]), )
+            point_4 = (float(point_4[0]), float(point_4[1]), )
+
+            points = (point_1, point_2, point_3, point_4, coord_system, epoch, )
+            map_points = self.astronomy.scanning_map_generator(points, step_size, direction)
+            num_of_points = len(map_points)  # Number of points to be scanned
+
+            if self.ui.uiSkyScanningWin.integrationEnabler.isChecked():
+                total_int_time = num_of_points * self.ui.uiSkyScanningWin.integrationTimeEntry.value()
+                self.ui.uiSkyScanningWin.totalIntTime.setText("%.0fs" % total_int_time)
+            self.ui.uiSkyScanningWin.totalPointsToScan.setText("%d" % num_of_points)
+
+        return map_points
+
+    def skyScanStart(self):
+        # TODO Add a perform calculation warning to the user
+        map_points = self.calcScanPoints()  # Get the mapping points
+        if map_points is not ():
+            home_steps = self.cfgData.getHomeSteps()
+            init_steps = (int(home_steps[0]), int(home_steps[1]), )
+
+            step_x = self.ui.uiSkyScanningWin.stepSizeBoxCoord1.value()
+            step_y = self.ui.uiSkyScanningWin.stepSizeBoxCoord2.value()
+            step_size = (step_x, step_y,)  # Step size in each axis
+
+            if self.ui.uiSkyScanningWin.integrationEnabler.isChecked():
+                int_time = self.ui.uiSkyScanningWin.integrationTimeEntry.value()
+            else:
+                int_time = 0.0
+
+            if self.ui.uiSkyScanningWin.planetaryObjectSelectcheckBox.isChecked():
+                objec = self.ui.uiSkyScanningWin.objectSelectionComboBox.currentText()
+            else:
+                objec = None
+
+            calc_points = self.astronomy.scanning_point_calculator(map_points, init_steps, step_size, int_time, objec)
+            self.tcpClient.sendData.emit("SKY-SCAN_RA_%f_DEC_%f_RA-SPEED_%f_DEC-SPEED_%f_INT-TIME_%.2f"
+                                         % (float(calc_points[0].split("_")[0]), float(calc_points[0].split("_")[2]),
+                                            float(calc_points[1][0]), float(calc_points[1][1]), int_time))
+            self.tcpClient.sendData.emit("SKY-SCAN-MAP_%s" % calc_points[0])
+
     # Make all the necessary signal connections
-    def signalConnectios(self):
+    def signalConnections(self):
         """
         Connect all the necessary signals from the different modules.
         This function is called at the start of the Operation handling thread.
@@ -519,6 +620,9 @@ class OpHandler(QtCore.QObject):
 
         self.ui.uiPlanetaryObjWin.commandExecutionBtn.clicked.connect(self.planObjCommand)
 
+        self.ui.uiSkyScanningWin.calculateScanMapBtn.clicked.connect(self.calcScanPoints)
+        self.ui.uiSkyScanningWin.startScanBtn.clicked.connect(self.skyScanStart)
+
         self.logD.debug("All signal connections made")
 
     def appExitRequest(self):
@@ -546,3 +650,6 @@ class OpHandler(QtCore.QObject):
         self.tcpStellarium.deleteLater()
         self.tcpStelThread.deleteLater()
         self.logD.debug("Stellarium server thread is closed for sure and operations handler thread closed")
+
+    def datePrint(self):
+        print(self.ui.uiSkyScanningWin.epochDateSelection.date().toString("yyyy/MM/dd"))
