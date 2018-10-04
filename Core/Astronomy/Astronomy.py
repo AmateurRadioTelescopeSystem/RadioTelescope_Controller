@@ -257,7 +257,7 @@ class Calculations(QtCore.QObject):
         return map_points
 
     def scanning_point_calculator(self, map_points: tuple, init_steps: tuple, step_size: tuple,
-                                  int_time=0.0 , objec=None):
+                                  int_time=0.0, objec=None):
         """
         Generate the scanning map in HA and DEC
         :param map_points:
@@ -267,8 +267,14 @@ class Calculations(QtCore.QObject):
         :param objec: Planetary object passing. Default is none.
         :return: The calculated position of the points for scanning
         """
-        first_point = self.transit(map_points[0][0], map_points[0][1], init_steps[0], init_steps[1], 0)
-        calc_points = ((first_point[0], first_point[1]),)
+        if objec is None:
+            first_point = self.transit(map_points[0][0], map_points[0][1], init_steps[0], init_steps[1], 0)
+            roc_ra = roc_dec = 0  # Not rate of change for the non-planetary bodies
+        else:
+            first_point = self.tracking_planetary(objec, init_steps[0], init_steps[1])  # Get also the rate of change
+            roc_ra = first_point[2]  # Get the rate of change for RA as returned from the tracking calculation
+            roc_dec = first_point[3]  # Get the rate of change for DEC as returned from the tracking calculation
+        calc_points = ((first_point[0], first_point[1]), )
 
         # Initialize the variable with the initial steps from home
         step_incr_dec = init_steps[1]
@@ -288,10 +294,15 @@ class Calculations(QtCore.QObject):
             else:
                 tr_time = 0
 
-            transit_point = self.transit(map_points[i][0], map_points[i][1], step_incr[0], step_incr[1], tr_time)
+            # Account for planetary object coordinates
+            # TODO Test how the planetary selection is functioning
+            if objec is None:
+                transit_point = self.transit(map_points[i][0], map_points[i][1], step_incr[0], step_incr[1], tr_time)
+            else:
+                transit_point = self.transit_planetary(objec, step_incr[0], step_incr[1], tr_time)
             calc_points += ((transit_point[0], transit_point[1]), )
 
-        return calc_points
+        return [calc_points, (roc_ra, roc_dec, )]
 
     def coordinate_transform(self, coordinates: tuple, system_and_date: tuple):
         position = np.radians(coordinates)  # Convert coordinates from degrees to radians
@@ -306,4 +317,4 @@ class Calculations(QtCore.QObject):
             ecliptical_posit = ephem.Ecliptic(position[0], position[1], epoch=system_and_date[1])
             ra, dec = ecliptical_posit.to_radec()  # Convert to RA and DEC at the same epoch
 
-        return (ra, dec, )  # Return the coordinate tuple
+        return ra, dec  # Return the coordinate tuple
