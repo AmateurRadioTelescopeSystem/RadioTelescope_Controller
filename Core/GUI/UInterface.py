@@ -3,6 +3,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets, uic, QtWebEngineWidgets
 from functools import partial
+import Core.GUI.resources
 import logging
 import sys
 import os
@@ -93,6 +94,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.actionCalibration.triggered.connect(self.uiCalibrationWin.show)
         self.mainWin.actionPlanetaryObject.triggered.connect(self.uiPlanetaryObjWin.show)
         self.mainWin.actionSky_Scanning.triggered.connect(self.uiSkyScanningWin.show)
+        self.mainWin.actionSky_Scanning.triggered.connect(self.coordinate_updater)
         self.mainWin.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
 
         self.mainWin.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
@@ -141,16 +143,15 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         # Location settings dialog input fields validation declaration
         locValidator = QtGui.QDoubleValidator()  # Create a double validator object
         locValidator.setDecimals(5)
-        # locValidator.setRange(-90.0, 90.0, 5)
-        self.uiLocationWin.latEntry.setValidator(locValidator)
-        # locValidator.setRange(-180.0, 180.0, 5)
-        self.uiLocationWin.lonEntry.setValidator(locValidator)
-        # locValidator.setRange(0.0, 7000.0, 2)
-        self.uiLocationWin.altEntry.setValidator(locValidator)
+        self.uiLocationWin.latEntry.setValidator(locValidator)  # locValidator.setRange(-90.0, 90.0, 5)
+        self.uiLocationWin.lonEntry.setValidator(locValidator)  # locValidator.setRange(-180.0, 180.0, 5)
+        self.uiLocationWin.altEntry.setValidator(locValidator)  # locValidator.setRange(0.0, 7000.0, 2)
 
         # Planetary object action window
         self.uiPlanetaryObjWin.planObjectTransitGroupBox.toggled.connect(self.checkBoxPlanTransit)
         self.uiPlanetaryObjWin.planObjectTrackingGroupBox.toggled.connect(self.checkBoxPlanTracking)
+
+        self.uiSkyScanningWin.coordinateSystemComboBx.currentTextChanged.connect(self.coordinate_updater)
 
     # Function called every time the corresponding checkbox is selected
     def checkBoxTCPRTClient(self, state):
@@ -367,6 +368,39 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                         QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
             msg.show()  # Show the message to the user
             self.motor_warn_msg_shown = False  # It gets here only after the window is closed
+
+    def coordinate_updater(self, system: str):
+        if type(system) is not type(""):
+            system = self.uiSkyScanningWin.coordinateSystemComboBx.currentText()
+        coord_1 = "<html><head/><body><p><span style=\" font-weight:600;\">%s</span></p></body></html>"
+        coord_2 = "<html><head/><body><p><span style=\" font-weight:600;\">%s</span></p></body></html>"
+
+        if system == "Horizontal":
+            coord_1 = coord_1 % "Alt: "
+            coord_2 = coord_2 % "Az:  "
+        elif system == "Equatorial":
+            coord_1 = coord_1 % "RA:  "
+            coord_2 = coord_2 % "DEC: "
+        elif system == "Galactic":
+            coord_1 = coord_1 % "Lat: "
+            coord_2 = coord_2 % "Lon: "
+        elif system == "Ecliptical":
+            coord_1 = coord_1 % "Lat: "
+            coord_2 = coord_2 % "Lon: "
+
+        # Set first coordinate of the system
+        self.uiSkyScanningWin.point1Coord_1Label.setText(coord_1)
+        self.uiSkyScanningWin.point2Coord_1Label.setText(coord_1)
+        self.uiSkyScanningWin.point3Coord_1Label.setText(coord_1)
+        self.uiSkyScanningWin.point4Coord_1Label.setText(coord_1)
+        self.uiSkyScanningWin.stepSizeCoord1.setText(coord_1)
+
+        # Set the second coordinate of the system
+        self.uiSkyScanningWin.point1Coord_2Label.setText(coord_2)
+        self.uiSkyScanningWin.point2Coord_2Label.setText(coord_2)
+        self.uiSkyScanningWin.point3Coord_2Label.setText(coord_2)
+        self.uiSkyScanningWin.point4Coord_2Label.setText(coord_2)
+        self.uiSkyScanningWin.stepSizeCoord2.setText(coord_2)
 
     # Show current date and time on the GUI
     def dateTime(self):
