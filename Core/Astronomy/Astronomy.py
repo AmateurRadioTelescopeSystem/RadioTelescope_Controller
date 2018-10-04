@@ -1,6 +1,8 @@
 from PyQt5 import QtCore
+import numpy as np
 import logging
 import ephem
+import math
 import time
 
 _rad_to_deg = 57.2957795131  # Radians to degrees conversion factor
@@ -181,8 +183,127 @@ class Calculations(QtCore.QObject):
     def scanning_map_generator(self, points: tuple, step_size: tuple, direction: str):
         """
         Generate a sky map of points to be scanned.
-        :param points: Initial box points at four corners. Counting direction clock-wise (a tuple)
+        :param points: Initial box points at four corners. Coordinate system and epoch is included
         :param step_size: Stepping size for each axis (a tuple)
         :param direction: Direction of scanning with respect to the first point
         :return: A tuple containing the point map
         """
+        epoch = points[5]  # Get the epoch provided
+        coord_system = points[4]  # Get the coordinate system of the provided coordinates
+
+        direct = direction.split(": ")[1]  # Get the direction string
+        if direct == "R-Down":
+            initial_point = points[0]
+            second_point = points[1]
+            third_point = points[2]
+            fourth_point = points[3]
+        elif direct == "R-Up":
+            initial_point = points[3]
+            second_point = points[2]
+            third_point = points[1]
+            fourth_point = points[0]
+        elif direct == "L-Down":
+            initial_point = points[1]
+            second_point = points[0]
+            third_point = points[3]
+            fourth_point = points[2]
+        elif direct == "L-Up":
+            initial_point = points[2]
+            second_point = points[3]
+            third_point = points[0]
+            fourth_point = points[1]
+        elif direct == "Up-R":
+            initial_point = points[3]
+            second_point = points[0]
+            third_point = points[1]
+            fourth_point = points[2]
+        elif direct == "Up-L":
+            initial_point = points[2]
+            second_point = points[1]
+            third_point = points[0]
+            fourth_point = points[3]
+        elif direct == "Down-R":
+            initial_point = points[0]
+            second_point = points[3]
+            third_point = points[2]
+            fourth_point = points[1]
+        elif direct == "Down-L":
+            initial_point = points[1]
+            second_point = points[2]
+            third_point = points[3]
+            fourth_point = points[0]
+        # TODO implement a fix to include the last box without overlap
+        num_boxes_x = math.floor(abs(second_point[0] - initial_point[0])/step_size[0])
+        num_boxes_y = math.floor(abs(second_point[1] - third_point[1])/step_size[1])
+
+        # Generate the point map in the Equatorial coordinate system
+        map_points = ()  # An empty tuple to contain mapping points
+        x_point = initial_point[0]  # Get the first coordinate before the loop
+        fill_reverse = False  # Indicate reverse direction filling of the tuple with points
+        for i in range(0, int(num_boxes_y - 1)):
+            y_point = initial_point[1] + step_size[1] * i
+            transformed = self.coordinate_transform((x_point, y_point, ), (coord_system, epoch, ))
+
+            map_points += (transformed, )
+            fill_reverse = not fill_reverse  # Negate the direction of point filling
+            for j in range(0, int(num_boxes_x - 1)):
+                if fill_reverse is True:
+                    x_point = second_point[0] - step_size[0] * i
+                else:
+                    x_point = second_point[0] + step_size[0] * i
+                transformed = self.coordinate_transform((x_point, y_point,), (coord_system, epoch,))
+                map_points += (transformed, )
+
+        return map_points
+
+    def scanning_point_calculator(self, map_points: tuple, init_steps: tuple, step_size: tuple,
+                                  int_time=0.0 , objec=None):
+        """
+        Generate the scanning map in HA and DEC
+        :param map_points:
+        :param init_steps: Initial steps from home in RA and DEC axis
+        :param step_size:
+        :param int_time:
+        :param objec: Planetary object passing. Default is none.
+        :return: The calculated position of the points for scanning
+        """
+        first_point = self.transit(map_points[0][0], map_points[0][1], init_steps[0], init_steps[1], 0)
+        calc_points = ((first_point[0], first_point[1]),)
+
+        # Initialize the variable with the initial steps from home
+        step_incr_dec = init_steps[1]
+        step_incr_ra = init_steps[0]
+        for i in range(0, len(map_points)):
+            try:
+                if map_points[i][1] != map_points[i + 1][1]:
+                    step_incr_dec = init_steps[1] + (step_size[1] * _motor_DEC_steps_per_deg)
+                elif map_points[i][0] != map_points[i + 1][0]:
+                    step_incr_ra = init_steps[0] + (step_size[0] * _motor_RA_steps_per_deg)
+            except IndexError:
+                pass
+            step_incr = (step_incr_ra, step_incr_dec, )
+
+            if int(int_time * 60.0) is not 0:
+                tr_time = int(int_time * 60.0)
+            else:
+                tr_time = 0
+
+            transit_point = self.transit(map_points[i][0], map_points[i][1], step_incr[0], step_incr[1], tr_time)
+            calc_points += ((transit_point[0], transit_point[1]), )
+
+        return calc_points
+
+    def coordinate_transform(self, coordinates: tuple, system_and_date: tuple):
+        position = np.radians(coordinates)  # Convert coordinates from degrees to radians
+        if system_and_date[0] == "Equatorial":
+            ra, dec = coordinates
+        elif system_and_date[0] == "Horizontal":
+            ra, dec = map(float, self.observer.radec_of(position[0], position[1]))
+        elif system_and_date[0] == "Galactic":
+            galactic_posit = ephem.Galactic(position[0], position[1], epoch=system_and_date[1])
+            ra, dec = galactic_posit.to_radec()  # Convert point from Galactic to RA and DEC in the same epoch
+        elif system_and_date[0] == "Ecliptical":
+            ecliptical_posit = ephem.Ecliptic(position[0], position[1], epoch=system_and_date[1])
+            ra, dec = ecliptical_posit.to_radec()  # Convert to RA and DEC at the same epoch
+
+        return (ra, dec, )  # Return the coordinate tuple
