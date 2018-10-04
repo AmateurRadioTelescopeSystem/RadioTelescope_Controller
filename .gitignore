@@ -288,4 +288,7 @@ fabric.properties
 logs/*
 *.xml
 
+# Ignore the compiled resources file
+resources.py
+
 # End of https://www.gitignore.io/api/c,c++,linux,python,windows
