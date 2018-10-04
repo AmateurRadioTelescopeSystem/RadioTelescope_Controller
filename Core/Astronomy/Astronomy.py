@@ -274,7 +274,7 @@ class Calculations(QtCore.QObject):
             first_point = self.tracking_planetary(objec, init_steps[0], init_steps[1])  # Get also the rate of change
             roc_ra = first_point[2]  # Get the rate of change for RA as returned from the tracking calculation
             roc_dec = first_point[3]  # Get the rate of change for DEC as returned from the tracking calculation
-        calc_points = ((first_point[0], first_point[1]), )
+        calc_points = "%f_%f" % (first_point[0], first_point[1])
 
         # Initialize the variable with the initial steps from home
         step_incr_dec = init_steps[1]
@@ -300,7 +300,7 @@ class Calculations(QtCore.QObject):
                 transit_point = self.transit(map_points[i][0], map_points[i][1], step_incr[0], step_incr[1], tr_time)
             else:
                 transit_point = self.transit_planetary(objec, step_incr[0], step_incr[1], tr_time)
-            calc_points += ((transit_point[0], transit_point[1]), )
+            calc_points += "_%f_%f" % (transit_point[0], transit_point[1])  # Save the points as a string
 
         return [calc_points, (roc_ra, roc_dec, )]
 
