@@ -485,7 +485,6 @@ class OpHandler(QtCore.QObject):
                     self.ui.uiSkyScanningWin.point3Coord_2Field.text(), )
         point_4 = (self.ui.uiSkyScanningWin.point4Coord_1Field.text(),
                     self.ui.uiSkyScanningWin.point4Coord_2Field.text(), )
-        map_points = ()  # Be sure it is initialized
 
         # Make boxes red wherever there is no input
         if point_1[0] == "":
@@ -541,41 +540,50 @@ class OpHandler(QtCore.QObject):
 
             points = (point_1, point_2, point_3, point_4, coord_system, epoch, )
             map_points = self.astronomy.scanning_map_generator(points, step_size, direction)
-            num_of_points = len(map_points)  # Number of points to be scanned
+            num_of_points = len(map_points[0])  # Number of points to be scanned
 
             if self.ui.uiSkyScanningWin.integrationEnabler.isChecked():
-                total_int_time = num_of_points * self.ui.uiSkyScanningWin.integrationTimeEntry.value()
+                total_int_time = num_of_points * self.ui.uiSkyScanningWin.integrationTimeEntry.value() * 60.0
                 self.ui.uiSkyScanningWin.totalIntTime.setText("%.0fs" % total_int_time)
             self.ui.uiSkyScanningWin.totalPointsToScan.setText("%d" % num_of_points)
 
-        return map_points
+            return map_points[0]
+        else:
+            self.ui.uiSkyScanningWin.pointOperationTabs.setCurrentIndex(0)
+
+        return ()
 
     def skyScanStart(self):
         # TODO Add a perform calculation warning to the user
-        map_points = self.calcScanPoints()  # Get the mapping points
-        if map_points is not ():
-            home_steps = self.cfgData.getHomeSteps()
-            init_steps = (int(home_steps[0]), int(home_steps[1]), )
+        if self.motors_enabled:
+            map_points = self.calcScanPoints()  # Get the mapping points
+            if map_points is not ():
+                home_steps = self.cfgData.getHomeSteps()
+                init_steps = (int(home_steps[0]), int(home_steps[1]), )
 
-            step_x = self.ui.uiSkyScanningWin.stepSizeBoxCoord1.value()
-            step_y = self.ui.uiSkyScanningWin.stepSizeBoxCoord2.value()
-            step_size = (step_x, step_y,)  # Step size in each axis
+                step_x = self.ui.uiSkyScanningWin.stepSizeBoxCoord1.value()
+                step_y = self.ui.uiSkyScanningWin.stepSizeBoxCoord2.value()
+                step_size = (step_x, step_y,)  # Step size in each axis
 
-            if self.ui.uiSkyScanningWin.integrationEnabler.isChecked():
-                int_time = self.ui.uiSkyScanningWin.integrationTimeEntry.value()
-            else:
-                int_time = 0.0
+                if self.ui.uiSkyScanningWin.integrationEnabler.isChecked():
+                    int_time = self.ui.uiSkyScanningWin.integrationTimeEntry.value()
+                else:
+                    int_time = 0.0
 
-            if self.ui.uiSkyScanningWin.planetaryObjectSelectcheckBox.isChecked():
-                objec = self.ui.uiSkyScanningWin.objectSelectionComboBox.currentText()
-            else:
-                objec = None
+                if self.ui.uiSkyScanningWin.planetaryObjectSelectcheckBox.isChecked():
+                    objec = self.ui.uiSkyScanningWin.objectSelectionComboBox.currentText()
+                else:
+                    objec = None
 
-            calc_points = self.astronomy.scanning_point_calculator(map_points, init_steps, step_size, int_time, objec)
-            self.tcpClient.sendData.emit("SKY-SCAN_RA_%f_DEC_%f_RA-SPEED_%f_DEC-SPEED_%f_INT-TIME_%.2f"
-                                         % (float(calc_points[0].split("_")[0]), float(calc_points[0].split("_")[2]),
-                                            float(calc_points[1][0]), float(calc_points[1][1]), int_time))
-            self.tcpClient.sendData.emit("SKY-SCAN-MAP_%s" % calc_points[0])
+                calc_points = self.astronomy.scanning_point_calculator(map_points, init_steps, step_size,
+                                                                       int_time, objec)
+                self.tcpClient.sendData.emit("SKY-SCAN_RA_%f_DEC_%f_RA-SPEED_%f_DEC-SPEED_%f_INT-TIME_%.2f"
+                                             % (float(calc_points[0].split("_")[0]), float(calc_points[0].split("_")[2]),
+                                                float(calc_points[1][0]), float(calc_points[1][1]), int_time))
+                self.tcpClient.sendData.emit("SKY-SCAN-MAP_%s" % calc_points[0])
+                print(calc_points[0])
+        else:
+            self.ui.motorsDisabledSig.emit()
 
     # Make all the necessary signal connections
     def signalConnections(self):
