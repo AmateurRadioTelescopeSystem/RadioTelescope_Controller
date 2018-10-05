@@ -237,24 +237,35 @@ class Calculations(QtCore.QObject):
         num_boxes_y = math.floor(abs(second_point[1] - third_point[1])/step_size[1])
 
         # Generate the point map in the Equatorial coordinate system
-        map_points = ()  # An empty tuple to contain mapping points
         x_point = initial_point[0]  # Get the first coordinate before the loop
-        fill_reverse = False  # Indicate reverse direction filling of the tuple with points
-        for i in range(0, int(num_boxes_y - 1)):
-            y_point = initial_point[1] + step_size[1] * i
-            transformed = self.coordinate_transform((x_point, y_point, ), (coord_system, epoch, ))
+        y_point = initial_point[1]
+        raw_points = ((x_point, y_point), )
+        transformed = self.coordinate_transform((x_point, y_point,), (coord_system, epoch,))
+        map_points = (transformed, )
 
-            map_points += (transformed, )
+        if second_point[0] - initial_point[0] < 0:
+            fill_reverse = False  # Indicate reverse direction filling of the tuple with points (inverse logic)
+        else:
+            fill_reverse = True
+
+        for i in range(0, int(num_boxes_y)):
+            if i is not 0:
+                y_point -= step_size[1]  # Don't deduct the step on the first point
             fill_reverse = not fill_reverse  # Negate the direction of point filling
-            for j in range(0, int(num_boxes_x - 1)):
-                if fill_reverse is True:
-                    x_point = second_point[0] - step_size[0] * i
-                else:
-                    x_point = second_point[0] + step_size[0] * i
+
+            for j in range(0, int(num_boxes_x)):
+                if not (j == 0 and i != 0):
+                    if fill_reverse is True:
+                        x_point -= step_size[0]
+                    else:
+                        x_point += step_size[0]
+                raw_points += ((round(x_point, 6), round(y_point, 6)),)
+
                 transformed = self.coordinate_transform((x_point, y_point,), (coord_system, epoch,))
                 map_points += (transformed, )
+        print(raw_points)
 
-        return map_points
+        return [map_points, raw_points]
 
     def scanning_point_calculator(self, map_points: tuple, init_steps: tuple, step_size: tuple,
                                   int_time=0.0, objec=None):
@@ -282,9 +293,9 @@ class Calculations(QtCore.QObject):
         for i in range(0, len(map_points)):
             try:
                 if map_points[i][1] != map_points[i + 1][1]:
-                    step_incr_dec = init_steps[1] + (step_size[1] * _motor_DEC_steps_per_deg)
+                    step_incr_dec += step_size[1] * _motor_DEC_steps_per_deg
                 elif map_points[i][0] != map_points[i + 1][0]:
-                    step_incr_ra = init_steps[0] + (step_size[0] * _motor_RA_steps_per_deg)
+                    step_incr_ra += step_size[0] * _motor_RA_steps_per_deg
             except IndexError:
                 pass
             step_incr = (step_incr_ra, step_incr_dec, )
