@@ -151,7 +151,12 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.uiPlanetaryObjWin.planObjectTransitGroupBox.toggled.connect(self.checkBoxPlanTransit)
         self.uiPlanetaryObjWin.planObjectTrackingGroupBox.toggled.connect(self.checkBoxPlanTracking)
 
+        self.uiSkyScanningWin.mapLayoutBox.setTabEnabled(1, False)  # Disable the tab at first
         self.uiSkyScanningWin.coordinateSystemComboBx.currentTextChanged.connect(self.coordinate_updater)
+        self.uiSkyScanningWin.listPointsCheckBox.toggled.connect(
+            partial(self.uiSkyScanningWin.mapLayoutBox.setTabEnabled, 1))
+        self.uiSkyScanningWin.textBrowser.setText(
+            "<html><table><tbody><tr><td style=\"width: 36px;\" colspan=\"2\"><strong>System</strong></td><td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 49px;\" colspan=\"2\"><strong>Equatorial</strong></td></tr><tr><td style=\"width: 26px;\"><strong>C1</strong></td><td style=\"width: 10px;\"><strong>C2</strong></td><td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 20px;\"><strong>RA</strong></td><td style=\"width: 29px;\"><strong>DEC</strong></td></tr><tr><td style=\"width: 26px;\">&nbsp;</td><td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 20px;\">&nbsp;</td><td style=\"width: 29px;\">&nbsp;</td></tr><tr><td style=\"width: 26px;\">&nbsp;</td><td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 20px;\">&nbsp;</td><td style=\"width: 29px;\">&nbsp;</td></tr></tbody></table><p>&nbsp;</p></html>")
 
     # Function called every time the corresponding checkbox is selected
     def checkBoxTCPRTClient(self, state):
