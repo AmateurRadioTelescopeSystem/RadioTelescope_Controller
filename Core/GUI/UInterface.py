@@ -153,10 +153,22 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
         self.uiSkyScanningWin.mapLayoutBox.setTabEnabled(1, False)  # Disable the tab at first
         self.uiSkyScanningWin.coordinateSystemComboBx.currentTextChanged.connect(self.coordinate_updater)
+        self.uiSkyScanningWin.simulateScanningChk.toggled.connect(self.simEnabler)
         self.uiSkyScanningWin.listPointsCheckBox.toggled.connect(
             partial(self.uiSkyScanningWin.mapLayoutBox.setTabEnabled, 1))
-        self.uiSkyScanningWin.textBrowser.setText(
-            "<html><table><tbody><tr><td style=\"width: 36px;\" colspan=\"2\"><strong>System</strong></td><td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 49px;\" colspan=\"2\"><strong>Equatorial</strong></td></tr><tr><td style=\"width: 26px;\"><strong>C1</strong></td><td style=\"width: 10px;\"><strong>C2</strong></td><td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 20px;\"><strong>RA</strong></td><td style=\"width: 29px;\"><strong>DEC</strong></td></tr><tr><td style=\"width: 26px;\">&nbsp;</td><td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 20px;\">&nbsp;</td><td style=\"width: 29px;\">&nbsp;</td></tr><tr><td style=\"width: 26px;\">&nbsp;</td><td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 20px;\">&nbsp;</td><td style=\"width: 29px;\">&nbsp;</td></tr></tbody></table><p>&nbsp;</p></html>")
+        '''self.uiSkyScanningWin.textBrowser.setText(
+            "<html><table><tbody><tr><td style=\"width: 36px;\" colspan=\"2\">"
+            "<strong>System</strong></td><td style=\"width: 10px;\">&nbsp;</td>"
+            "<td style=\"width: 49px;\" colspan=\"2\"><strong>Equatorial</strong>"
+            "</td></tr><tr><td style=\"width: 26px;\"><strong>C1</strong></td>"
+            "<td style=\"width: 10px;\"><strong>C2</strong></td><td style=\"width: 10px;\">&nbsp;</td>"
+            "<td style=\"width: 20px;\"><strong>RA</strong></td><td style=\"width: 29px;\">"
+            "<strong>DEC</strong></td></tr><tr><td style=\"width: 26px;\">&nbsp;</td>"
+            "<td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 10px;\">&nbsp;</td>"
+            "<td style=\"width: 20px;\">&nbsp;</td><td style=\"width: 29px;\">&nbsp;</td></tr><tr>"
+            "<td style=\"width: 26px;\">&nbsp;</td><td style=\"width: 10px;\">&nbsp;</td>"
+            "<td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 20px;\">&nbsp;</td>"
+            "<td style=\"width: 29px;\">&nbsp;</td></tr></tbody></table><p>&nbsp;</p></html>")'''
 
     # Function called every time the corresponding checkbox is selected
     def checkBoxTCPRTClient(self, state):
@@ -406,6 +418,12 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.uiSkyScanningWin.point3Coord_2Label.setText(coord_2)
         self.uiSkyScanningWin.point4Coord_2Label.setText(coord_2)
         self.uiSkyScanningWin.stepSizeCoord2.setText(coord_2)
+
+    def simEnabler(self, state: bool):
+        if state is True:
+            self.uiSkyScanningWin.calculateScanMapBtn.setText("Simulate")
+        else:
+            self.uiSkyScanningWin.calculateScanMapBtn.setText("Calculate")
 
     # Show current date and time on the GUI
     def dateTime(self):
