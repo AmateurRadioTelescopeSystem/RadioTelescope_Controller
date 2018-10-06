@@ -1,43 +1,54 @@
 from PyQt5 import QtCore
-import time
 import logging
 
 
 class SimulHandler(QtCore.QObject):
-    simStartSig = QtCore.pyqtSignal(tuple, name='simulationStarter')
+    simStartSig = QtCore.pyqtSignal(tuple, float, name='simulationStarter')
     simStopSig = QtCore.pyqtSignal(name='stopCurrentSimulation')
-    simFinishedSig = QtCore.pyqtSignal(name='simulationFinishedIndicator')
 
     def __init__(self, tcpStellarium, parent=None):
         super(SimulHandler, self).__init__(parent)
         self.tcpStell = tcpStellarium
         self.log = logging.getLogger(__name__)
         self.stopSim = False
+        self.counter = 0
+        self.map_points = ()
 
     def start(self):
-        self.simStartSig.connect(self.simulateScanning)
-        self.simStopSig.connect(self.simStopper)
-        self.log.debug("Simulation thread started. Thread ID = %d" % QtCore.QThread.currentThreadId())
+        self.timer = QtCore.QTimer()  # Simulation timer
 
-    @QtCore.pyqtSlot(tuple, name='simulationStarter')
-    def simulateScanning(self, map_points: tuple):
-        self.stopSim = False
-        num_points = len(map_points)
+        self.simStartSig.connect(self.simStarter)
+        self.simStopSig.connect(self.simStopper)
+        self.timer.timeout.connect(self.simulateScanning)
+
+        self.log.info("Simulation handler thread started")
+
+    def simulateScanning(self):
+        num_points = len(self.map_points)
         if num_points > 0:
-            for i in range(0, num_points):
-                if self.stopSim is True:
-                    break
-                if map_points[i][0] < 0:
-                    ra = (map_points[i][0] + 23.9997)/15.0
+            if self.counter < num_points:
+                if self.map_points[self.counter][0] < 0:
+                    ra = (self.map_points[self.counter][0] + 23.9997)/15.0
                 else:
-                    ra = map_points[i][0]/15.0
-                self.tcpStell.sendDataStell.emit(ra, float(map_points[i][1]))
-                time.sleep(0.1)
-        if self.stopSim is False:
-            self.simFinishedSig.emit()  # Indicate that sim has finished
-        self.stopSim = False  # Execute that only if stop is requested
+                    ra = self.map_points[self.counter][0]/15.0
+                self.tcpStell.sendDataStell.emit(ra, float(self.map_points[self.counter][1]))
+                self.counter += 1  # Increment the counter variable
+            else:
+                self.timer.stop()  # Stop the timer
+                self.counter = 0  # Reset the count
+
+    @QtCore.pyqtSlot(tuple, float, name='simulationStarter')
+    def simStarter(self, points: tuple, speed: float):
+        self.map_points = points  # Save the map points
+        self.counter = 0  # Reset the counter variable
+        self.timer.setInterval(speed)  # Set the interval at which the point will move
+        self.timer.start()  # Start the simulation timer
 
     @QtCore.pyqtSlot(name='stopCurrentSimulation')
     def simStopper(self):
-        self.stopSim = True
+        self.counter = 0  # Reset the counter
+        self.timer.stop()  # Stop the timer as requested
 
+    def close(self):
+        self.timer.stop()  # Stop the timer before exiting the thread
+        self.log.info("Simulation handler thread closed")
