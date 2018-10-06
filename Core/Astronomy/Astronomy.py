@@ -246,7 +246,7 @@ class Calculations(QtCore.QObject):
         y_point = initial_point[1]
         raw_points = ((x_point, y_point), )
         transformed = self.coordinate_transform((x_point, y_point,), (coord_system, epoch,))
-        map_points = (transformed, )
+        map_points = ((round(transformed[0], 6), round(transformed[1], 6)),)
 
         if second_point[0] - initial_point[0] < 0:
             fill_reverse = False  # Indicate reverse direction filling of the tuple with points (inverse logic)
@@ -268,7 +268,7 @@ class Calculations(QtCore.QObject):
                     raw_points += ((round(x_point, 6), round(y_point, 6)),)
 
                     transformed = self.coordinate_transform((x_point, y_point,), (coord_system, epoch,))
-                    map_points += (transformed, )
+                    map_points += ((round(transformed[0], 6), round(transformed[1], 6)),)
         else:
             for i in range(0, int(num_boxes_x)):
                 if i is not 0:
@@ -284,9 +284,12 @@ class Calculations(QtCore.QObject):
                     raw_points += ((round(x_point, 6), round(y_point, 6)),)
 
                     transformed = self.coordinate_transform((x_point, y_point,), (coord_system, epoch,))
-                    map_points += (transformed,)
+                    map_points += ((round(transformed[0], 6), round(transformed[1], 6)),)
         # TODO Remove print statement
+        print("Raw points:")
         print(raw_points)
+        print("Mapped points")
+        print(map_points)
 
         return [map_points, raw_points]
 
@@ -317,7 +320,7 @@ class Calculations(QtCore.QObject):
             try:
                 if map_points[i][1] != map_points[i + 1][1]:
                     step_incr_dec += step_size[1] * _motor_DEC_steps_per_deg
-                elif map_points[i][0] != map_points[i + 1][0]:
+                if map_points[i][0] != map_points[i + 1][0]:
                     step_incr_ra += step_size[0] * _motor_RA_steps_per_deg
             except IndexError:
                 pass
@@ -343,12 +346,12 @@ class Calculations(QtCore.QObject):
         if system_and_date[0] == "Equatorial":
             ra, dec = coordinates
         elif system_and_date[0] == "Horizontal":
-            ra, dec = map(float, self.observer.radec_of(position[0], position[1]))
+            ra, dec = np.degrees(map(float, self.observer.radec_of(position[0], position[1])))
         elif system_and_date[0] == "Galactic":
             galactic_posit = ephem.Galactic(position[0], position[1], epoch=system_and_date[1])
-            ra, dec = galactic_posit.to_radec()  # Convert point from Galactic to RA and DEC in the same epoch
+            ra, dec = np.degrees(galactic_posit.to_radec())  # Convert point from Galactic to RA and DEC
         elif system_and_date[0] == "Ecliptical":
             ecliptical_posit = ephem.Ecliptic(position[0], position[1], epoch=system_and_date[1])
-            ra, dec = ecliptical_posit.to_radec()  # Convert to RA and DEC at the same epoch
+            ra, dec = np.degrees(ecliptical_posit.to_radec())  # Convert to RA and DEC from Ecliptic coordinate system
 
         return ra, dec  # Return the coordinate tuple
