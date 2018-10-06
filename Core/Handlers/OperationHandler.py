@@ -41,6 +41,7 @@ class OpHandler(QtCore.QObject):
 
         self.max_steps_to_targ_ra = 0
         self.max_steps_to_targ_dec = 0
+        self.simStarted = False
 
         # Simulation thread operations
         self.simThread = QtCore.QThread()
@@ -569,9 +570,14 @@ class OpHandler(QtCore.QObject):
             self.ui.uiSkyScanningWin.totalPointsToScan.setText("%d" % num_of_points)
 
             if self.ui.uiSkyScanningWin.simulateScanningChk.isChecked():
-                self.simThread.start()  # Start the simulation thread
-                self.simThread.wait(500)  # Wait until thread is started
-                self.simHandler.simStartSig.emit(map_points[0])  # Start the simulation
+                if self.simStarted is True:
+                    self.simHandler.simStopSig.emit()
+                    self.simHandler.simStartSig.emit(map_points[0])
+                else:
+                    self.simThread.start()  # Start the simulation thread
+                    self.simThread.wait(500)  # Wait until thread is started
+                    self.simHandler.simStartSig.emit(map_points[0])  # Start the simulation
+                    self.simStarted = True
 
             return map_points[0]
         else:
@@ -611,6 +617,11 @@ class OpHandler(QtCore.QObject):
         else:
             self.ui.motorsDisabledSig.emit()
 
+    def simQuiter(self):
+        self.simThread.quit()
+        self.simThread.wait(msecs=500)
+        self.simStarted = False
+
     # Make all the necessary signal connections
     def signalConnections(self):
         """
@@ -618,7 +629,7 @@ class OpHandler(QtCore.QObject):
         This function is called at the start of the Operation handling thread.
         :return: Nothing
         """
-        self.simHandler.simFinishedSig.connect(self.simThread.quit)  # Close the thread after simulation has finished
+        self.simHandler.simFinishedSig.connect(self.simQuiter)  # Close the thread after simulation has finished
 
         self.tcpStellarium.sendClientConn.connect(self.stellCommSend)  # Send data from Stellarium to the RPi
         self.tcpClient.dataRcvSigC.connect(self.clientDataRx)  # Receive pending data from RPi connected client
