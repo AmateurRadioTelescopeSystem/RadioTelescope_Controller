@@ -192,6 +192,7 @@ class Calculations(QtCore.QObject):
         coord_system = points[4]  # Get the coordinate system of the provided coordinates
 
         direct = direction.split(": ")[1]  # Get the direction string
+        second_axis = False
         if direct == "R-Down":
             initial_point = points[0]
             second_point = points[1]
@@ -217,21 +218,25 @@ class Calculations(QtCore.QObject):
             second_point = points[0]
             third_point = points[1]
             fourth_point = points[2]
+            second_axis = True
         elif direct == "Up-L":
             initial_point = points[2]
             second_point = points[1]
             third_point = points[0]
             fourth_point = points[3]
+            second_axis = True
         elif direct == "Down-R":
             initial_point = points[0]
             second_point = points[3]
             third_point = points[2]
             fourth_point = points[1]
+            second_axis = True
         elif direct == "Down-L":
             initial_point = points[1]
             second_point = points[2]
             third_point = points[3]
             fourth_point = points[0]
+            second_axis = True
         # TODO implement a fix to include the last box without overlap
         num_boxes_x = math.floor(abs(second_point[0] - initial_point[0])/step_size[0])
         num_boxes_y = math.floor(abs(second_point[1] - third_point[1])/step_size[1])
@@ -248,21 +253,39 @@ class Calculations(QtCore.QObject):
         else:
             fill_reverse = True
 
-        for i in range(0, int(num_boxes_y)):
-            if i is not 0:
-                y_point -= step_size[1]  # Don't deduct the step on the first point
-            fill_reverse = not fill_reverse  # Negate the direction of point filling
+        if not second_axis:
+            for i in range(0, int(num_boxes_y)):
+                if i is not 0:
+                    y_point -= step_size[1]  # Don't deduct the step on the first point
+                fill_reverse = not fill_reverse  # Negate the direction of point filling
 
-            for j in range(0, int(num_boxes_x)):
-                if not (j == 0 and i != 0):
-                    if fill_reverse is True:
-                        x_point -= step_size[0]
-                    else:
-                        x_point += step_size[0]
-                raw_points += ((round(x_point, 6), round(y_point, 6)),)
+                for j in range(0, int(num_boxes_x)):
+                    if not (j == 0 and i != 0):
+                        if fill_reverse is True:
+                            x_point -= step_size[0]
+                        else:
+                            x_point += step_size[0]
+                    raw_points += ((round(x_point, 6), round(y_point, 6)),)
 
-                transformed = self.coordinate_transform((x_point, y_point,), (coord_system, epoch,))
-                map_points += (transformed, )
+                    transformed = self.coordinate_transform((x_point, y_point,), (coord_system, epoch,))
+                    map_points += (transformed, )
+        else:
+            for i in range(0, int(num_boxes_x)):
+                if i is not 0:
+                    x_point -= step_size[0]  # Don't deduct the step on the first point
+                fill_reverse = not fill_reverse  # Negate the direction of point filling
+
+                for j in range(0, int(num_boxes_y)):
+                    if not (j == 0 and i != 0):
+                        if fill_reverse is True:
+                            y_point -= step_size[1]
+                        else:
+                            y_point += step_size[1]
+                    raw_points += ((round(x_point, 6), round(y_point, 6)),)
+
+                    transformed = self.coordinate_transform((x_point, y_point,), (coord_system, epoch,))
+                    map_points += (transformed,)
+        # TODO Remove print statement
         print(raw_points)
 
         return [map_points, raw_points]
@@ -290,7 +313,7 @@ class Calculations(QtCore.QObject):
         # Initialize the variable with the initial steps from home
         step_incr_dec = init_steps[1]
         step_incr_ra = init_steps[0]
-        for i in range(0, len(map_points)):
+        for i in range(1, len(map_points)):  # Exclude first point
             try:
                 if map_points[i][1] != map_points[i + 1][1]:
                     step_incr_dec += step_size[1] * _motor_DEC_steps_per_deg
