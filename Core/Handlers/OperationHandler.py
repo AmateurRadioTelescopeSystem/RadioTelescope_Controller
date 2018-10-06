@@ -48,6 +48,8 @@ class OpHandler(QtCore.QObject):
         self.simHandler = SimulationHandler.SimulHandler(tcpStellarium)
         self.simHandler.moveToThread(self.simThread)
         self.simThread.started.connect(self.simHandler.start)
+        self.simThread.finished.connect(self.simHandler.close)
+        self.simThread.start()  # Start the simulation thread
 
         self.ui.uiSkyScanningWin.textBrowser.setText(
             "<html><table><tbody><tr><td style=\"width: 36px;\" colspan=\"2\">"
@@ -570,14 +572,9 @@ class OpHandler(QtCore.QObject):
             self.ui.uiSkyScanningWin.totalPointsToScan.setText("%d" % num_of_points)
 
             if self.ui.uiSkyScanningWin.simulateScanningChk.isChecked():
-                if self.simStarted is True:
-                    self.simHandler.simStopSig.emit()
-                    self.simHandler.simStartSig.emit(map_points[0])
-                else:
-                    self.simThread.start()  # Start the simulation thread
-                    self.simThread.wait(500)  # Wait until thread is started
-                    self.simHandler.simStartSig.emit(map_points[0])  # Start the simulation
-                    self.simStarted = True
+                sim_speed = self.ui.uiSkyScanningWin.simSpeedValue.value()
+                self.simHandler.simStopSig.emit()  # First stop any ongoing simulation
+                self.simHandler.simStartSig.emit(map_points[0], sim_speed)  # Then send the new points
 
             return map_points[0]
         else:
@@ -617,11 +614,6 @@ class OpHandler(QtCore.QObject):
         else:
             self.ui.motorsDisabledSig.emit()
 
-    def simQuiter(self):
-        self.simThread.quit()
-        self.simThread.wait(msecs=500)
-        self.simStarted = False
-
     # Make all the necessary signal connections
     def signalConnections(self):
         """
@@ -629,8 +621,6 @@ class OpHandler(QtCore.QObject):
         This function is called at the start of the Operation handling thread.
         :return: Nothing
         """
-        self.simHandler.simFinishedSig.connect(self.simQuiter)  # Close the thread after simulation has finished
-
         self.tcpStellarium.sendClientConn.connect(self.stellCommSend)  # Send data from Stellarium to the RPi
         self.tcpClient.dataRcvSigC.connect(self.clientDataRx)  # Receive pending data from RPi connected client
         self.tcpClient.newConInitComms.connect(self.initialCommands)
@@ -697,6 +687,12 @@ class OpHandler(QtCore.QObject):
         self.tcpStellarium.deleteLater()
         self.tcpStelThread.deleteLater()
         self.logD.debug("Stellarium server thread is closed for sure and operations handler thread closed")
+
+        self.simThread.quit()
+        self.simThread.wait()
+        self.simHandler.deleteLater()
+        self.simThread.deleteLater()
+        self.logD.debug("Simulation handler thread is closed.")
 
     def datePrint(self):
         print(self.ui.uiSkyScanningWin.epochDateSelection.date().toString("yyyy/MM/dd"))
