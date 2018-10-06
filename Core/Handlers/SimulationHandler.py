@@ -25,17 +25,16 @@ class SimulHandler(QtCore.QObject):
 
     def simulateScanning(self):
         num_points = len(self.map_points)
-        if num_points > 0:
-            if self.counter < num_points:
-                if self.map_points[self.counter][0] < 0:
-                    ra = (self.map_points[self.counter][0] + 23.9997)/15.0
-                else:
-                    ra = self.map_points[self.counter][0]/15.0
-                self.tcpStell.sendDataStell.emit(ra, float(self.map_points[self.counter][1]))
-                self.counter += 1  # Increment the counter variable
+        if num_points > 0 and self.counter < num_points:
+            if self.map_points[self.counter][0] < 0:
+                ra = (self.map_points[self.counter][0] + 23.9997)/15.0
             else:
-                self.timer.stop()  # Stop the timer
-                self.counter = 0  # Reset the count
+                ra = self.map_points[self.counter][0]/15.0
+            self.tcpStell.sendDataStell.emit(ra, float(self.map_points[self.counter][1]))
+            self.counter += 1  # Increment the counter variable
+        else:
+            self.timer.stop()  # Stop the timer
+            self.counter = 0  # Reset the count
 
     @QtCore.pyqtSlot(tuple, float, name='simulationStarter')
     def simStarter(self, points: tuple, speed: float):
@@ -46,8 +45,8 @@ class SimulHandler(QtCore.QObject):
 
     @QtCore.pyqtSlot(name='stopCurrentSimulation')
     def simStopper(self):
-        self.counter = 0  # Reset the counter
         self.timer.stop()  # Stop the timer as requested
+        self.counter = 0  # Reset the counter
 
     def close(self):
         self.timer.stop()  # Stop the timer before exiting the thread
