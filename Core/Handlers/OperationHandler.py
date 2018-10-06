@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtNetwork
 from Core.Astronomy import Astronomy
+from Core.Handlers import SimulationHandler
 from functools import partial
 import logging
 
@@ -40,6 +41,26 @@ class OpHandler(QtCore.QObject):
 
         self.max_steps_to_targ_ra = 0
         self.max_steps_to_targ_dec = 0
+
+        # Simulation thread operations
+        self.simThread = QtCore.QThread()
+        self.simHandler = SimulationHandler.SimulHandler(tcpStellarium)
+        self.simHandler.moveToThread(self.simThread)
+        self.simThread.started.connect(self.simHandler.start)
+
+        self.ui.uiSkyScanningWin.textBrowser.setText(
+            "<html><table><tbody><tr><td style=\"width: 36px;\" colspan=\"2\">"
+            "<strong>System</strong></td><td style=\"width: 10px;\">&nbsp;</td>"
+            "<td style=\"width: 49px;\" colspan=\"2\"><strong>Equatorial</strong>"
+            "</td></tr><tr><td style=\"width: 26px;\"><strong>C1</strong></td>"
+            "<td style=\"width: 10px;\"><strong>C2</strong></td><td style=\"width: 10px;\">&nbsp;</td>"
+            "<td style=\"width: 20px;\"><strong>RA</strong></td><td style=\"width: 29px;\">"
+            "<strong>DEC</strong></td></tr><tr><td style=\"width: 26px;\">&nbsp;</td>"
+            "<td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 10px;\">&nbsp;</td>"
+            "<td style=\"width: 20px;\">&nbsp;</td><td style=\"width: 29px;\">&nbsp;</td></tr><tr>"
+            "<td style=\"width: 26px;\">&nbsp;</td><td style=\"width: 10px;\">&nbsp;</td>"
+            "<td style=\"width: 10px;\">&nbsp;</td><td style=\"width: 20px;\">&nbsp;</td>"
+            "<td style=\"width: 29px;\">&nbsp;</td></tr></tbody></table><p>&nbsp;</p></html>")
 
     def start(self):
         """
@@ -547,6 +568,11 @@ class OpHandler(QtCore.QObject):
                 self.ui.uiSkyScanningWin.totalIntTime.setText("%.0fs" % total_int_time)
             self.ui.uiSkyScanningWin.totalPointsToScan.setText("%d" % num_of_points)
 
+            if self.ui.uiSkyScanningWin.simulateScanningChk.isChecked():
+                self.simThread.start()  # Start the simulation thread
+                self.simThread.wait(500)  # Wait until thread is started
+                self.simHandler.simStartSig.emit(map_points[0])  # Start the simulation
+
             return map_points[0]
         else:
             self.ui.uiSkyScanningWin.pointOperationTabs.setCurrentIndex(0)
@@ -555,7 +581,7 @@ class OpHandler(QtCore.QObject):
 
     def skyScanStart(self):
         # TODO Add a perform calculation warning to the user
-        if self.motors_enabled:
+        if not self.motors_enabled:  # TODO Set the condition to the correct one
             map_points = self.calcScanPoints()  # Get the mapping points
             if map_points is not ():
                 home_steps = self.cfgData.getHomeSteps()
@@ -581,7 +607,7 @@ class OpHandler(QtCore.QObject):
                                              % (float(calc_points[0].split("_")[0]), float(calc_points[0].split("_")[2]),
                                                 float(calc_points[1][0]), float(calc_points[1][1]), int_time))
                 self.tcpClient.sendData.emit("SKY-SCAN-MAP_%s" % calc_points[0])
-                print(calc_points[0])
+                print(calc_points[0])  # TODO Remove the print statement
         else:
             self.ui.motorsDisabledSig.emit()
 
@@ -592,6 +618,8 @@ class OpHandler(QtCore.QObject):
         This function is called at the start of the Operation handling thread.
         :return: Nothing
         """
+        self.simHandler.simFinishedSig.connect(self.simThread.quit)  # Close the thread after simulation has finished
+
         self.tcpStellarium.sendClientConn.connect(self.stellCommSend)  # Send data from Stellarium to the RPi
         self.tcpClient.dataRcvSigC.connect(self.clientDataRx)  # Receive pending data from RPi connected client
         self.tcpClient.newConInitComms.connect(self.initialCommands)
