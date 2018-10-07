@@ -3,7 +3,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets, uic, QtWebEngineWidgets
 from functools import partial
-import Core.GUI.resources
+from Core.GUI import resources
 import logging
 import sys
 import os
