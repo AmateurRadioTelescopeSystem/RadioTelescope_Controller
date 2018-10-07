@@ -11,7 +11,8 @@ from Handlers import OperationHandler
 from Client import ClientThread
 from Server import RPiServerThread
 from Stellarium import StellariumThread
-from Configuration import configData, defaultData
+from Configuration import configData
+import defaultData
 import logging.config
 import logging
 import yaml
