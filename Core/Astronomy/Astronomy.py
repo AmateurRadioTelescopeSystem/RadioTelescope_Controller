@@ -248,12 +248,12 @@ class Calculations(QtCore.QObject):
         transformed = self.coordinate_transform((x_point, y_point,), (coord_system, epoch,))
         map_points = ((round(transformed[0], 6), round(transformed[1], 6)),)
 
-        if second_point[0] - initial_point[0] < 0:
-            fill_reverse = False  # Indicate reverse direction filling of the tuple with points (inverse logic)
-        else:
-            fill_reverse = True
-
         if not second_axis:
+            if second_point[0] - initial_point[0] < 0:
+                fill_reverse = False  # Indicate reverse direction filling of the tuple with points (inverse logic)
+            else:
+                fill_reverse = True
+
             for i in range(0, int(num_boxes_y)):
                 if i is not 0:
                     y_point -= step_size[1]  # Don't deduct the step on the first point
@@ -270,6 +270,11 @@ class Calculations(QtCore.QObject):
                     transformed = self.coordinate_transform((x_point, y_point,), (coord_system, epoch,))
                     map_points += ((round(transformed[0], 6), round(transformed[1], 6)),)
         else:
+            if second_point[1] - initial_point[1] < 0:
+                fill_reverse = False  # Indicate reverse direction filling of the tuple with points (inverse logic)
+            else:
+                fill_reverse = True
+
             for i in range(0, int(num_boxes_x)):
                 if i is not 0:
                     x_point -= step_size[0]  # Don't deduct the step on the first point
