@@ -24,7 +24,7 @@ log_config_str = """Logging:
       level: DEBUG
       filename: logs/debugging_info.log
     radioTelescopeThread:
-      class: Core.Handlers.CLogFileHandler.CustomLogHandler
+      class: Handlers.CLogFileHandler.CustomLogHandler
       formatter: mainFile
       level: INFO
       filename: logs/RadioTelescope_Logger.log
@@ -46,8 +46,8 @@ settings_xml_str = """<settings>
         <latitude>40.6306</latitude>
         <longitude>22.9589</longitude>
     </location>
-    <TCP autoconnect="yes" remote="yes">
-        <host>155.207.50.36</host>
+    <TCP autoconnect="yes" remote="no">
+        <host>127.0.0.1</host>
         <port>10001</port>
     </TCP>
     <TCPStell autoconnect="yes" remote="no">

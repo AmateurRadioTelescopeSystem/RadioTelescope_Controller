@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtNetwork
-from Core.Astronomy import Astronomy
-from Core.Handlers import SimulationHandler
+from Astronomy import Astronomy
+from Handlers import SimulationHandler
 from functools import partial
 import logging
 

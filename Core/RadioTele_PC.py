@@ -1,12 +1,12 @@
-#!/usr/bin/env python3.5
+#!/usr/bin/env python3
 
 from PyQt5 import QtWidgets, QtCore
-from Core.GUI import UInterface
-from Core.Handlers import OperationHandler
-from Core.Client import ClientThread
-from Core.Server import RPiServerThread
-from Core.Stellarium import StellariumThread
-from Core.Configuration import configData, defaultData
+from GUI import UInterface
+from Handlers import OperationHandler
+from Client import ClientThread
+from Server import RPiServerThread
+from Stellarium import StellariumThread
+from Configuration import configData, defaultData
 import logging.config
 import logging
 import yaml
@@ -14,12 +14,14 @@ import sys
 import os
 
 # Required for successful operation of the pyinstaller
-from Core.Handlers import CLogFileHandler
+from Handlers import CLogFileHandler
 
 # Create the directory for the log files if it does not exist already
 try:
     if not os.path.exists('logs'):
-        os.makedirs('logs')
+        os.makedirs('logs')  # Create the logs directory
+    if not os.path.exists('Settings'):
+        os.makedirs('Settings')  # Create the settings directory
 except Exception as excep:
     print("There is a problem with the log directory. See tracback: \n%s" % excep, file=sys.stderr)
     sys.exit(-1)  # Exit the program if an error occurred
@@ -27,7 +29,7 @@ except Exception as excep:
 # Check if the logging configuration file exists
 try:
     if not os.path.exists(os.path.abspath('Settings/logging_settings.yaml')):
-        print("Logging configuration file not found. Creating the default.", file==sys.stderr)
+        print("Logging configuration file not found. Creating the default.", file=sys.stderr)
         log_file = open(os.path.abspath('Settings/logging_settings.yaml'), "w+")  # Open file in writing mode
         log_file.write(defaultData.log_config_str)  # Write the default dat to the file
         log_file.close()  # Close the file, since no other operation required
