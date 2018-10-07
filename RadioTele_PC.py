@@ -27,7 +27,7 @@ except Exception as excep:
 # Check if the logging configuration file exists
 try:
     if not os.path.exists(os.path.abspath('Settings/logging_settings.yaml')):
-        print("Logging configuration file not found. Creating the default.", file==sys.stderr)
+        print("Logging configuration file not found. Creating the default.", file=sys.stderr)
         log_file = open(os.path.abspath('Settings/logging_settings.yaml'), "w+")  # Open file in writing mode
         log_file.write(defaultData.log_config_str)  # Write the default dat to the file
         log_file.close()  # Close the file, since no other operation required
