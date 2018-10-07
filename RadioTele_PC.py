@@ -14,6 +14,7 @@ import sys
 import os
 
 # Required for successful operation of the pyinstaller
+from Core.Handlers import CLogFileHandler
 
 # Create the directory for the log files if it does not exist already
 try:
