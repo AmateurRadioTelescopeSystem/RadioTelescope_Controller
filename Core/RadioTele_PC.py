@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 from PyQt5 import QtWidgets, QtCore
-from Core.GUI import UInterface
-from Core.Handlers import OperationHandler
-from Core.Client import ClientThread
-from Core.Server import RPiServerThread
-from Core.Stellarium import StellariumThread
-from Core.Configuration import configData, defaultData
+from GUI import UInterface
+from Handlers import OperationHandler
+from Client import ClientThread
+from Server import RPiServerThread
+from Stellarium import StellariumThread
+from Configuration import configData, defaultData
 import logging.config
 import logging
 import yaml
@@ -14,7 +14,7 @@ import sys
 import os
 
 # Required for successful operation of the pyinstaller
-from Core.Handlers import CLogFileHandler
+from Handlers import CLogFileHandler
 
 # Create the directory for the log files if it does not exist already
 try:

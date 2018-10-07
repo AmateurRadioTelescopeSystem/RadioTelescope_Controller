@@ -24,7 +24,7 @@ log_config_str = """Logging:
       level: DEBUG
       filename: logs/debugging_info.log
     radioTelescopeThread:
-      class: Core.Handlers.CLogFileHandler.CustomLogHandler
+      class: Handlers.CLogFileHandler.CustomLogHandler
       formatter: mainFile
       level: INFO
       filename: logs/RadioTelescope_Logger.log
