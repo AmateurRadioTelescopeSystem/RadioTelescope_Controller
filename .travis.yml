@@ -2,6 +2,8 @@ language: python
 python:
   - "3.5"
   - "3.6"
+before_install:
+  - chmod +x build_test.sh
 install:
   - pip install -r requirements.txt
-script: ./RadioTele_PC.py
+script: ./build_test.sh
