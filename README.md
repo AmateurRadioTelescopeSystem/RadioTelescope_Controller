@@ -1,5 +1,7 @@
 # Radio Telescope Controller Software #
 
+![GitHub tag](https://img.shields.io/github/tag/dimst23/RadioTelescope_Controller.svg?style=plastic)
+
 Below you will find installation instructions to get the controller up and running on your own system.
 This installation information are not the final ones, since more packages may be used and/or a different approach will be used.
 
