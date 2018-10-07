@@ -19,7 +19,9 @@ from Handlers import CLogFileHandler
 # Create the directory for the log files if it does not exist already
 try:
     if not os.path.exists('logs'):
-        os.makedirs('logs')
+        os.makedirs('logs')  # Create the logs directory
+    if not os.path.exists('Settings'):
+        os.makedirs('Settings')  # Create the settings directory
 except Exception as excep:
     print("There is a problem with the log directory. See tracback: \n%s" % excep, file=sys.stderr)
     sys.exit(-1)  # Exit the program if an error occurred
