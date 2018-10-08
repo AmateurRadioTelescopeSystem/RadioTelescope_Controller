@@ -16,8 +16,8 @@ This installation information are not the final ones, since more packages may be
 ### How do I get set up? ###
 
 * In the setup process the important part is to install the required package/packages
-* Use the `pip install -r requirements.txt` command to install the necessary packages for python.
-* Currently the only package used is PyQt5 version 5.10
+* Use the `$ (sudo) pip install -r requirements.txt` command to install the necessary packages for python.
+* After the installtion of packages, you can run the main program from the Core directory. Main file is RadioTele_PC.py
 
 ### Who do I talk to? ###
 
