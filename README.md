@@ -20,7 +20,10 @@ This installation information are not the final ones, since more packages may be
 
 * In the setup process the important part is to install the required package/packages
 * Use the `$ (sudo) pip install -r requirements.txt` command to install the necessary packages for python.
-* After the installtion of packages, you can run the main program from the Core directory. Main file is RadioTele_PC.py
+* After the installtion of packages, you can run the main program from the `run.sh` script.
+* Running command: `$ ./run.sh`. Make sure the run script has executable permissions.
+* If executable permissions are needed for the run script type `$ chmod +x run.sh`, and the run the script as described above.
+
 
 ### Who do I talk to? ###
 
