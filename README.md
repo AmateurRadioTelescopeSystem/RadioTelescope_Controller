@@ -1,13 +1,12 @@
 # Radio Telescope Controller Software #
 
+[![AUR](https://img.shields.io/aur/license/yaourt.svg?style=plastic)](https://github.com/dimst23/RadioTelescope_Controller/blob/master/LICENSE)
 <p align="center">
 <img src="http://www.marysrosaries.com/collaboration/images/0/0b/Radio_Telescope_3_%28PSF%29.png" width="35%" />
 </p>
 
-[![AUR](https://img.shields.io/aur/license/yaourt.svg?style=plastic)](https://github.com/dimst23/RadioTelescope_Controller/blob/master/LICENSE)
-![GitHub top language](https://img.shields.io/github/languages/top/dimst23/RadioTelescope_Controller.svg?style=plastic)  
-![Travis (.org) branch](https://img.shields.io/travis/dimst23/RadioTelescope_Controller/master.svg?style=plastic)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/dimst23/RadioTelescope_Controller.svg?style=plastic)
+![Travis (.org) branch](https://img.shields.io/travis/dimst23/RadioTelescope_Controller/master.svg?style=plastic)
 
 Below you will find installation instructions to get the controller up and running on your own system.
 This installation information are not the final ones, since more packages may be used and/or a different approach will be used.
