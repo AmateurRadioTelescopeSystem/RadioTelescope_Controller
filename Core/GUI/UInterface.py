@@ -82,27 +82,27 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.man_cn_widg.setFont(fnt)
 
         # Make all the necessary connections
-        self.mainWin.clientRPiEnableLabel.stateChanged.connect(
+        self.main_widg.clientRPiEnableLabel.stateChanged.connect(
             self.checkBoxTCPRTClient)  # Assign functionality to the checkbox
-        self.mainWin.serverRPiEnableLabel.stateChanged.connect(self.checkBoxTCPRTServer)
-        self.mainWin.tcpStelServChkBox.stateChanged.connect(
+        self.main_widg.serverRPiEnableLabel.stateChanged.connect(self.checkBoxTCPRTServer)
+        self.main_widg.tcpStelServChkBox.stateChanged.connect(
             self.checkBoxTCPStel)  # Assign functionality to the checkbox
-        self.mainWin.homePositioncheckBox.stateChanged.connect(self.checkBoxReturnHome)
-        self.mainWin.dishHaultCommandCheckBox.stateChanged.connect(self.checkBoxDishHault)
-        self.mainWin.motorCommandCheckBox.stateChanged.connect(self.checkBoxMotors)
+        self.main_widg.homePositioncheckBox.stateChanged.connect(self.checkBoxReturnHome)
+        self.main_widg.dishHaultCommandCheckBox.stateChanged.connect(self.checkBoxDishHault)
+        self.main_widg.motorCommandCheckBox.stateChanged.connect(self.checkBoxMotors)
 
-        self.mainWin.actionSettings.triggered.connect(self.uiTCPWin.show)  # Show the TCP settings window
-        self.mainWin.actionManual_Control.triggered.connect(self.uiManContWin.show)  # Show the manual control window
-        self.mainWin.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
-        self.mainWin.actionCalibration.triggered.connect(self.uiCalibrationWin.show)
-        self.mainWin.actionPlanetaryObject.triggered.connect(self.uiPlanetaryObjWin.show)
-        self.mainWin.actionSky_Scanning.triggered.connect(self.uiSkyScanningWin.show)
-        self.mainWin.actionSky_Scanning.triggered.connect(self.coordinate_updater)
-        self.mainWin.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
+        self.main_widg.actionSettings.triggered.connect(self.uiTCPWin.show)  # Show the TCP settings window
+        self.main_widg.actionManual_Control.triggered.connect(self.uiManContWin.show)  # Show the manual control window
+        self.main_widg.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
+        self.main_widg.actionCalibration.triggered.connect(self.uiCalibrationWin.show)
+        self.main_widg.actionPlanetaryObject.triggered.connect(self.uiPlanetaryObjWin.show)
+        self.main_widg.actionSky_Scanning.triggered.connect(self.uiSkyScanningWin.show)
+        self.main_widg.actionSky_Scanning.triggered.connect(self.coordinate_updater)
+        self.main_widg.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
 
-        self.mainWin.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
-        self.mainWin.locatChangeBtn.clicked.connect(self.uiLocationWin.show)
-        self.mainWin.onTargetProgress.setVisible(False)  # Have the progrees bar invisible at first
+        self.main_widg.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
+        self.main_widg.locatChangeBtn.clicked.connect(self.uiLocationWin.show)
+        self.main_widg.onTargetProgress.setVisible(False)  # Have the progrees bar invisible at first
 
         # Signal connections
         self.motorsDisabledSig.connect(self.motorsDisabled)
@@ -111,9 +111,9 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.setManContStepsSig.connect(self.manContStepSetter)
 
         # Change between widgets
-        self.mainWin.stellNextPageBtn.clicked.connect(lambda: self.mainWin.stackedWidget.setCurrentIndex(1))
-        self.mainWin.stellPrevPageBtn.clicked.connect(lambda: self.mainWin.stackedWidget.setCurrentIndex(0))
-        self.mainWin.stellariumOperationSelect.currentIndexChanged.connect(self.commandListText)
+        self.main_widg.stellNextPageBtn.clicked.connect(lambda: self.main_widg.stackedWidget.setCurrentIndex(1))
+        self.main_widg.stellPrevPageBtn.clicked.connect(lambda: self.main_widg.stackedWidget.setCurrentIndex(0))
+        self.main_widg.stellariumOperationSelect.currentIndexChanged.connect(self.commandListText)
 
         # Connect the functions on index change for the settings window
         self.tcp_widg.telServBox.currentIndexChanged.connect(self.ipSelectionBoxRPiServer)
@@ -182,42 +182,42 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     # Function called every time the corresponding checkbox is selected
     def checkBoxTCPRTClient(self, state):
         if state == QtCore.Qt.Checked:
-            self.mainWin.connectRadioTBtn.setEnabled(True)  # And also enable the button selection
+            self.main_widg.connectRadioTBtn.setEnabled(True)  # And also enable the button selection
         else:
-            self.mainWin.connectRadioTBtn.setEnabled(False)  # And also disable the button selection
+            self.main_widg.connectRadioTBtn.setEnabled(False)  # And also disable the button selection
 
     # Function called every time the corresponding checkbox is selected
     def checkBoxTCPRTServer(self, state):
         if state == QtCore.Qt.Checked:
-            self.mainWin.serverRPiConnBtn.setEnabled(True)  # And also enable the button selection
+            self.main_widg.serverRPiConnBtn.setEnabled(True)  # And also enable the button selection
         else:
-            self.mainWin.serverRPiConnBtn.setEnabled(False)  # And also disable the button selection
+            self.main_widg.serverRPiConnBtn.setEnabled(False)  # And also disable the button selection
 
     # Function called every time the corresponding checkbox is selected
     def checkBoxTCPStel(self, state):
         if state == QtCore.Qt.Checked:
-            self.mainWin.connectStellariumBtn.setEnabled(True)
+            self.main_widg.connectStellariumBtn.setEnabled(True)
         else:
-            self.mainWin.connectStellariumBtn.setEnabled(False)
+            self.main_widg.connectStellariumBtn.setEnabled(False)
 
     # Function called when the enable/disable checkbox is pressed
     def checkBoxReturnHome(self, state):
         if state == QtCore.Qt.Checked:
-            self.mainWin.homePositionButton.setEnabled(True)
+            self.main_widg.homePositionButton.setEnabled(True)
         else:
-            self.mainWin.homePositionButton.setEnabled(False)
+            self.main_widg.homePositionButton.setEnabled(False)
 
     def checkBoxDishHault(self, state):
         if state == QtCore.Qt.Checked:
-            self.mainWin.stopMovingBtn.setEnabled(True)
+            self.main_widg.stopMovingBtn.setEnabled(True)
         else:
-            self.mainWin.stopMovingBtn.setEnabled(False)
+            self.main_widg.stopMovingBtn.setEnabled(False)
 
     def checkBoxMotors(self, state):
         if state == QtCore.Qt.Checked:
-            self.mainWin.motorCommandButton.setEnabled(True)
+            self.main_widg.motorCommandButton.setEnabled(True)
         else:
-            self.mainWin.motorCommandButton.setEnabled(False)
+            self.main_widg.motorCommandButton.setEnabled(False)
 
     def checkBoxPlanTracking(self, state):
         if state is True:
@@ -233,13 +233,13 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
     # Set the label of the command on change
     def commandListText(self):
-        self.mainWin.commandStellIndLabel.setText(self.mainWin.stellariumOperationSelect.currentText())
-        if self.mainWin.stellariumOperationSelect.currentText() == "Transit":
-            self.mainWin.transitTimeValue.setEnabled(True)
-            self.mainWin.transitTimeLablel.setEnabled(True)
+        self.main_widg.commandStellIndLabel.setText(self.main_widg.stellariumOperationSelect.currentText())
+        if self.main_widg.stellariumOperationSelect.currentText() == "Transit":
+            self.main_widg.transitTimeValue.setEnabled(True)
+            self.main_widg.transitTimeLablel.setEnabled(True)
         else:
-            self.mainWin.transitTimeValue.setEnabled(False)
-            self.mainWin.transitTimeLablel.setEnabled(False)
+            self.main_widg.transitTimeValue.setEnabled(False)
+            self.main_widg.transitTimeLablel.setEnabled(False)
 
     # Change the IP fields according to choice
     def ipSelectionBoxRPiServer(self):
@@ -291,94 +291,94 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     @QtCore.pyqtSlot(str, name='conStellStat')
     def stellTCPGUIHandle(self, data: str):
         if data == "Waiting":
-            self.mainWin.connectStellariumBtn.setText("Stop")  # Change user's selection
-            self.mainWin.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
-            self.mainWin.stellConStatText.setText("<html><head/><body><p><span style=\" "
-                                                  "color:#ffb400;\">Waiting...</span></p></body></html>")
-            self.mainWin.nextPageLabel.setEnabled(False)  # Disable the next page label
-            self.mainWin.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
-            self.mainWin.stackedWidget.setCurrentIndex(0)  # Stay in the same widget
+            self.main_widg.connectStellariumBtn.setText("Stop")  # Change user's selection
+            self.main_widg.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
+            self.main_widg.stellConStatText.setText("<html><head/><body><p><span style=\" "
+                                                    "color:#ffb400;\">Waiting...</span></p></body></html>")
+            self.main_widg.nextPageLabel.setEnabled(False)  # Disable the next page label
+            self.main_widg.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
+            self.main_widg.stackedWidget.setCurrentIndex(0)  # Stay in the same widget
         elif data == "Connected":
-            self.mainWin.connectStellariumBtn.setText("Disable")  # Change user's selection
-            self.mainWin.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
-            self.mainWin.stellConStatText.setText("<html><head/><body><p><span style=\" "
-                                                  "color:#00ff00;\">Connected</span></p></body></html>")
-            self.mainWin.nextPageLabel.setEnabled(True)  # Enable the label to indicate functionality
-            self.mainWin.stellNextPageBtn.setEnabled(True)  # Enable next page transition, since we have a connection
-            self.mainWin.stackedWidget.setCurrentIndex(1)  # Change the widget index since we are connected
+            self.main_widg.connectStellariumBtn.setText("Disable")  # Change user's selection
+            self.main_widg.tcpStelServChkBox.setCheckState(QtCore.Qt.Unchecked)
+            self.main_widg.stellConStatText.setText("<html><head/><body><p><span style=\" "
+                                                    "color:#00ff00;\">Connected</span></p></body></html>")
+            self.main_widg.nextPageLabel.setEnabled(True)  # Enable the label to indicate functionality
+            self.main_widg.stellNextPageBtn.setEnabled(True)  # Enable next page transition, since we have a connection
+            self.main_widg.stackedWidget.setCurrentIndex(1)  # Change the widget index since we are connected
         elif data == "Disconnected":
-            self.mainWin.connectStellariumBtn.setText("Enable")
-            self.mainWin.tcpStelServChkBox.setCheckState(QtCore.Qt.Checked)
-            self.mainWin.stellConStatText.setText("<html><head/><body><p><span style=\" "
-                                                  "color:#ff0000;\">Disconnected</span></p></body></html>")
-            self.mainWin.nextPageLabel.setEnabled(False)  # Disable the next page label
-            self.mainWin.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
-            self.mainWin.stackedWidget.setCurrentIndex(0)
-        self.mainWin.commandStellIndLabel.setText(
-            self.mainWin.stellariumOperationSelect.currentText())  # Set the text initially
-        if self.mainWin.stellariumOperationSelect.currentText() == "Transit":
-            self.mainWin.transitTimeValue.setEnabled(True)
-            self.mainWin.transitTimeLablel.setEnabled(True)
+            self.main_widg.connectStellariumBtn.setText("Enable")
+            self.main_widg.tcpStelServChkBox.setCheckState(QtCore.Qt.Checked)
+            self.main_widg.stellConStatText.setText("<html><head/><body><p><span style=\" "
+                                                    "color:#ff0000;\">Disconnected</span></p></body></html>")
+            self.main_widg.nextPageLabel.setEnabled(False)  # Disable the next page label
+            self.main_widg.stellNextPageBtn.setEnabled(False)  # Disable the button to avoid changing to next page
+            self.main_widg.stackedWidget.setCurrentIndex(0)
+        self.main_widg.commandStellIndLabel.setText(
+            self.main_widg.stellariumOperationSelect.currentText())  # Set the text initially
+        if self.main_widg.stellariumOperationSelect.currentText() == "Transit":
+            self.main_widg.transitTimeValue.setEnabled(True)
+            self.main_widg.transitTimeLablel.setEnabled(True)
         else:
-            self.mainWin.transitTimeValue.setEnabled(False)
-            self.mainWin.transitTimeLablel.setEnabled(False)
+            self.main_widg.transitTimeValue.setEnabled(False)
+            self.main_widg.transitTimeLablel.setEnabled(False)
 
     # Signal handler to show the received data fro Stellarium on the GUI
     @QtCore.pyqtSlot(float, float, name='dataStellShow')
     def stellDataShow(self, ra: float, dec: float):
-        self.mainWin.raPosInd_2.setText("%.5fh" % ra)  # Update the corresponding field
-        self.mainWin.decPosInd_2.setText("%.5f" % dec + u"\u00b0")  # Update the corresponding field
+        self.main_widg.raPosInd_2.setText("%.5fh" % ra)  # Update the corresponding field
+        self.main_widg.decPosInd_2.setText("%.5f" % dec + u"\u00b0")  # Update the corresponding field
 
     # Signal handler to show the status of the TCP client connected to RPi
     @QtCore.pyqtSlot(str, name='conClientStat')
     def clientTCPGUIHandle(self, data: str):
         if data == "Connecting":
-            self.mainWin.connectRadioTBtn.setText("Stop")  # Change user's selection
-            self.mainWin.clientRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
-            self.mainWin.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
-                                                   "color:#ffb400;\">Connecting...</span></p></body></html>")
+            self.main_widg.connectRadioTBtn.setText("Stop")  # Change user's selection
+            self.main_widg.clientRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
+            self.main_widg.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
+                                                     "color:#ffb400;\">Connecting...</span></p></body></html>")
         elif data == "Connected":
-            self.mainWin.connectRadioTBtn.setText("Disconnect")
-            self.mainWin.clientRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
-            self.mainWin.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
-                                                   "color:#00ff00;\">Connected</span></p></body></html>")
+            self.main_widg.connectRadioTBtn.setText("Disconnect")
+            self.main_widg.clientRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
+            self.main_widg.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
+                                                     "color:#00ff00;\">Connected</span></p></body></html>")
         elif data == "Disconnected":
-            self.mainWin.connectRadioTBtn.setText("Connect")  # Change user's selection
-            self.mainWin.clientRPiEnableLabel.setCheckState(QtCore.Qt.Checked)
-            self.mainWin.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
-                                                   "color:#ff0000;\">Disconnected</span></p></body></html>")
+            self.main_widg.connectRadioTBtn.setText("Connect")  # Change user's selection
+            self.main_widg.clientRPiEnableLabel.setCheckState(QtCore.Qt.Checked)
+            self.main_widg.rpiConStatTextInd.setText("<html><head/><body><p><span style=\" "
+                                                     "color:#ff0000;\">Disconnected</span></p></body></html>")
 
     # Signal handler to show the status of the RPi server on the GUI
     @QtCore.pyqtSlot(str, name='conRPiStat')
     def rpiTCPGUIHandle(self, data: str):
         if data == "Waiting":
-            self.mainWin.serverRPiConnBtn.setText("Stop")  # Change user's selection
-            self.mainWin.serverRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
-            self.mainWin.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
-                                                      "color:#ffb400;\">Waiting...</span></p></body></html>")
-            self.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
-                                            "color:#ff0000;\">No</span></p></body></html>")
+            self.main_widg.serverRPiConnBtn.setText("Stop")  # Change user's selection
+            self.main_widg.serverRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
+            self.main_widg.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
+                                                        "color:#ffb400;\">Waiting...</span></p></body></html>")
+            self.main_widg.movTextInd.setText("<html><head/><body><p><span style=\" "
+                                              "color:#ff0000;\">No</span></p></body></html>")
         elif data == "Connected":
-            self.mainWin.serverRPiConnBtn.setText("Disable")
-            self.mainWin.serverRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
-            self.mainWin.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
-                                                      "color:#00ff00;\">Connected</span></p></body></html>")
+            self.main_widg.serverRPiConnBtn.setText("Disable")
+            self.main_widg.serverRPiEnableLabel.setCheckState(QtCore.Qt.Unchecked)
+            self.main_widg.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
+                                                        "color:#00ff00;\">Connected</span></p></body></html>")
         elif data == "Disconnected":
-            self.mainWin.serverRPiConnBtn.setText("Enable")  # Change user's selection
-            self.mainWin.serverRPiEnableLabel.setCheckState(QtCore.Qt.Checked)  # Set the checkbox to checked state
-            self.mainWin.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
-                                                      "color:#ff0000;\">Disconnected</span></p></body></html>")
-            self.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
-                                            "color:#ff0000;\">No</span></p></body></html>")
+            self.main_widg.serverRPiConnBtn.setText("Enable")  # Change user's selection
+            self.main_widg.serverRPiEnableLabel.setCheckState(QtCore.Qt.Checked)  # Set the checkbox to checked state
+            self.main_widg.servForRpiConTextInd.setText("<html><head/><body><p><span style=\" "
+                                                        "color:#ff0000;\">Disconnected</span></p></body></html>")
+            self.main_widg.movTextInd.setText("<html><head/><body><p><span style=\" "
+                                              "color:#ff0000;\">No</span></p></body></html>")
 
     @QtCore.pyqtSlot(float, float, name='posDataShow')
     def posDataShow(self, ra: float, dec: float):
-        self.mainWin.raPosInd.setText("%.5fh" % ra)  # Show the RA of the dish on the GUI
-        self.mainWin.decPosInd.setText("%.5f" % dec + u"\u00b0")  # Show the declination of the dish on the GUI
+        self.main_widg.raPosInd.setText("%.5fh" % ra)  # Show the RA of the dish on the GUI
+        self.main_widg.decPosInd.setText("%.5f" % dec + u"\u00b0")  # Show the declination of the dish on the GUI
 
     @QtCore.pyqtSlot(float, name='moveProgress')
     def moveProgress(self, percent: float):
-        self.mainWin.onTargetProgress.setValue(percent)  # Set the percentage of the progress according to position
+        self.main_widg.onTargetProgress.setValue(percent)  # Set the percentage of the progress according to position
 
     @QtCore.pyqtSlot(name='motorsDisabledUISignal')
     def motorsDisabled(self):
@@ -400,29 +400,29 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         if command == "OK":
             self.tcp_widg.clientStatus.setText("OK")  # Set the response if the client responded correctly
         elif command == "STOPPED_MOVING":
-            self.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
-                                            "color:#ff0000;\">No</span></p></body></html>")
-            self.mainWin.onTargetProgress.setVisible(False)  # Make the progress bar invisible
-        elif command == "STARTED_MOVING":
-            self.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
-                                            "color:#00ff00;\">Yes</span></p></body></html>")
-            self.mainWin.onTargetProgress.setVisible(True)  # Make the progress bar visible
-        elif command == "TRACKING_STARTED":
-            self.mainWin.trackTextInd.setText("<html><head/><body><p><span style=\" "
-                                              "color:#00ff00;\">Yes</span></p></body></html>")
-        elif command == "TRACKING_STOPPED":
-            self.mainWin.trackTextInd.setText("<html><head/><body><p><span style=\" "
+            self.main_widg.movTextInd.setText("<html><head/><body><p><span style=\" "
                                               "color:#ff0000;\">No</span></p></body></html>")
+            self.main_widg.onTargetProgress.setVisible(False)  # Make the progress bar invisible
+        elif command == "STARTED_MOVING":
+            self.main_widg.movTextInd.setText("<html><head/><body><p><span style=\" "
+                                              "color:#00ff00;\">Yes</span></p></body></html>")
+            self.main_widg.onTargetProgress.setVisible(True)  # Make the progress bar visible
+        elif command == "TRACKING_STARTED":
+            self.main_widg.trackTextInd.setText("<html><head/><body><p><span style=\" "
+                                                "color:#00ff00;\">Yes</span></p></body></html>")
+        elif command == "TRACKING_STOPPED":
+            self.main_widg.trackTextInd.setText("<html><head/><body><p><span style=\" "
+                                                "color:#ff0000;\">No</span></p></body></html>")
         elif command == "MOTORS_ENABLED":
-            self.mainWin.motorStatusText.setText("<html><head/><body><p><span style=\" "
-                                                 "color:#00ff00;\">Enabled</span></p></body></html>")
-            self.mainWin.motorCommandButton.setText("Disable")
-            self.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Unchecked)
+            self.main_widg.motorStatusText.setText("<html><head/><body><p><span style=\" "
+                                                   "color:#00ff00;\">Enabled</span></p></body></html>")
+            self.main_widg.motorCommandButton.setText("Disable")
+            self.main_widg.motorCommandCheckBox.setCheckState(QtCore.Qt.Unchecked)
         elif command == "MOTORS_DISABLED":
-            self.mainWin.motorStatusText.setText("<html><head/><body><p><span style=\" "
-                                                 "color:#ff0000;\">Disabled</span></p></body></html>")
-            self.mainWin.motorCommandButton.setText("Enable")
-            self.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Checked)
+            self.main_widg.motorStatusText.setText("<html><head/><body><p><span style=\" "
+                                                   "color:#ff0000;\">Disabled</span></p></body></html>")
+            self.main_widg.motorCommandButton.setText("Enable")
+            self.main_widg.motorCommandCheckBox.setCheckState(QtCore.Qt.Checked)
             self.motorsDisabled()  # Call the disabled motors function
 
     @QtCore.pyqtSlot(str, str, name='setManContSteps')
@@ -532,7 +532,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
     # Show current date and time on the GUI
     def dateTime(self):
-        self.mainWin.dateAndTimeLabel.setText(QtCore.QDateTime.currentDateTimeUtc().toString())
+        self.main_widg.dateAndTimeLabel.setText(QtCore.QDateTime.currentDateTimeUtc().toString())
 
     # Show the main GUI
     def show_application(self):
