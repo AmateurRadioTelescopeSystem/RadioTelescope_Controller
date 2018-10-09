@@ -145,42 +145,17 @@ class OpHandler(QtCore.QObject):
         :param data: Data received from the client
         :return:
         """
-        if data == "OK":
-            self.ui.uiTCPWin.clientStatus.setText("OK")  # Set the response if the client responded correctly
-        elif data == "STOPPED_MOVING":
-            self.ui.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
-                                               "color:#ff0000;\">No</span></p></body></html>")
-            self.ui.mainWin.onTargetProgress.setVisible(False)  # Make the progress bar invisible
-        elif data == "STARTED_MOVING":
-            self.ui.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
-                                               "color:#00ff00;\">Yes</span></p></body></html>")
-            self.ui.mainWin.onTargetProgress.setVisible(True)  # Make the progress bar visible
-        elif data == "TRACKING_STARTED":
-            self.ui.mainWin.trackTextInd.setText("<html><head/><body><p><span style=\" "
-                                                 "color:#00ff00;\">Yes</span></p></body></html>")
-        elif data == "TRACKING_STOPPED":
-            self.ui.mainWin.trackTextInd.setText("<html><head/><body><p><span style=\" "
-                                                 "color:#ff0000;\">No</span></p></body></html>")
-        elif data == "MOTORS_ENABLED":
+        if data == "MOTORS_ENABLED":
             self.motors_enabled = True
-            self.ui.mainWin.motorStatusText.setText("<html><head/><body><p><span style=\" "
-                                                    "color:#00ff00;\">Enabled</span></p></body></html>")
-            self.ui.mainWin.motorCommandButton.setText("Disable")
-            self.ui.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Unchecked)
         elif data == "MOTORS_DISABLED":
             self.motors_enabled = False
-            self.ui.mainWin.motorStatusText.setText("<html><head/><body><p><span style=\" "
-                                                    "color:#ff0000;\">Disabled</span></p></body></html>")
-            self.ui.mainWin.motorCommandButton.setText("Enable")
-            self.ui.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Checked)
-            self.ui.motorsDisabledSig.emit()  # Show the warning window when motors are disabled
         else:
             splt_str = data.split("_")  # Try to split the string, and if it splits then a command is sent
             if len(splt_str) > 0:
                 if splt_str[0] == "STEPS-FROM-HOME":
                     self.cfgData.setHomeSteps(splt_str[1], splt_str[2])  # Set the current away from home position steps
-                    self.ui.uiManContWin.raStepText.setText(splt_str[1])
-                    self.ui.uiManContWin.decStepText.setText(splt_str[2])
+                    self.ui.setManContStepsSig.emit("RA", splt_str[1])
+                    self.ui.setManContStepsSig.emit("DEC", splt_str[2])
                 elif splt_str[0] == "MAX-STEPS-TO-DO":
                     if splt_str[1] == "RA":
                         self.max_steps_to_targ_ra = int(splt_str[2])
@@ -190,6 +165,8 @@ class OpHandler(QtCore.QObject):
                         self.max_steps_to_targ_ra = 0
             else:
                 self.logD.debug("Data received from client (Connected to remote RPi server): %s" % data)
+        if type(data) is str:
+            self.ui.setGUIFromClientSig.emit(data)  # If it is not split yet, send the command
 
     @QtCore.pyqtSlot(list, name='clientCommandSendStell')
     def stellCommSend(self, radec: list):
@@ -238,8 +215,8 @@ class OpHandler(QtCore.QObject):
             dec_degrees = spltData[4]  # Get the DEC from the received position
             ra_steps = spltData[7]
             dec_steps = spltData[9]
-            self.ui.uiManContWin.raStepText.setText(ra_steps)  # Update the manual control window
-            self.ui.uiManContWin.decStepText.setText(dec_steps)  # Update the manual control window
+            self.ui.setManContStepsSig.emit("RA", ra_steps)  # Update the manual control window
+            self.ui.setManContStepsSig.emit("DEC", dec_steps)
             self.tcpStellarium.sendDataStell.emit(float(ra_degrees)/15.0, float(dec_degrees))
             self.posDataShow.emit(float(ra_degrees)/15.0, float(dec_degrees))
 
@@ -509,41 +486,7 @@ class OpHandler(QtCore.QObject):
                     self.ui.uiSkyScanningWin.point3Coord_2Field.text(), )
         point_4 = (self.ui.uiSkyScanningWin.point4Coord_1Field.text(),
                     self.ui.uiSkyScanningWin.point4Coord_2Field.text(), )
-
-        # Make boxes red wherever there is no input
-        if point_1[0] == "":
-            self.ui.uiSkyScanningWin.point1Coord_1Field.setStyleSheet("border: 1px solid red")
-        else:
-            self.ui.uiSkyScanningWin.point1Coord_1Field.setStyleSheet("")
-        if point_2[0] == "":
-            self.ui.uiSkyScanningWin.point2Coord_1Field.setStyleSheet("border: 1px solid red")
-        else:
-            self.ui.uiSkyScanningWin.point2Coord_1Field.setStyleSheet("")
-        if point_3[0] == "":
-            self.ui.uiSkyScanningWin.point3Coord_1Field.setStyleSheet("border: 1px solid red")
-        else:
-            self.ui.uiSkyScanningWin.point3Coord_1Field.setStyleSheet("")
-        if point_4[0] == "":
-            self.ui.uiSkyScanningWin.point4Coord_1Field.setStyleSheet("border: 1px solid red")
-        else:
-            self.ui.uiSkyScanningWin.point4Coord_1Field.setStyleSheet("")
-
-        if point_1[1] == "":
-            self.ui.uiSkyScanningWin.point1Coord_2Field.setStyleSheet("border: 1px solid red")
-        else:
-            self.ui.uiSkyScanningWin.point1Coord_2Field.setStyleSheet("")
-        if point_2[1] == "":
-            self.ui.uiSkyScanningWin.point2Coord_2Field.setStyleSheet("border: 1px solid red")
-        else:
-            self.ui.uiSkyScanningWin.point2Coord_2Field.setStyleSheet("")
-        if point_3[1] == "":
-            self.ui.uiSkyScanningWin.point3Coord_2Field.setStyleSheet("border: 1px solid red")
-        else:
-            self.ui.uiSkyScanningWin.point3Coord_2Field.setStyleSheet("")
-        if point_4[1] == "":
-            self.ui.uiSkyScanningWin.point4Coord_2Field.setStyleSheet("border: 1px solid red")
-        else:
-            self.ui.uiSkyScanningWin.point4Coord_2Field.setStyleSheet("")
+        self.ui.setStyleSkyScanningSig.emit((point_1, point_2, point_3, point_4, ))
 
         check_1 = point_1[0] != "" and point_1[1] != "" and point_2[0] != "" and point_2[1] != ""
         check_2 = point_3[0] != "" and point_3[1] != "" and point_4[0] != "" and point_4[1] != ""
@@ -693,6 +636,3 @@ class OpHandler(QtCore.QObject):
         self.simHandler.deleteLater()
         self.simThread.deleteLater()
         self.logD.debug("Simulation handler thread is closed.")
-
-    def datePrint(self):
-        print(self.ui.uiSkyScanningWin.epochDateSelection.date().toString("yyyy/MM/dd"))
