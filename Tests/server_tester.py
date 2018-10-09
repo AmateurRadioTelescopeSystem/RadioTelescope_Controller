@@ -1,5 +1,6 @@
 import socket
 import sys
+import time
 
 
 serverAddress = ('127.0.0.1', 10001)
@@ -11,13 +12,13 @@ try:
 except Exception as e:
     print("****Server Tester****")
     print("Can not bind to port. %s" % e, file=sys.stderr)
-    print("*********************")
+    print("*********************\n")
 
 sock.settimeout(10)  # Add a timeout timer for 10 seconds
 sock.listen(1)  # Set the socket to listen
 print("****Server Tester****")
 print("Waiting for connection...")
-print("*********************")
+print("*********************\n")
 
 connected = False
 
@@ -28,12 +29,12 @@ try:
             connected = True
             print("****Server Tester****")
             print("Successfully connected with %s:%s" % (clientAddress[0], clientAddress[1]))
-            print("*********************")
+            print("*********************\n")
             break
 except Exception as e:
     print("****Server Tester****")
     print("Failed to establish a connection. %s" % e)
-    print("*********************")
+    print("*********************\n")
 cldisc = False
 
 while True:
@@ -41,7 +42,7 @@ while True:
         try:
             print("****Server Tester****")
             print("Waiting for connection...")
-            print("*********************")
+            print("*********************\n")
             while True:
                 connection, clientAddress = sock.accept()
                 if connection is not None:
@@ -49,12 +50,12 @@ while True:
                     cldisc = False
                     print("****Server Tester****")
                     print("Successfully connected with %s:%s" % (clientAddress[0], clientAddress[1]))
-                    print("*********************")
+                    print("*********************\n")
                     break
         except Exception as e:
             print("****Server Tester****")
             print("Failed to establish a connection. %s" % e)
-            print("*********************")
+            print("*********************\n")
             break
     else:
         rec = ""
@@ -64,6 +65,7 @@ while True:
         if len(rec) > 0:
             print("****Server Tester****")
             print(rec)
-            print("*********************")
+            print("*********************\n")
+            time.sleep(0.2)  # Wait a bit before closing
             connection.close()
             break
