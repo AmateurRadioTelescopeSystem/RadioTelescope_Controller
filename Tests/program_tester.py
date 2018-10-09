@@ -5,7 +5,7 @@ import os
 
 sys.path.append(os.path.abspath('Core/'))
 
-from PyQt5 import QtWidgets, QtCore, QtTest
+from PyQt5 import QtWidgets, QtCore, QtTest, QtNetwork
 from GUI import UInterface
 from Handlers import OperationHandler
 from Client import ClientThread
@@ -129,18 +129,22 @@ def main():
 
     ui.show_application()  # Render and show the GUI main window and start the application
 
-    if QtTest.QTest.qWaitForWindowExposed(ui.mainWin):
-        tcpClientThread.quit()
-        tcpClientThread.wait()
-        tcpServerThread.quit()
-        tcpServerThread.wait()
-        tcpStellThread.quit()
-        tcpStellThread.wait()
-        operHandlerThread.quit()
-        operHandlerThread.wait()
-        sys.exit(0)
+    window_show = QtTest.QTest.qWaitForWindowExposed(ui.mainWin)
+    client_connected = (tcpClient.sock.state() == QtNetwork.QAbstractSocket.ConnectedState)
 
-    sys.exit(app.exec_())  # Execute the app until exit is selected
+    if window_show and client_connected:
+        exit_code = 0  # Successful test
+    else:
+        exit_code = -1  # Indicate some error
+    tcpClientThread.quit()
+    tcpClientThread.wait()
+    tcpServerThread.quit()
+    tcpServerThread.wait()
+    tcpStellThread.quit()
+    tcpStellThread.wait()
+    operHandlerThread.quit()
+    operHandlerThread.wait()
+    sys.exit(exit_code)
 
 
 if __name__ == '__main__':
