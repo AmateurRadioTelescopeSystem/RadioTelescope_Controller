@@ -116,13 +116,13 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.stellariumOperationSelect.currentIndexChanged.connect(self.commandListText)
 
         # Connect the functions on index change for the settings window
-        self.uiTCPWin.telServBox.currentIndexChanged.connect(self.ipSelectionBoxRPiServer)
-        self.uiTCPWin.telClientBox.currentIndexChanged.connect(self.ipSelectionBoxClient)
-        self.uiTCPWin.stellIPServBox.currentIndexChanged.connect(self.ipSelectionBoxStellServer)
+        self.tcp_widg.telServBox.currentIndexChanged.connect(self.ipSelectionBoxRPiServer)
+        self.tcp_widg.telClientBox.currentIndexChanged.connect(self.ipSelectionBoxClient)
+        self.tcp_widg.stellIPServBox.currentIndexChanged.connect(self.ipSelectionBoxStellServer)
 
         # Make connections for the location settings dialog
-        self.uiLocationWin.exitBtn.clicked.connect(self.uiLocationWin.close)  # Close the settings window when requested
-        self.uiLocationWin.locationTypeChoose.currentIndexChanged.connect(self.showMapSelection)
+        self.loc_widg.exitBtn.clicked.connect(self.uiLocationWin.close)  # Close the settings window when requested
+        self.loc_widg.locationTypeChoose.currentIndexChanged.connect(self.showMapSelection)
 
         # Make the webview widget for the map
         # Disabled for the moment because it gives an error on Ubuntu
@@ -136,36 +136,48 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         # Create validators for the TCP port settings entries
         ipPortValidator = QtGui.QIntValidator()  # Create an integer validator
         ipPortValidator.setRange(1025, 65535)  # Set the validator range (lower than 1024 usually they are taken)
-        self.uiTCPWin.telescopeIPPortServ.setValidator(ipPortValidator)
-        self.uiTCPWin.telescopeIPPortClient.setValidator(ipPortValidator)
-        self.uiTCPWin.stellPortServ.setValidator(ipPortValidator)
+        self.tcp_widg.telescopeIPPortServ.setValidator(ipPortValidator)
+        self.tcp_widg.telescopeIPPortClient.setValidator(ipPortValidator)
+        self.tcp_widg.stellPortServ.setValidator(ipPortValidator)
 
         # Create validators for the TCP IP settings entries
         ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])"  # A regular expression for one numeric IP part
         ipAddrRegEx = QtCore.QRegExp("^" + ipRange + "\\." + ipRange + "\\." + ipRange + "\\." + ipRange + "$")
         ipAddrRegEx = QtGui.QRegExpValidator(ipAddrRegEx)  # Regular expression validator object
-        self.uiTCPWin.telescopeIPAddrServ.setValidator(ipAddrRegEx)
-        self.uiTCPWin.telescopeIPAddrClient.setValidator(ipAddrRegEx)
-        self.uiTCPWin.stellServInpIP.setValidator(ipAddrRegEx)
+        self.tcp_widg.telescopeIPAddrServ.setValidator(ipAddrRegEx)
+        self.tcp_widg.telescopeIPAddrClient.setValidator(ipAddrRegEx)
+        self.tcp_widg.stellServInpIP.setValidator(ipAddrRegEx)
 
         # Location settings dialog input fields validation declaration
         locValidator = QtGui.QDoubleValidator()  # Create a double validator object
         locValidator.setDecimals(5)
-        self.uiLocationWin.latEntry.setValidator(locValidator)  # locValidator.setRange(-90.0, 90.0, 5)
-        self.uiLocationWin.lonEntry.setValidator(locValidator)  # locValidator.setRange(-180.0, 180.0, 5)
-        self.uiLocationWin.altEntry.setValidator(locValidator)  # locValidator.setRange(0.0, 7000.0, 2)
+        self.loc_widg.latEntry.setValidator(locValidator)  # locValidator.setRange(-90.0, 90.0, 5)
+        self.loc_widg.lonEntry.setValidator(locValidator)  # locValidator.setRange(-180.0, 180.0, 5)
+        self.loc_widg.altEntry.setValidator(locValidator)  # locValidator.setRange(0.0, 7000.0, 2)
 
         # Planetary object action window
-        self.uiPlanetaryObjWin.planObjectTransitGroupBox.toggled.connect(self.checkBoxPlanTransit)
-        self.uiPlanetaryObjWin.planObjectTrackingGroupBox.toggled.connect(self.checkBoxPlanTracking)
+        self.plan_obj_win.planObjectTransitGroupBox.toggled.connect(self.checkBoxPlanTransit)
+        self.plan_obj_win.planObjectTrackingGroupBox.toggled.connect(self.checkBoxPlanTracking)
 
-        self.uiSkyScanningWin.mapLayoutBox.setTabEnabled(1, False)  # Disable the tab at first
-        self.uiSkyScanningWin.coordinateSystemComboBx.currentTextChanged.connect(self.coordinate_updater)
-        self.uiSkyScanningWin.simulateScanningChk.toggled.connect(self.simEnabler)
-        self.uiSkyScanningWin.listPointsCheckBox.toggled.connect(
-            partial(self.uiSkyScanningWin.mapLayoutBox.setTabEnabled, 1))
-        self.uiSkyScanningWin.simSpeedLabel.setVisible(False)
-        self.uiSkyScanningWin.simSpeedValue.setVisible(False)
+        self.sky_scan_win.mapLayoutBox.setTabEnabled(1, False)  # Disable the tab at first
+        self.sky_scan_win.coordinateSystemComboBx.currentTextChanged.connect(self.coordinate_updater)
+        self.sky_scan_win.simulateScanningChk.toggled.connect(self.simEnabler)
+        self.sky_scan_win.listPointsCheckBox.toggled.connect(
+            partial(self.sky_scan_win.mapLayoutBox.setTabEnabled, 1))
+        self.sky_scan_win.simSpeedLabel.setVisible(False)
+        self.sky_scan_win.simSpeedValue.setVisible(False)
+
+        # Validate coordinate entry fields
+        double_validator = QtGui.QDoubleValidator(-360.0, 360.0, 6)
+        double_validator.setNotation(QtGui.QDoubleValidator.StandardNotation)
+        self.sky_scan_win.point1Coord_1Field.setValidator(double_validator)
+        self.sky_scan_win.point1Coord_2Field.setValidator(double_validator)
+        self.sky_scan_win.point2Coord_1Field.setValidator(double_validator)
+        self.sky_scan_win.point2Coord_2Field.setValidator(double_validator)
+        self.sky_scan_win.point3Coord_1Field.setValidator(double_validator)
+        self.sky_scan_win.point3Coord_2Field.setValidator(double_validator)
+        self.sky_scan_win.point4Coord_1Field.setValidator(double_validator)
+        self.sky_scan_win.point4Coord_2Field.setValidator(double_validator)
 
     # Function called every time the corresponding checkbox is selected
     def checkBoxTCPRTClient(self, state):
@@ -209,15 +221,15 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
     def checkBoxPlanTracking(self, state):
         if state is True:
-            self.uiPlanetaryObjWin.planObjectTransitGroupBox.setChecked(False)
+            self.plan_obj_win.planObjectTransitGroupBox.setChecked(False)
         else:
-            self.uiPlanetaryObjWin.planObjectTransitGroupBox.setChecked(True)
+            self.plan_obj_win.planObjectTransitGroupBox.setChecked(True)
 
     def checkBoxPlanTransit(self, state):
         if state is True:
-            self.uiPlanetaryObjWin.planObjectTrackingGroupBox.setChecked(False)
+            self.plan_obj_win.planObjectTrackingGroupBox.setChecked(False)
         else:
-            self.uiPlanetaryObjWin.planObjectTrackingGroupBox.setChecked(True)
+            self.plan_obj_win.planObjectTrackingGroupBox.setChecked(True)
 
     # Set the label of the command on change
     def commandListText(self):
@@ -231,39 +243,39 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
     # Change the IP fields according to choice
     def ipSelectionBoxRPiServer(self):
-        stat = self.uiTCPWin.telServBox.currentText()
+        stat = self.tcp_widg.telServBox.currentText()
         if stat == "Localhost":
-            self.uiTCPWin.telescopeIPAddrServ.setText("127.0.0.1")
-            self.uiTCPWin.telescopeIPAddrServ.setEnabled(False)
+            self.tcp_widg.telescopeIPAddrServ.setText("127.0.0.1")
+            self.tcp_widg.telescopeIPAddrServ.setEnabled(False)
         elif stat == "Remote":
-            self.uiTCPWin.telescopeIPAddrServ.setEnabled(False)
+            self.tcp_widg.telescopeIPAddrServ.setEnabled(False)
         elif stat == "Custom":
-            self.uiTCPWin.telescopeIPAddrServ.setEnabled(True)
+            self.tcp_widg.telescopeIPAddrServ.setEnabled(True)
 
     def ipSelectionBoxClient(self):
-        if self.uiTCPWin.telClientBox.currentText() == "Remote":
-            self.uiTCPWin.telescopeIPAddrClient.setEnabled(True)
-            # self.uiTCPWin.telescopeIPAddrClient.setText("")
+        if self.tcp_widg.telClientBox.currentText() == "Remote":
+            self.tcp_widg.telescopeIPAddrClient.setEnabled(True)
+            # self.tcp_widg.telescopeIPAddrClient.setText("")
         else:
-            self.uiTCPWin.telescopeIPAddrClient.setEnabled(False)
-            self.uiTCPWin.telescopeIPAddrClient.setText("127.0.0.1")
+            self.tcp_widg.telescopeIPAddrClient.setEnabled(False)
+            self.tcp_widg.telescopeIPAddrClient.setText("127.0.0.1")
 
     def ipSelectionBoxStellServer(self):
-        if self.uiTCPWin.stellIPServBox.currentText() == "Localhost":
-            self.uiTCPWin.stellServInpIP.setText("127.0.0.1")
+        if self.tcp_widg.stellIPServBox.currentText() == "Localhost":
+            self.tcp_widg.stellServInpIP.setText("127.0.0.1")
         # else:
-            # self.uiTCPWin.stellServInpIP.setText("")
+            # self.tcp_widg.stellServInpIP.setText("")
 
     def showMapSelection(self):
-        if self.uiLocationWin.locationTypeChoose.currentText() == "Google Maps":
-            self.uiLocationWin.latEntry.setEnabled(False)
-            self.uiLocationWin.lonEntry.setEnabled(False)
-            self.uiLocationWin.altEntry.setEnabled(False)
+        if self.loc_widg.locationTypeChoose.currentText() == "Google Maps":
+            self.loc_widg.latEntry.setEnabled(False)
+            self.loc_widg.lonEntry.setEnabled(False)
+            self.loc_widg.altEntry.setEnabled(False)
             self.mapDialog.show()
         else:
-            self.uiLocationWin.latEntry.setEnabled(True)
-            self.uiLocationWin.lonEntry.setEnabled(True)
-            self.uiLocationWin.altEntry.setEnabled(True)
+            self.loc_widg.latEntry.setEnabled(True)
+            self.loc_widg.lonEntry.setEnabled(True)
+            self.loc_widg.altEntry.setEnabled(True)
 
     # Handle the motion stop request
     def stopMotion(self, objec):
@@ -386,7 +398,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     @QtCore.pyqtSlot(str, name='setTheGUIFromClient')
     def setGUIFromClientCommand(self, command: str):
         if command == "OK":
-            self.uiTCPWin.clientStatus.setText("OK")  # Set the response if the client responded correctly
+            self.tcp_widg.clientStatus.setText("OK")  # Set the response if the client responded correctly
         elif command == "STOPPED_MOVING":
             self.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
                                             "color:#ff0000;\">No</span></p></body></html>")
@@ -458,43 +470,65 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.sky_scan_win.point4Coord_2Field.setStyleSheet("")
 
     def coordinate_updater(self, system: str):
-        if type(system) is not type(""):
-            system = self.uiSkyScanningWin.coordinateSystemComboBx.currentText()
+        if type(system) is not str:
+            system = self.sky_scan_win.coordinateSystemComboBx.currentText()
         coord_1 = "<html><head/><body><p><span style=\" font-weight:600;\">%s</span></p></body></html>"
         coord_2 = "<html><head/><body><p><span style=\" font-weight:600;\">%s</span></p></body></html>"
+
+        # Create coordinate field validator object
+        validator_coord_1 = QtGui.QDoubleValidator()
+        validator_coord_2 = QtGui.QDoubleValidator()
+        validator_coord_1.setNotation(QtGui.QDoubleValidator.StandardNotation)
+        validator_coord_2.setNotation(QtGui.QDoubleValidator.StandardNotation)
 
         if system == "Horizontal":
             coord_1 = coord_1 % "Alt: "
             coord_2 = coord_2 % "Az:  "
+            validator_coord_1.setRange(0.0, 90.0, 6)
+            validator_coord_2.setRange(0.0, 360.0, 6)
         elif system == "Equatorial":
             coord_1 = coord_1 % "RA:  "
             coord_2 = coord_2 % "DEC: "
+            validator_coord_1.setRange(0.0, 360.0, 6)
+            validator_coord_2.setRange(0.0, 360.0, 6)
         elif system == "Galactic":
             coord_1 = coord_1 % "Lat: "
             coord_2 = coord_2 % "Lon: "
+            validator_coord_1.setRange(-90.0, 90.0, 6)
+            validator_coord_2.setRange(0.0, 360.0, 6)
         elif system == "Ecliptical":
             coord_1 = coord_1 % "Lat: "
             coord_2 = coord_2 % "Lon: "
+            validator_coord_1.setRange(-90.0, 90.0, 6)
+            validator_coord_2.setRange(0.0, 360.0, 6)
 
         # Set first coordinate of the system
-        self.uiSkyScanningWin.point1Coord_1Label.setText(coord_1)
-        self.uiSkyScanningWin.point2Coord_1Label.setText(coord_1)
-        self.uiSkyScanningWin.point3Coord_1Label.setText(coord_1)
-        self.uiSkyScanningWin.point4Coord_1Label.setText(coord_1)
-        self.uiSkyScanningWin.stepSizeCoord1.setText(coord_1)
+        self.sky_scan_win.point1Coord_1Label.setText(coord_1)
+        self.sky_scan_win.point1Coord_1Field.setValidator(validator_coord_1)
+        self.sky_scan_win.point2Coord_1Label.setText(coord_1)
+        self.sky_scan_win.point2Coord_1Field.setValidator(validator_coord_1)
+        self.sky_scan_win.point3Coord_1Label.setText(coord_1)
+        self.sky_scan_win.point3Coord_1Field.setValidator(validator_coord_1)
+        self.sky_scan_win.point4Coord_1Label.setText(coord_1)
+        self.sky_scan_win.point3Coord_1Field.setValidator(validator_coord_1)
+        self.sky_scan_win.stepSizeCoord1.setText(coord_1)
 
         # Set the second coordinate of the system
-        self.uiSkyScanningWin.point1Coord_2Label.setText(coord_2)
-        self.uiSkyScanningWin.point2Coord_2Label.setText(coord_2)
-        self.uiSkyScanningWin.point3Coord_2Label.setText(coord_2)
-        self.uiSkyScanningWin.point4Coord_2Label.setText(coord_2)
-        self.uiSkyScanningWin.stepSizeCoord2.setText(coord_2)
+        self.sky_scan_win.point1Coord_2Label.setText(coord_2)
+        self.sky_scan_win.point1Coord_2Field.setValidator(validator_coord_2)
+        self.sky_scan_win.point2Coord_2Label.setText(coord_2)
+        self.sky_scan_win.point2Coord_2Field.setValidator(validator_coord_2)
+        self.sky_scan_win.point3Coord_2Label.setText(coord_2)
+        self.sky_scan_win.point3Coord_2Field.setValidator(validator_coord_2)
+        self.sky_scan_win.point4Coord_2Label.setText(coord_2)
+        self.sky_scan_win.point4Coord_2Field.setValidator(validator_coord_2)
+        self.sky_scan_win.stepSizeCoord2.setText(coord_2)
 
     def simEnabler(self, state: bool):
         if state is True:
-            self.uiSkyScanningWin.calculateScanMapBtn.setText("Simulate")
+            self.sky_scan_win.calculateScanMapBtn.setText("Simulate")
         else:
-            self.uiSkyScanningWin.calculateScanMapBtn.setText("Calculate")
+            self.sky_scan_win.calculateScanMapBtn.setText("Calculate")
 
     # Show current date and time on the GUI
     def dateTime(self):
