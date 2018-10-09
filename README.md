@@ -7,7 +7,7 @@
 </p>
 
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/dimst23/RadioTelescope_Controller.svg?style=plastic)
-![Travis (.org) branch](https://img.shields.io/travis/dimst23/RadioTelescope_Controller/master.svg?style=plastic)
+[![Build Status](https://img.shields.io/travis/dimst23/RadioTelescope_Controller/master.svg?style=plastic)](https://travis-ci.org/dimst23/RadioTelescope_Controller)
 
 Below you will find installation instructions to get the controller up and running on your own system.
 This installation information are not the final ones, since more packages may be used and/or a different approach will be used.
