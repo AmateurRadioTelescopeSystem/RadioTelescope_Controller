@@ -1,6 +1,6 @@
 # Radio Telescope Controller Software #
 
-[![AUR](https://img.shields.io/aur/license/yaourt.svg?style=plastic)](https://github.com/dimst23/RadioTelescope_Controller/blob/master/LICENSE)
+ [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg?style=plastic)](https://github.com/dimst23/RadioTelescope_Controller/blob/master/LICENSE)
 <p align="center">
 <img src="http://www.marysrosaries.com/collaboration/images/0/0b/Radio_Telescope_3_%28PSF%29.png" width="35%" />
 </p>
