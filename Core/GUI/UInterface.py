@@ -12,6 +12,9 @@ import os
 class Ui_RadioTelescopeControl(QtCore.QObject):
     stopMovingRTSig = QtCore.pyqtSignal(name='stopRadioTele')  # Signal to stop dish's motion
     motorsDisabledSig = QtCore.pyqtSignal(name='motorsDisabledUISignal')
+    setGUIFromClientSig = QtCore.pyqtSignal(str, name='setTheGUIFromClient')
+    setManContStepsSig = QtCore.pyqtSignal(str, str, name='setManContSteps')
+    setStyleSkyScanningSig = QtCore.pyqtSignal(tuple, name='setStylesheetForSkyScanning')
 
     def __init__(self, parent=None):
         super(Ui_RadioTelescopeControl, self).__init__(parent)
@@ -100,7 +103,12 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mainWin.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
         self.mainWin.locatChangeBtn.clicked.connect(self.uiLocationWin.show)
         self.mainWin.onTargetProgress.setVisible(False)  # Have the progrees bar invisible at first
+
+        # Signal connections
         self.motorsDisabledSig.connect(self.motorsDisabled)
+        self.setGUIFromClientSig.connect(self.setGUIFromClientCommand)
+        self.setStyleSkyScanningSig.connect(self.styleSetterSkyScan)
+        self.setManContStepsSig.connect(self.manContStepSetter)
 
         # Change between widgets
         self.mainWin.stellNextPageBtn.clicked.connect(lambda: self.mainWin.stackedWidget.setCurrentIndex(1))
@@ -374,6 +382,80 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                         QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
             msg.show()  # Show the message to the user
             self.motor_warn_msg_shown = False  # It gets here only after the window is closed
+
+    @QtCore.pyqtSlot(str, name='setTheGUIFromClient')
+    def setGUIFromClientCommand(self, command: str):
+        if command == "OK":
+            self.uiTCPWin.clientStatus.setText("OK")  # Set the response if the client responded correctly
+        elif command == "STOPPED_MOVING":
+            self.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
+                                            "color:#ff0000;\">No</span></p></body></html>")
+            self.mainWin.onTargetProgress.setVisible(False)  # Make the progress bar invisible
+        elif command == "STARTED_MOVING":
+            self.mainWin.movTextInd.setText("<html><head/><body><p><span style=\" "
+                                            "color:#00ff00;\">Yes</span></p></body></html>")
+            self.mainWin.onTargetProgress.setVisible(True)  # Make the progress bar visible
+        elif command == "TRACKING_STARTED":
+            self.mainWin.trackTextInd.setText("<html><head/><body><p><span style=\" "
+                                              "color:#00ff00;\">Yes</span></p></body></html>")
+        elif command == "TRACKING_STOPPED":
+            self.mainWin.trackTextInd.setText("<html><head/><body><p><span style=\" "
+                                              "color:#ff0000;\">No</span></p></body></html>")
+        elif command == "MOTORS_ENABLED":
+            self.mainWin.motorStatusText.setText("<html><head/><body><p><span style=\" "
+                                                 "color:#00ff00;\">Enabled</span></p></body></html>")
+            self.mainWin.motorCommandButton.setText("Disable")
+            self.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Unchecked)
+        elif command == "MOTORS_DISABLED":
+            self.mainWin.motorStatusText.setText("<html><head/><body><p><span style=\" "
+                                                 "color:#ff0000;\">Disabled</span></p></body></html>")
+            self.mainWin.motorCommandButton.setText("Enable")
+            self.mainWin.motorCommandCheckBox.setCheckState(QtCore.Qt.Checked)
+            self.motorsDisabled()  # Call the disabled motors function
+
+    @QtCore.pyqtSlot(str, str, name='setManContSteps')
+    def manContStepSetter(self, axis: str, steps: str):
+        if axis == "RA":
+            self.man_cn_widg.raStepText.setText(steps)  # Update the manual control window
+        elif axis == "DEC":
+            self.man_cn_widg.decStepText.setText(steps)
+
+    @QtCore.pyqtSlot(tuple, name='setStylesheetForSkyScanning')
+    def styleSetterSkyScan(self, points: tuple):
+        # Make boxes red wherever there is no input
+        if points[0][0] == "":
+            self.sky_scan_win.point1Coord_1Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.sky_scan_win.point1Coord_1Field.setStyleSheet("")
+        if points[1][0] == "":
+            self.sky_scan_win.point2Coord_1Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.sky_scan_win.point2Coord_1Field.setStyleSheet("")
+        if points[2][0] == "":
+            self.sky_scan_win.point3Coord_1Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.sky_scan_win.point3Coord_1Field.setStyleSheet("")
+        if points[3][0] == "":
+            self.sky_scan_win.point4Coord_1Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.sky_scan_win.point4Coord_1Field.setStyleSheet("")
+
+        if points[0][1] == "":
+            self.sky_scan_win.point1Coord_2Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.sky_scan_win.point1Coord_2Field.setStyleSheet("")
+        if points[1][1] == "":
+            self.sky_scan_win.point2Coord_2Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.sky_scan_win.point2Coord_2Field.setStyleSheet("")
+        if points[2][1] == "":
+            self.sky_scan_win.point3Coord_2Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.sky_scan_win.point3Coord_2Field.setStyleSheet("")
+        if points[3][1] == "":
+            self.sky_scan_win.point4Coord_2Field.setStyleSheet("border: 1px solid red")
+        else:
+            self.sky_scan_win.point4Coord_2Field.setStyleSheet("")
 
     def coordinate_updater(self, system: str):
         if type(system) is not type(""):
