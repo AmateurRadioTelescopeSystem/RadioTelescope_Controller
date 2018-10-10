@@ -229,7 +229,7 @@
           </item>
           <item>
            <property name="text">
-            <string>Ecliptical</string>
+            <string>Ecliptic</string>
            </property>
           </item>
          </widget>

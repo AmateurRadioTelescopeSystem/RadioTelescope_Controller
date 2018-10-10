@@ -29,6 +29,11 @@
           <widget class="QComboBox" name="coordinatSystemcomboBox">
            <item>
             <property name="text">
+             <string>Horizontal</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
              <string>Equatorial</string>
             </property>
            </item>
@@ -39,12 +44,17 @@
            </item>
            <item>
             <property name="text">
-             <string>Alt. Azimuth</string>
+             <string>Ecliptic</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>Steps</string>
+             <string>Motor steps</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Satellite</string>
             </property>
            </item>
           </widget>
@@ -110,7 +120,10 @@
         </layout>
        </item>
        <item row="2" column="0">
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="repositionButton">
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
          <property name="text">
           <string>Reposition</string>
          </property>
@@ -187,8 +200,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>303</width>
-     <height>21</height>
+     <width>350</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>
