@@ -348,15 +348,20 @@ class Calculations(QtCore.QObject):
 
     def coordinate_transform(self, coordinates: tuple, system_and_date: tuple):
         position = np.radians(coordinates)  # Convert coordinates from degrees to radians
+        if system_and_date[1] == "Now":
+            epoch = self.current_time()  # Get the current time and date as the epoch
+        else:
+            epoch = system_and_date[1]
+
         if system_and_date[0] == "Equatorial":
             ra, dec = coordinates
         elif system_and_date[0] == "Horizontal":
             ra, dec = np.degrees(map(float, self.observer.radec_of(position[0], position[1])))
         elif system_and_date[0] == "Galactic":
-            galactic_posit = ephem.Galactic(position[0], position[1], epoch=system_and_date[1])
+            galactic_posit = ephem.Galactic(position[0], position[1], epoch=epoch)
             ra, dec = np.degrees(galactic_posit.to_radec())  # Convert point from Galactic to RA and DEC
-        elif system_and_date[0] == "Ecliptical":
-            ecliptical_posit = ephem.Ecliptic(position[0], position[1], epoch=system_and_date[1])
+        elif system_and_date[0] == "Ecliptic":
+            ecliptical_posit = ephem.Ecliptic(position[0], position[1], epoch=epoch)
             ra, dec = np.degrees(ecliptical_posit.to_radec())  # Convert to RA and DEC from Ecliptic coordinate system
 
         return ra, dec  # Return the coordinate tuple
