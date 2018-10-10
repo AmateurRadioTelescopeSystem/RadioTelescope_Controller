@@ -51,7 +51,7 @@ class OpHandler(QtCore.QObject):
         self.simThread.finished.connect(self.simHandler.close)
         self.simThread.start()  # Start the simulation thread
 
-        self.ui.uiSkyScanningWin.textBrowser.setText(
+        self.ui.sky_scan_win.textBrowser.setText(
             "<html><table><tbody><tr><td style=\"width: 36px;\" colspan=\"2\">"
             "<strong>System</strong></td><td style=\"width: 10px;\">&nbsp;</td>"
             "<td style=\"width: 49px;\" colspan=\"2\"><strong>Equatorial</strong>"
@@ -87,8 +87,8 @@ class OpHandler(QtCore.QObject):
     # Client connection button handling method
     def connectButtonR(self):
         if self.tcpClThread.isRunning() and \
-                (self.ui.mainWin.connectRadioTBtn.text() == "Disconnect" or
-                 self.ui.mainWin.connectRadioTBtn.text() == "Stop"):
+                (self.ui.main_widg.connectRadioTBtn.text() == "Disconnect" or
+                 self.ui.main_widg.connectRadioTBtn.text() == "Stop"):
             self.tcpClThread.quit()  # Disconnect from the client
         elif not self.tcpClThread.isRunning():
             self.tcpClThread.start()  # Attempt a connection with the client
@@ -99,8 +99,8 @@ class OpHandler(QtCore.QObject):
     # Stellarium server connection handling method
     def connectButtonS(self):
         if self.tcpStelThread.isRunning() and \
-                (self.ui.mainWin.connectStellariumBtn.text() == "Disable" or
-                 self.ui.mainWin.connectStellariumBtn.text() == "Stop"):
+                (self.ui.main_widg.connectStellariumBtn.text() == "Disable" or
+                 self.ui.main_widg.connectStellariumBtn.text() == "Stop"):
             self.tcpStelThread.quit()  # Quit the currently running thread
         elif not self.tcpStelThread.isRunning():
             self.tcpStelThread.start()  # Attempt a connection with the client
@@ -111,8 +111,8 @@ class OpHandler(QtCore.QObject):
     # RPi server connection handling method
     def connectButtonRPi(self):
         if self.tcpServThread.isRunning() and \
-                (self.ui.mainWin.serverRPiConnBtn.text() == "Disable" or
-                 self.ui.mainWin.serverRPiConnBtn.text() == "Stop"):
+                (self.ui.main_widg.serverRPiConnBtn.text() == "Disable" or
+                 self.ui.main_widg.serverRPiConnBtn.text() == "Stop"):
             self.tcpServThread.quit()  # Quit the currently running thread
         elif not self.tcpServThread.isRunning():
             self.tcpServThread.start()  # Attempt a connection with the client
@@ -121,7 +121,7 @@ class OpHandler(QtCore.QObject):
             self.tcpServer.reConnectSigR.emit()
 
     def testConnButton(self):
-        if self.ui.uiTCPWin.clientConTestChkBox.isChecked():
+        if self.ui.tcp_widg.clientConTestChkBox.isChecked():
             self.tcpClient.sendData.emit("Test\n")
 
     def motorsEnableButton(self):
@@ -179,14 +179,14 @@ class OpHandler(QtCore.QObject):
             self.ui.motorsDisabledSig.emit()
         else:
             home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
-            tr_time = int(self.ui.mainWin.transitTimeValue.text())
-            if self.ui.mainWin.stellariumOperationSelect.currentText() == "Transit":
+            tr_time = int(self.ui.main_widg.transitTimeValue.text())
+            if self.ui.main_widg.stellariumOperationSelect.currentText() == "Transit":
                 ra_degrees = radec[0] * 15.0  # Stellarium returns right ascension is hours, so we convert to degrees
                 transit_coords = self.astronomy.transit(ra_degrees, radec[1], -int(home_steps[0]), -int(home_steps[1]),
                                                         tr_time)
                 command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
                 self.tcpClient.sendData.emit(command)  # Send the transit command to the RPi
-            elif self.ui.mainWin.stellariumOperationSelect.currentText() == "Aim and track":
+            elif self.ui.main_widg.stellariumOperationSelect.currentText() == "Aim and track":
                 ra_degrees = radec[0] * 15.0  # Stellarium returns right ascension is hours, so we convert to degrees
                 trk_coords = self.astronomy.transit(ra_degrees, radec[1], -int(home_steps[0]), -int(home_steps[1]), 0)
                 command = "TRK_RA_%.5f_DEC_%.5f_RA-SPEEDD_%.5f_DEC-SPEED_%.5f\n" % (trk_coords[0], trk_coords[1], 0, 0)
@@ -223,10 +223,10 @@ class OpHandler(QtCore.QObject):
             # Update the progress bar
             if self.max_steps_to_targ_ra is not 0:
                 ratio = int(ra_steps)/self.max_steps_to_targ_ra
-                self.ui.mainWin.onTargetProgress.setValue(ratio)
+                self.ui.main_widg.onTargetProgress.setValue(ratio)
             elif self.max_steps_to_targ_dec is not 0:
                 ratio = int(dec_steps)/self.max_steps_to_targ_dec
-                self.ui.mainWin.onTargetProgress.setValue(ratio)
+                self.ui.main_widg.onTargetProgress.setValue(ratio)
 
     # Command to stop any motion of the radio telescope dish
     @QtCore.pyqtSlot(name='stopRadioTele')
@@ -241,8 +241,8 @@ class OpHandler(QtCore.QObject):
         if not self.motors_enabled:
             self.ui.motorsDisabledSig.emit()
         else:
-            freq = self.ui.uiManContWin.frequncyInputBox.text()
-            step = self.ui.uiManContWin.raStepsField.text()
+            freq = self.ui.man_cn_widg.frequncyInputBox.text()
+            step = self.ui.man_cn_widg.raStepsField.text()
             string = "MANCONT_MOVRA_%s_%s_0\n" % (freq, step)
             self.tcpClient.sendData.emit(string)
 
@@ -250,8 +250,8 @@ class OpHandler(QtCore.QObject):
         if not self.motors_enabled:
             self.ui.motorsDisabledSig.emit()
         else:
-            freq = self.ui.uiManContWin.frequncyInputBox.text()
-            step = self.ui.uiManContWin.decStepsField.text()
+            freq = self.ui.man_cn_widg.frequncyInputBox.text()
+            step = self.ui.man_cn_widg.decStepsField.text()
             string = "MANCONT_MOVDEC_%s_0_%s\n" % (freq, step)
             self.tcpClient.sendData.emit(string)
 
@@ -259,9 +259,9 @@ class OpHandler(QtCore.QObject):
         if not self.motors_enabled:
             self.ui.motorsDisabledSig.emit()
         else:
-            freq = self.ui.uiManContWin.frequncyInputBox.text()
-            step_ra = self.ui.uiManContWin.raStepsField.text()
-            step_dec = self.ui.uiManContWin.decStepsField.text()
+            freq = self.ui.man_cn_widg.frequncyInputBox.text()
+            step_ra = self.ui.man_cn_widg.raStepsField.text()
+            step_dec = self.ui.man_cn_widg.decStepsField.text()
             string = "MANCONT_MOVE_%s_%s_%s\n" % (freq, step_ra, step_dec)
             self.tcpClient.sendData.emit(string)
 
@@ -283,14 +283,14 @@ class OpHandler(QtCore.QObject):
 
         # If auto-connection is selected for thr TCP section, then do as requested
         if autoconStell == "yes":
-            self.ui.uiTCPWin.stellServAutoStartBtn.setChecked(True)
+            self.ui.tcp_widg.stellServAutoStartBtn.setChecked(True)
         if autoconRPi == "yes":
-            self.ui.uiTCPWin.teleAutoConChoice.setChecked(True)
+            self.ui.tcp_widg.teleAutoConChoice.setChecked(True)
 
         if clientIP == "localhost" or clientIP == "127.0.0.1":
-            self.ui.uiTCPWin.telClientBox.setCurrentIndex(0)
+            self.ui.tcp_widg.telClientBox.setCurrentIndex(0)
         else:
-            self.ui.uiTCPWin.telClientBox.setCurrentIndex(1)
+            self.ui.tcp_widg.telClientBox.setCurrentIndex(1)
 
         if servRPiRemote == "yes" or stellServRemote == "yes":
             for ipAddress in QtNetwork.QNetworkInterface.allAddresses():
@@ -301,109 +301,109 @@ class OpHandler(QtCore.QObject):
             remoteIP = ipAddress.toString()  # Assign the IP address that wa found above
 
         if servRPiRemote == "no":
-            self.ui.uiTCPWin.telServBox.setCurrentIndex(0)
+            self.ui.tcp_widg.telServBox.setCurrentIndex(0)
         elif servRPiRemote == "yes":
-            self.ui.uiTCPWin.telServBox.setCurrentIndex(1)
+            self.ui.tcp_widg.telServBox.setCurrentIndex(1)
         elif servRPiRemote == "custom":
-            self.ui.uiTCPWin.telServBox.setCurrentIndex(2)
+            self.ui.tcp_widg.telServBox.setCurrentIndex(2)
 
         if stellServRemote == "no":
-            self.ui.uiTCPWin.stellIPServBox.setCurrentIndex(0)
+            self.ui.tcp_widg.stellIPServBox.setCurrentIndex(0)
         else:
             stellIP = remoteIP
-            self.ui.uiTCPWin.stellIPServBox.setCurrentIndex(1)
+            self.ui.tcp_widg.stellIPServBox.setCurrentIndex(1)
 
         # Set all the text fields with the correct data
         # TODO handle what happens when server is not initialized at start
-        self.ui.uiTCPWin.telescopeIPAddrClient.setText(clientIP)
-        self.ui.uiTCPWin.telescopeIPPortClient.setText(self.cfgData.getPort())
+        self.ui.tcp_widg.telescopeIPAddrClient.setText(clientIP)
+        self.ui.tcp_widg.telescopeIPPortClient.setText(self.cfgData.getPort())
 
-        self.ui.uiTCPWin.telescopeIPAddrServ.setText(remoteIP)
-        self.ui.uiTCPWin.telescopeIPPortServ.setText(self.cfgData.getRPiPort())
+        self.ui.tcp_widg.telescopeIPAddrServ.setText(remoteIP)
+        self.ui.tcp_widg.telescopeIPPortServ.setText(self.cfgData.getRPiPort())
 
-        self.ui.uiTCPWin.stellServInpIP.setText(stellIP)
-        self.ui.uiTCPWin.stellPortServ.setText(self.cfgData.getStellPort())
+        self.ui.tcp_widg.stellServInpIP.setText(stellIP)
+        self.ui.tcp_widg.stellPortServ.setText(self.cfgData.getStellPort())
 
         # Set the settings for the connection test tab
         if self.tcpClient.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
-            self.ui.uiTCPWin.clientConTestChkBox.setEnabled(True)
-            self.ui.uiTCPWin.clientStatLbl.setEnabled(True)
-            self.ui.uiTCPWin.clientStatus.setEnabled(True)
+            self.ui.tcp_widg.clientConTestChkBox.setEnabled(True)
+            self.ui.tcp_widg.clientStatLbl.setEnabled(True)
+            self.ui.tcp_widg.clientStatus.setEnabled(True)
         else:
-            self.ui.uiTCPWin.clientConTestChkBox.setEnabled(False)
-            self.ui.uiTCPWin.clientStatLbl.setEnabled(False)
-            self.ui.uiTCPWin.clientStatus.setEnabled(False)
+            self.ui.tcp_widg.clientConTestChkBox.setEnabled(False)
+            self.ui.tcp_widg.clientStatLbl.setEnabled(False)
+            self.ui.tcp_widg.clientStatus.setEnabled(False)
 
         if self.tcpServer.socket is not None:
             if self.tcpServer.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
-                self.ui.uiTCPWin.serverConTestChkBox.setEnabled(True)
-                self.ui.uiTCPWin.servStatLbl.setEnabled(True)
-                self.ui.uiTCPWin.serverStatus.setEnabled(True)
+                self.ui.tcp_widg.serverConTestChkBox.setEnabled(True)
+                self.ui.tcp_widg.servStatLbl.setEnabled(True)
+                self.ui.tcp_widg.serverStatus.setEnabled(True)
             else:
-                self.ui.uiTCPWin.serverConTestChkBox.setEnabled(False)
-                self.ui.uiTCPWin.servStatLbl.setEnabled(False)
-                self.ui.uiTCPWin.serverStatus.setEnabled(False)
+                self.ui.tcp_widg.serverConTestChkBox.setEnabled(False)
+                self.ui.tcp_widg.servStatLbl.setEnabled(False)
+                self.ui.tcp_widg.serverStatus.setEnabled(False)
         else:
-            self.ui.uiTCPWin.serverConTestChkBox.setEnabled(False)
-            self.ui.uiTCPWin.servStatLbl.setEnabled(False)
-            self.ui.uiTCPWin.serverStatus.setEnabled(False)
+            self.ui.tcp_widg.serverConTestChkBox.setEnabled(False)
+            self.ui.tcp_widg.servStatLbl.setEnabled(False)
+            self.ui.tcp_widg.serverStatus.setEnabled(False)
 
         if self.tcpStellarium.socket is not None:
             if self.tcpStellarium.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
-                self.ui.uiTCPWin.stellConTestChkBox.setEnabled(True)
-                self.ui.uiTCPWin.stellStatLbl.setEnabled(True)
-                self.ui.uiTCPWin.stellariumStatus.setEnabled(True)
+                self.ui.tcp_widg.stellConTestChkBox.setEnabled(True)
+                self.ui.tcp_widg.stellStatLbl.setEnabled(True)
+                self.ui.tcp_widg.stellariumStatus.setEnabled(True)
             else:
-                self.ui.uiTCPWin.stellConTestChkBox.setEnabled(False)
-                self.ui.uiTCPWin.stellStatLbl.setEnabled(False)
-                self.ui.uiTCPWin.stellariumStatus.setEnabled(False)
+                self.ui.tcp_widg.stellConTestChkBox.setEnabled(False)
+                self.ui.tcp_widg.stellStatLbl.setEnabled(False)
+                self.ui.tcp_widg.stellariumStatus.setEnabled(False)
         else:
-            self.ui.uiTCPWin.stellConTestChkBox.setEnabled(False)
-            self.ui.uiTCPWin.stellStatLbl.setEnabled(False)
-            self.ui.uiTCPWin.stellariumStatus.setEnabled(False)
+            self.ui.tcp_widg.stellConTestChkBox.setEnabled(False)
+            self.ui.tcp_widg.stellStatLbl.setEnabled(False)
+            self.ui.tcp_widg.stellariumStatus.setEnabled(False)
 
     # Save the settings when the save button is pressed
     def saveTCPSettings(self):
         # Save the ports entered for each setting
-        self.cfgData.setPort(self.ui.uiTCPWin.telescopeIPPortClient.text())
-        self.cfgData.setStellPort(self.ui.uiTCPWin.stellPortServ.text())
-        self.cfgData.setRPiPort(self.ui.uiTCPWin.telescopeIPPortServ.text())
+        self.cfgData.setPort(self.ui.tcp_widg.telescopeIPPortClient.text())
+        self.cfgData.setStellPort(self.ui.tcp_widg.stellPortServ.text())
+        self.cfgData.setRPiPort(self.ui.tcp_widg.telescopeIPPortServ.text())
 
         # Save the auto start/enable option
-        if self.ui.uiTCPWin.teleAutoConChoice.isChecked():
+        if self.ui.tcp_widg.teleAutoConChoice.isChecked():
             self.cfgData.TCPAutoConnEnable()
         else:
             self.cfgData.TCPAutoConnDisable()
 
-        if self.ui.uiTCPWin.stellServAutoStartBtn.isChecked():
+        if self.ui.tcp_widg.stellServAutoStartBtn.isChecked():
             self.cfgData.TCPStellAutoConnEnable()
         else:
             self.cfgData.TCPStellAutoConnDisable()
 
         # Save the IP addresses
-        if self.ui.uiTCPWin.telServBox.currentText() == "Localhost":
+        if self.ui.tcp_widg.telServBox.currentText() == "Localhost":
             self.cfgData.setRPiHost("127.0.0.1")
             self.cfgData.setServRemote("TCPRPiServ", "no")
-        elif self.ui.uiTCPWin.telServBox.currentText() == "Remote":
+        elif self.ui.tcp_widg.telServBox.currentText() == "Remote":
             self.cfgData.setServRemote("TCPRPiServ", "yes")
-            self.cfgData.setRPiHost(self.ui.uiTCPWin.telescopeIPAddrServ.text())
-        elif self.ui.uiTCPWin.telServBox.currentText() == "Custom":
+            self.cfgData.setRPiHost(self.ui.tcp_widg.telescopeIPAddrServ.text())
+        elif self.ui.tcp_widg.telServBox.currentText() == "Custom":
             self.cfgData.setServRemote("TCPRPiServ", "custom")
-            self.cfgData.setRPiHost(self.ui.uiTCPWin.telescopeIPAddrServ.text())
+            self.cfgData.setRPiHost(self.ui.tcp_widg.telescopeIPAddrServ.text())
 
-        if self.ui.uiTCPWin.telClientBox.currentText() == "Localhost":
+        if self.ui.tcp_widg.telClientBox.currentText() == "Localhost":
             self.cfgData.setHost("127.0.0.1")
             self.cfgData.setServRemote("TCP", "no")
         else:
             self.cfgData.setServRemote("TCP", "yes")
-            self.cfgData.setHost(self.ui.uiTCPWin.telescopeIPAddrClient.text())
+            self.cfgData.setHost(self.ui.tcp_widg.telescopeIPAddrClient.text())
 
-        if self.ui.uiTCPWin.stellIPServBox.currentText() == "Localhost":
+        if self.ui.tcp_widg.stellIPServBox.currentText() == "Localhost":
             self.cfgData.setStellHost("127.0.0.1")
             self.cfgData.setServRemote("TCPStell", "no")
         else:
             self.cfgData.setServRemote("TCPStell", "yes")
-            self.cfgData.setStellHost(self.ui.uiTCPWin.stellServInpIP.text())
+            self.cfgData.setStellHost(self.ui.tcp_widg.stellServInpIP.text())
 
         # Send a reconnect signal to all TCP operations (No effect if some is not active)
         self.tcpClient.reConnectSigC.emit()
@@ -414,30 +414,30 @@ class OpHandler(QtCore.QObject):
         s_latlon = self.cfgData.getLatLon()  # First element is latitude and second element is longitude
         s_alt = self.cfgData.getAltitude()  # Get the altitude from the settings file
 
-        self.ui.uiLocationWin.latEntry.setText(s_latlon[0])
-        self.ui.uiLocationWin.lonEntry.setText(s_latlon[1])
-        self.ui.uiLocationWin.altEntry.setText(s_alt)
+        self.ui.loc_widg.latEntry.setText(s_latlon[0])
+        self.ui.loc_widg.lonEntry.setText(s_latlon[1])
+        self.ui.loc_widg.altEntry.setText(s_alt)
 
         if self.cfgData.getMapsSelect() == "no":
-            self.ui.uiLocationWin.locationTypeChoose.setCurrentIndex(0)
+            self.ui.loc_widg.locationTypeChoose.setCurrentIndex(0)
 
     def saveLocationSettings(self):
-        coords = [self.ui.uiLocationWin.latEntry.text(), self.ui.uiLocationWin.lonEntry.text()]
-        altd = self.ui.uiLocationWin.altEntry.text()
+        coords = [self.ui.loc_widg.latEntry.text(), self.ui.loc_widg.lonEntry.text()]
+        altd = self.ui.loc_widg.altEntry.text()
         self.cfgData.setLatLon(coords)
         self.cfgData.setAltitude(altd)
 
-        if self.ui.uiLocationWin.locationTypeChoose.currentText() == "Google Maps":
+        if self.ui.loc_widg.locationTypeChoose.currentText() == "Google Maps":
             self.cfgData.setMapsSelect("yes")
         else:
             self.cfgData.setMapsSelect("no")
 
         # Show location on the GUI
-        self.ui.mainWin.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
-                                           "vertical-align:super;\">o</span></p></body></html>" % coords[1])
-        self.ui.mainWin.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
-                                           "vertical-align:super;\">o</span></p></body></html>" % coords[0])
-        self.ui.mainWin.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % altd)
+        self.ui.main_widg.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
+                                             "vertical-align:super;\">o</span></p></body></html>" % coords[1])
+        self.ui.main_widg.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
+                                             "vertical-align:super;\">o</span></p></body></html>" % coords[0])
+        self.ui.main_widg.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % altd)
 
     def homePositionReturn(self):
         if not self.motors_enabled:
@@ -450,17 +450,17 @@ class OpHandler(QtCore.QObject):
             self.ui.motorsDisabledSig.emit()
         else:
             home_steps = self.cfgData.getHomeSteps()
-            if self.ui.uiPlanetaryObjWin.planObjectTransitGroupBox.isChecked():
-                objec = self.ui.uiPlanetaryObjWin.objectSelectionComboBox.currentText()
-                tr_time = self.ui.uiPlanetaryObjWin.transitTimeBox.value()
+            if self.ui.plan_obj_win.planObjectTransitGroupBox.isChecked():
+                objec = self.ui.plan_obj_win.objectSelectionComboBox.currentText()
+                tr_time = self.ui.plan_obj_win.transitTimeBox.value()
                 transit_coords = self.astronomy.transit_planetary(objec, -int(home_steps[0]), -int(home_steps[1]),
                                                                   int(tr_time))
 
                 command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
                 self.tcpClient.sendData.emit(command)  # Send the transit command to the RPi
-            elif self.ui.uiPlanetaryObjWin.planObjectTrackingGroupBox.isChecked():
-                objec = self.ui.uiPlanetaryObjWin.objectSelectionComboBox.currentText()
-                track_time = self.ui.uiPlanetaryObjWin.trackingtTimeBox.value()
+            elif self.ui.plan_obj_win.planObjectTrackingGroupBox.isChecked():
+                objec = self.ui.plan_obj_win.objectSelectionComboBox.currentText()
+                track_time = self.ui.plan_obj_win.trackingtTimeBox.value()
                 tracking_info = self.astronomy.tracking_planetary(objec, -int(home_steps[0]), -int(home_steps[1]))
 
                 command = "TRK_RA_%.5f_DEC_%.5f_RA-SPEED_%.5f_DEC-SPEED_%.5f_TIME_%.2f\n" % \
@@ -478,26 +478,26 @@ class OpHandler(QtCore.QObject):
         return formated_coord  # Return the formatted coordinate string
 
     def calcScanPoints(self):
-        point_1 = (self.ui.uiSkyScanningWin.point1Coord_1Field.text(),
-                    self.ui.uiSkyScanningWin.point1Coord_2Field.text(), )
-        point_2 = (self.ui.uiSkyScanningWin.point2Coord_1Field.text(),
-                    self.ui.uiSkyScanningWin.point2Coord_2Field.text(), )
-        point_3 = (self.ui.uiSkyScanningWin.point3Coord_1Field.text(),
-                    self.ui.uiSkyScanningWin.point3Coord_2Field.text(), )
-        point_4 = (self.ui.uiSkyScanningWin.point4Coord_1Field.text(),
-                    self.ui.uiSkyScanningWin.point4Coord_2Field.text(), )
+        point_1 = (self.ui.sky_scan_win.point1Coord_1Field.text(),
+                   self.ui.sky_scan_win.point1Coord_2Field.text(), )
+        point_2 = (self.ui.sky_scan_win.point2Coord_1Field.text(),
+                   self.ui.sky_scan_win.point2Coord_2Field.text(), )
+        point_3 = (self.ui.sky_scan_win.point3Coord_1Field.text(),
+                   self.ui.sky_scan_win.point3Coord_2Field.text(), )
+        point_4 = (self.ui.sky_scan_win.point4Coord_1Field.text(),
+                   self.ui.sky_scan_win.point4Coord_2Field.text(), )
         self.ui.setStyleSkyScanningSig.emit((point_1, point_2, point_3, point_4, ))
 
         check_1 = point_1[0] != "" and point_1[1] != "" and point_2[0] != "" and point_2[1] != ""
         check_2 = point_3[0] != "" and point_3[1] != "" and point_4[0] != "" and point_4[1] != ""
 
         if (check_1 and check_2) is True:
-            coord_system = self.ui.uiSkyScanningWin.coordinateSystemComboBx.currentText()
-            epoch = self.ui.uiSkyScanningWin.epochDateSelection.date().toString("yyyy/MM/dd")
-            direction = self.ui.uiSkyScanningWin.directionSelection.currentText()
+            coord_system = self.ui.sky_scan_win.coordinateSystemComboBx.currentText()
+            epoch = self.ui.sky_scan_win.epochDateSelection.date().toString("yyyy/MM/dd")
+            direction = self.ui.sky_scan_win.directionSelection.currentText()
 
-            step_x = self.ui.uiSkyScanningWin.stepSizeBoxCoord1.value()
-            step_y = self.ui.uiSkyScanningWin.stepSizeBoxCoord2.value()
+            step_x = self.ui.sky_scan_win.stepSizeBoxCoord1.value()
+            step_y = self.ui.sky_scan_win.stepSizeBoxCoord2.value()
             step_size = (step_x, step_y, )  # Step size in each axis
 
             point_1 = (float(point_1[0]), float(point_1[1]), )
@@ -509,19 +509,19 @@ class OpHandler(QtCore.QObject):
             map_points = self.astronomy.scanning_map_generator(points, step_size, direction)
             num_of_points = len(map_points[0])  # Number of points to be scanned
 
-            if self.ui.uiSkyScanningWin.integrationEnabler.isChecked():
-                total_int_time = num_of_points * self.ui.uiSkyScanningWin.integrationTimeEntry.value() * 60.0
-                self.ui.uiSkyScanningWin.totalIntTime.setText("%.0fs" % total_int_time)
-            self.ui.uiSkyScanningWin.totalPointsToScan.setText("%d" % num_of_points)
+            if self.ui.sky_scan_win.integrationEnabler.isChecked():
+                total_int_time = num_of_points * self.ui.sky_scan_win.integrationTimeEntry.value() * 60.0
+                self.ui.sky_scan_win.totalIntTime.setText("%.0fs" % total_int_time)
+            self.ui.sky_scan_win.totalPointsToScan.setText("%d" % num_of_points)
 
-            if self.ui.uiSkyScanningWin.simulateScanningChk.isChecked():
-                sim_speed = self.ui.uiSkyScanningWin.simSpeedValue.value()
+            if self.ui.sky_scan_win.simulateScanningChk.isChecked():
+                sim_speed = self.ui.sky_scan_win.simSpeedValue.value()
                 self.simHandler.simStopSig.emit()  # First stop any ongoing simulation
                 self.simHandler.simStartSig.emit(map_points[0], sim_speed)  # Then send the new points
 
             return map_points[0]
         else:
-            self.ui.uiSkyScanningWin.pointOperationTabs.setCurrentIndex(0)
+            self.ui.sky_scan_win.pointOperationTabs.setCurrentIndex(0)
 
         return ()
 
@@ -533,27 +533,44 @@ class OpHandler(QtCore.QObject):
                 home_steps = self.cfgData.getHomeSteps()
                 init_steps = (int(home_steps[0]), int(home_steps[1]), )
 
-                step_x = self.ui.uiSkyScanningWin.stepSizeBoxCoord1.value()
-                step_y = self.ui.uiSkyScanningWin.stepSizeBoxCoord2.value()
+                step_x = self.ui.sky_scan_win.stepSizeBoxCoord1.value()
+                step_y = self.ui.sky_scan_win.stepSizeBoxCoord2.value()
                 step_size = (step_x, step_y,)  # Step size in each axis
 
-                if self.ui.uiSkyScanningWin.integrationEnabler.isChecked():
-                    int_time = self.ui.uiSkyScanningWin.integrationTimeEntry.value()
+                if self.ui.sky_scan_win.integrationEnabler.isChecked():
+                    int_time = self.ui.sky_scan_win.integrationTimeEntry.value()
                 else:
                     int_time = 0.0
 
-                if self.ui.uiSkyScanningWin.planetaryObjectSelectcheckBox.isChecked():
-                    objec = self.ui.uiSkyScanningWin.objectSelectionComboBox.currentText()
+                if self.ui.sky_scan_win.planetaryObjectSelectcheckBox.isChecked():
+                    objec = self.ui.sky_scan_win.objectSelectionComboBox.currentText()
                 else:
                     objec = None
 
                 calc_points = self.astronomy.scanning_point_calculator(map_points, init_steps, step_size,
                                                                        int_time, objec)
                 self.tcpClient.sendData.emit("SKY-SCAN_RA_%f_DEC_%f_RA-SPEED_%f_DEC-SPEED_%f_INT-TIME_%.2f"
-                                             % (float(calc_points[0].split("_")[0]), float(calc_points[0].split("_")[2]),
-                                                float(calc_points[1][0]), float(calc_points[1][1]), int_time))
+                                             % (float(calc_points[0].split("_")[0]), float(calc_points[0].split("_")[2])
+                                                , float(calc_points[1][0]), float(calc_points[1][1]), int_time))
                 self.tcpClient.sendData.emit("SKY-SCAN-MAP_%s" % calc_points[0])
                 print(calc_points[0])  # TODO Remove the print statement
+        else:
+            self.ui.motorsDisabledSig.emit()
+
+    def calibration_reposition(self):
+        if self.motors_enabled:
+            system = self.calib_win.coordinatSystemcomboBox.currentText()
+            coord_1 = self.ui.calib_win.calibCoord_1_Text.text()
+            coord_2 = self.ui.calib_win.calibCoord_2_Text.text()
+            coord_tuple = (coord_1, coord_2, )
+            sys_date_tuple = (system, "Now", )
+            final_coords = self.astronomy.coordinate_transform(coord_tuple, sys_date_tuple)
+
+            home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
+            transit_coords = self.astronomy.transit(final_coords[0], final_coords[1], -int(home_steps[0]),
+                                                    -int(home_steps[1]), 0)
+            command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
+            self.tcpClient.sendData.emit(command)  # Send the transit command to RPi, to set the calibration position
         else:
             self.ui.motorsDisabledSig.emit()
 
@@ -572,36 +589,39 @@ class OpHandler(QtCore.QObject):
         self.tcpServer.clientNotice.connect(self.tcpClient.connect)  # Tell the client to reconnect
 
         self.ui.stopMovingRTSig.connect(self.stopMovingRT)  # Send a motion stop command, once this signal is triggered
-        self.ui.mainWin.stellPosUpdtBtn.clicked.connect(partial(self.tcpClient.sendData.emit, "SEND_POS_UPDATE\n"))
+        self.ui.main_widg.stellPosUpdtBtn.clicked.connect(partial(self.tcpClient.sendData.emit, "SEND_POS_UPDATE\n"))
         self.posDataShow.connect(self.ui.posDataShow)  # Show the dish position data, when available
 
-        self.ui.uiTCPWin.conTestBtn.clicked.connect(self.testConnButton)
+        self.ui.tcp_widg.conTestBtn.clicked.connect(self.testConnButton)
 
         # Give functionality to the buttons
-        self.ui.mainWin.connectRadioTBtn.clicked.connect(self.connectButtonR)  # TCP client connection button
-        self.ui.mainWin.serverRPiConnBtn.clicked.connect(self.connectButtonRPi)  # TCP server connection button
-        self.ui.mainWin.connectStellariumBtn.clicked.connect(
+        self.ui.main_widg.connectRadioTBtn.clicked.connect(self.connectButtonR)  # TCP client connection button
+        self.ui.main_widg.serverRPiConnBtn.clicked.connect(self.connectButtonRPi)  # TCP server connection button
+        self.ui.main_widg.connectStellariumBtn.clicked.connect(
             self.connectButtonS)  # Stellarium TCP server connection button
-        self.ui.mainWin.motorCommandButton.clicked.connect(self.motorsEnableButton)  # Enable/Disable the motors on RPi
+        self.ui.main_widg.motorCommandButton.clicked.connect(self.motorsEnableButton)  # Enable/Disable the motors on RPi
 
-        self.ui.uiManContWin.movRaBtn.clicked.connect(self.manCont_movRA)
-        self.ui.uiManContWin.movDecBtn.clicked.connect(self.manCont_movDEC)
-        self.ui.uiManContWin.syncMoveBtn.clicked.connect(self.manCont_movBoth)
-        self.ui.uiManContWin.stopMotMotionBtn.clicked.connect(self.manCont_stop)
+        self.ui.man_cn_widg.movRaBtn.clicked.connect(self.manCont_movRA)
+        self.ui.man_cn_widg.movDecBtn.clicked.connect(self.manCont_movDEC)
+        self.ui.man_cn_widg.syncMoveBtn.clicked.connect(self.manCont_movBoth)
+        self.ui.man_cn_widg.stopMotMotionBtn.clicked.connect(self.manCont_stop)
 
-        self.ui.uiTCPWin.telescopeSaveBtn.clicked.connect(self.saveTCPSettings)
-        self.ui.uiLocationWin.saveBtn.clicked.connect(self.saveLocationSettings)
+        self.ui.tcp_widg.telescopeSaveBtn.clicked.connect(self.saveTCPSettings)
+        self.ui.loc_widg.saveBtn.clicked.connect(self.saveLocationSettings)
 
-        self.ui.mainWin.actionSettings.triggered.connect(self.TCPSettingsHandle)  # Update settings each time
-        self.ui.mainWin.actionLocation.triggered.connect(self.locationSettingsHandle)  # Update location fields
-        self.ui.mainWin.actionManual_Control.triggered.connect(partial(self.tcpClient.sendData.emit, "SEND_HOME_STEPS\n"))
-        self.ui.mainWin.locatChangeBtn.clicked.connect(self.locationSettingsHandle)
-        self.ui.mainWin.homePositionButton.clicked.connect(self.homePositionReturn)
+        self.ui.main_widg.actionSettings.triggered.connect(self.TCPSettingsHandle)  # Update settings each time
+        self.ui.main_widg.actionLocation.triggered.connect(self.locationSettingsHandle)  # Update location fields
+        self.ui.main_widg.actionManual_Control.triggered.connect(partial(self.tcpClient.sendData.emit,
+                                                                         "SEND_HOME_STEPS\n"))
+        self.ui.main_widg.locatChangeBtn.clicked.connect(self.locationSettingsHandle)
+        self.ui.main_widg.homePositionButton.clicked.connect(self.homePositionReturn)
 
-        self.ui.uiPlanetaryObjWin.commandExecutionBtn.clicked.connect(self.planObjCommand)
+        self.ui.plan_obj_win.commandExecutionBtn.clicked.connect(self.planObjCommand)
 
-        self.ui.uiSkyScanningWin.calculateScanMapBtn.clicked.connect(self.calcScanPoints)
-        self.ui.uiSkyScanningWin.startScanBtn.clicked.connect(self.skyScanStart)
+        self.ui.sky_scan_win.calculateScanMapBtn.clicked.connect(self.calcScanPoints)
+        self.ui.sky_scan_win.startScanBtn.clicked.connect(self.skyScanStart)
+
+        self.ui.calib_win.repositionButton.clicked.connect(self.calibration_reposition)
 
         self.logD.debug("All signal connections made")
 
