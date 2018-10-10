@@ -95,9 +95,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.main_widg.actionManual_Control.triggered.connect(self.uiManContWin.show)  # Show the manual control window
         self.main_widg.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
         self.main_widg.actionCalibration.triggered.connect(self.uiCalibrationWin.show)
+        self.main_widg.actionCalibration.triggered.connect(self.coordinate_updater_calibration)
         self.main_widg.actionPlanetaryObject.triggered.connect(self.uiPlanetaryObjWin.show)
         self.main_widg.actionSky_Scanning.triggered.connect(self.uiSkyScanningWin.show)
-        self.main_widg.actionSky_Scanning.triggered.connect(self.coordinate_updater)
+        self.main_widg.actionSky_Scanning.triggered.connect(self.coordinate_updater_scanning)
         self.main_widg.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
 
         self.main_widg.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
@@ -159,13 +160,17 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.plan_obj_win.planObjectTransitGroupBox.toggled.connect(self.checkBoxPlanTransit)
         self.plan_obj_win.planObjectTrackingGroupBox.toggled.connect(self.checkBoxPlanTracking)
 
+        # Sky scanner initializations
         self.sky_scan_win.mapLayoutBox.setTabEnabled(1, False)  # Disable the tab at first
-        self.sky_scan_win.coordinateSystemComboBx.currentTextChanged.connect(self.coordinate_updater)
+        self.sky_scan_win.coordinateSystemComboBx.currentTextChanged.connect(self.coordinate_updater_scanning)
         self.sky_scan_win.simulateScanningChk.toggled.connect(self.simEnabler)
         self.sky_scan_win.listPointsCheckBox.toggled.connect(
             partial(self.sky_scan_win.mapLayoutBox.setTabEnabled, 1))
         self.sky_scan_win.simSpeedLabel.setVisible(False)
         self.sky_scan_win.simSpeedValue.setVisible(False)
+
+        # Calibration GUI initializations and signal connections
+        self.calib_win.coordinatSystemcomboBox.currentTextChanged.connect(self.coordinate_updater_calibration)
 
         # Validate coordinate entry fields
         double_validator = QtGui.QDoubleValidator(-360.0, 360.0, 6)
@@ -469,7 +474,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         else:
             self.sky_scan_win.point4Coord_2Field.setStyleSheet("")
 
-    def coordinate_updater(self, system: str):
+    def coordinate_updater_scanning(self, system: str):
         if type(system) is not str:
             system = self.sky_scan_win.coordinateSystemComboBx.currentText()
         coord_1 = "<html><head/><body><p><span style=\" font-weight:600;\">%s</span></p></body></html>"
@@ -523,6 +528,52 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.sky_scan_win.point4Coord_2Label.setText(coord_2)
         self.sky_scan_win.point4Coord_2Field.setValidator(validator_coord_2)
         self.sky_scan_win.stepSizeCoord2.setText(coord_2)
+
+    def coordinate_updater_calibration(self, system: str):
+        if type(system) is not str:
+            system = self.calib_win.coordinatSystemcomboBox.currentText()
+        coord_1 = "<html><head/><body><p><span style=\" font-weight:600;\">%s</span></p></body></html>"
+        coord_2 = "<html><head/><body><p><span style=\" font-weight:600;\">%s</span></p></body></html>"
+
+        # Create coordinate field validator object
+        validator_coord_1 = QtGui.QDoubleValidator()
+        validator_coord_2 = QtGui.QDoubleValidator()
+        validator_coord_1.setNotation(QtGui.QDoubleValidator.StandardNotation)
+        validator_coord_2.setNotation(QtGui.QDoubleValidator.StandardNotation)
+
+        if system == "Horizontal":
+            coord_1 = coord_1 % "Alt: "
+            coord_2 = coord_2 % "Az:  "
+            validator_coord_1.setRange(0.0, 90.0, 6)
+            validator_coord_2.setRange(0.0, 360.0, 6)
+        elif system == "Equatorial":
+            coord_1 = coord_1 % "RA:  "
+            coord_2 = coord_2 % "DEC: "
+            validator_coord_1.setRange(0.0, 360.0, 6)
+            validator_coord_2.setRange(0.0, 360.0, 6)
+        elif system == "Galactic":
+            coord_1 = coord_1 % "Lat: "
+            coord_2 = coord_2 % "Lon: "
+            validator_coord_1.setRange(-90.0, 90.0, 6)
+            validator_coord_2.setRange(0.0, 360.0, 6)
+        elif system == "Ecliptic":
+            coord_1 = coord_1 % "Lat: "
+            coord_2 = coord_2 % "Lon: "
+            validator_coord_1.setRange(-90.0, 90.0, 6)
+            validator_coord_2.setRange(0.0, 360.0, 6)
+        elif system == "Motor steps":
+            coord_1 = coord_1 % "RA: "
+            coord_2 = coord_2 % "DEC: "
+            validator_coord_1 = QtGui.QIntValidator(-150000, 150000)
+            validator_coord_2 = QtGui.QIntValidator(-180000, 180000)
+
+        # Set first coordinate of the system
+        self.calib_win.calibCoord_1_Label.setText(coord_1)
+        self.calib_win.calibCoord_1_Text.setValidator(validator_coord_1)
+
+        # Set the second coordinate of the system
+        self.calib_win.calibCoord_2_Label.setText(coord_2)
+        self.calib_win.calibCoord_2_Text.setValidator(validator_coord_2)
 
     def simEnabler(self, state: bool):
         if state is True:
