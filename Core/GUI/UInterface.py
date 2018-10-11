@@ -15,6 +15,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     setGUIFromClientSig = QtCore.pyqtSignal(str, name='setTheGUIFromClient')
     setManContStepsSig = QtCore.pyqtSignal(str, str, name='setManContSteps')
     setStyleSkyScanningSig = QtCore.pyqtSignal(tuple, name='setStylesheetForSkyScanning')
+    updateCoordFieldsSig = QtCore.pyqtSignal(list, name='coordinateSetterSatelliteDialog')
 
     def __init__(self, parent=None):
         super(Ui_RadioTelescopeControl, self).__init__(parent)
@@ -32,6 +33,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
         # Extra dialogs
         self.mapDialog = QtWidgets.QDialog()  # Create the location selection from map dialog
+        self.satelliteDialog = QtWidgets.QDialog()  # Create the satellite selction dialog
 
         # Set the icons for the GUI windows
         try:
@@ -42,6 +44,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.uiCalibrationWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/calibration.png')))
             self.uiPlanetaryObjWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/planetary.png')))
             self.uiSkyScanningWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/skyScanning.png')))
+            self.satelliteDialog.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/satelliteSelection.png')))
         except Exception:
             self.logD.exception("Problem setting window icons. See traceback below.")
 
@@ -54,6 +57,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.calib_win = uic.loadUi(os.path.abspath('UI_Files/Calibration.ui'), self.uiCalibrationWin)
             self.plan_obj_win = uic.loadUi(os.path.abspath('UI_Files/PlanetaryObject.ui'), self.uiPlanetaryObjWin)
             self.sky_scan_win = uic.loadUi(os.path.abspath('UI_Files/SkyScanning.ui'), self.uiSkyScanningWin)
+            self.sat_sel_diag = uic.loadUi(os.path.abspath('UI_Files/SatelliteSelectionDialog.ui'),
+                                           self.satelliteDialog)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
@@ -110,6 +115,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.setGUIFromClientSig.connect(self.setGUIFromClientCommand)
         self.setStyleSkyScanningSig.connect(self.styleSetterSkyScan)
         self.setManContStepsSig.connect(self.manContStepSetter)
+        self.updateCoordFieldsSig.connect(self.set_sat_coordinates)
 
         # Change between widgets
         self.main_widg.stellNextPageBtn.clicked.connect(lambda: self.main_widg.stackedWidget.setCurrentIndex(1))
@@ -171,6 +177,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
         # Calibration GUI initializations and signal connections
         self.calib_win.coordinatSystemcomboBox.currentTextChanged.connect(self.coordinate_updater_calibration)
+        self.sat_sel_diag.coordinateSystemBox.currentTextChanged.connect(self.coordinate_updater_satellite)
+        self.sat_sel_diag.satSelectionList.currentTextChanged.connect(self.sat_selection_updater)
 
         # Validate coordinate entry fields
         double_validator = QtGui.QDoubleValidator(-360.0, 360.0, 6)
@@ -530,6 +538,11 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.sky_scan_win.stepSizeCoord2.setText(coord_2)
 
     def coordinate_updater_calibration(self, system: str):
+        # Set the fields visible at first
+        self.calib_win.calibCoord_1_Text.setVisible(True)
+        self.calib_win.calibCoord_2_Text.setVisible(True)
+        self.calib_win.calibCoord_2_Label.setVisible(True)
+
         if type(system) is not str:
             system = self.calib_win.coordinatSystemcomboBox.currentText()
         coord_1 = "<html><head/><body><p><span style=\" font-weight:600;\">%s</span></p></body></html>"
@@ -566,6 +579,13 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             coord_2 = coord_2 % "DEC: "
             validator_coord_1 = QtGui.QIntValidator(-150000, 150000)
             validator_coord_2 = QtGui.QIntValidator(-180000, 180000)
+        elif system == "Satellite":
+            coord_1 = coord_1 % "Satellite..."
+            self.coordinate_updater_satellite()  # Update the coordinates on the first call
+            self.calib_win.calibCoord_1_Text.setVisible(False)
+            self.calib_win.calibCoord_2_Text.setVisible(False)
+            self.calib_win.calibCoord_2_Label.setVisible(False)
+            self.satelliteDialog.show()
 
         # Set first coordinate of the system
         self.calib_win.calibCoord_1_Label.setText(coord_1)
@@ -574,6 +594,47 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         # Set the second coordinate of the system
         self.calib_win.calibCoord_2_Label.setText(coord_2)
         self.calib_win.calibCoord_2_Text.setValidator(validator_coord_2)
+
+    def coordinate_updater_satellite(self, system=""):
+        if system is "":
+            system = self.sat_sel_diag.coordinateSystemBox.currentText()
+        coord_1 = "<html><head/><body><p><span style=\" font-weight:600;\">%s</span></p></body></html>"
+        coord_2 = "<html><head/><body><p><span style=\" font-weight:600;\">%s</span></p></body></html>"
+
+        if system == "Horizontal":
+            coord_1 = coord_1 % "Alt: "
+            coord_2 = coord_2 % "Az:  "
+        elif system == "Celestial":
+            coord_1 = coord_1 % "HA:  "
+            coord_2 = coord_2 % "DEC: "
+
+        # Set first coordinate of the system
+        self.sat_sel_diag.coord_1_Label.setText(coord_1)
+
+        # Set the second coordinate of the system
+        self.sat_sel_diag.coord_2_Label.setText(coord_2)
+
+    def sat_selection_updater(self, satellite: str):
+        sat = satellite.split(" ")
+        sat_name = sat[0]  # Get the satellite's name
+        sat_deg = sat[-1][:-1]  # Get the satellite's position in degrees
+        sat_pos = sat[-1][-1]  # Get the direction of satellite
+
+        formatter = "<html><head/><body><p><span style=\" font-weight:600;\" " \
+                    "style = \"font-style:italic;\">%s %s%s</span></p></body></html>"
+
+        self.calib_win.calibCoord_1_Label.setText(formatter % (sat_name, sat_deg, sat_pos))
+
+    @QtCore.pyqtSlot(list, name='coordinateSetterSatelliteDialog')
+    def set_sat_coordinates(self, coords: list):
+        if self.sat_sel_diag.coordinateSystemBox.currentText() == "Horizontal":
+            c_1 = coords[0][0]
+            c_2 = coords[0][1]
+        else:
+            c_1 = coords[1][0]
+            c_2 = coords[1][1]
+        self.sat_sel_diag.coord_1_Value.setText(str(c_1))
+        self.sat_sel_diag.coord_2_Value.setText(str(c_2))
 
     def simEnabler(self, state: bool):
         if state is True:
