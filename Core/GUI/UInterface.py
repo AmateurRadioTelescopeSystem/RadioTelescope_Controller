@@ -179,6 +179,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.calib_win.coordinatSystemcomboBox.currentTextChanged.connect(self.coordinate_updater_calibration)
         self.sat_sel_diag.coordinateSystemBox.currentTextChanged.connect(self.coordinate_updater_satellite)
         self.sat_sel_diag.satSelectionList.currentTextChanged.connect(self.sat_selection_updater)
+        self.sat_sel_diag.selectionButton.clicked.connect(self.satelliteDialog.close)
 
         # Validate coordinate entry fields
         double_validator = QtGui.QDoubleValidator(-360.0, 360.0, 6)
@@ -615,15 +616,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.sat_sel_diag.coord_2_Label.setText(coord_2)
 
     def sat_selection_updater(self, satellite: str):
-        sat = satellite.split(" ")
-        sat_name = sat[0]  # Get the satellite's name
-        sat_deg = sat[-1][:-1]  # Get the satellite's position in degrees
-        sat_pos = sat[-1][-1]  # Get the direction of satellite
-
         formatter = "<html><head/><body><p><span style=\" font-weight:600;\" " \
-                    "style = \"font-style:italic;\">%s %s%s</span></p></body></html>"
+                    "style = \"font-style:italic;\">%s</span></p></body></html>"
 
-        self.calib_win.calibCoord_1_Label.setText(formatter % (sat_name, sat_deg, sat_pos))
+        self.calib_win.calibCoord_1_Label.setText(formatter % satellite)
 
     @QtCore.pyqtSlot(list, name='coordinateSetterSatelliteDialog')
     def set_sat_coordinates(self, coords: list):
