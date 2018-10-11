@@ -1,10 +1,12 @@
 from PyQt5 import QtCore
-from astropy.constants import iau2015 as const
+from pyorbital import tlefile
+from urllib import request
 import numpy as np
 import logging
 import ephem
 import math
 import time
+import os
 
 _rad_to_deg = 57.2957795131  # Radians to degrees conversion factor
 _sec_to_day = 1.1574074e-5  # How many days a second has
@@ -26,6 +28,9 @@ class Calculations(QtCore.QObject):
         self.observer = ephem.Observer()  # Create the observer object
         self.observer.lat, self.observer.lon = self.latlon[0], self.latlon[1]  # Provide the observer's location
         self.observer.elevation = float(self.alt)  # Set the location's altitude in meters
+
+        self.tle = ""  # Hold the read TLE data
+        self.tle_retriever()
 
     def hour_angle(self, date: tuple, obj_ra: float):
         self.observer.date = date
@@ -367,35 +372,30 @@ class Calculations(QtCore.QObject):
 
         return ra, dec  # Return the coordinate tuple
 
-    def geo_sat_position(self, sat_pos: tuple):
-        """
-        Get the satellite's position in degrees and its position relative to the prime meridian.
-        :param sat_pos: Tuple containing satellite's position
-        :return: Satellite's calculated Azimuth and Elevation (Altitude), for the current location
-        """
-        if sat_pos[1].lower() == "e":
-            sat_pos_deg = float(sat_pos[0])
-        else:
-            sat_pos_deg = -float(sat_pos[0])
-        lat = float(self.observer.lat)  # Value is in radians
-        lon = float(self.observer.lon)  # Value is in radians
+    def tle_retriever(self):
+        # TODO improve the function
+        url = "https://www.celestrak.com/NORAD/elements/geo.txt"
+        file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
+        request.urlretrieve(url, file_dir)  # Get the TLE file from the URL
 
-        # Calculate necessary constants
-        earth_radius = const.R_earth.to('km').value
-        earth_circum = 2.0 * np.pi * earth_radius
+        with open(file_dir) as tle_file:
+            self.tle = tle_file.read()  # Save the TLE file contents
 
-        # All following math expressions are evaluated in radians, unless explicitly defined in degrees
-        p_angle = lon - np.radians(sat_pos_deg)  # Expression evaluated in radians
-        b = np.arccos(np.cos(p_angle) * np.cos(lat))
-        a = np.degrees(np.arcsin(np.sin(p_angle)/np.sin(b)))  # Convert the angle to degrees
-        d = np.sqrt(np.power(earth_radius, 2) + np.power(earth_circum, 2) - 2*earth_radius*earth_circum*np.cos(b))
+    def geo_sat_position(self, satellite: str):
+        # TODO improve the funtion
+        try:
+            tle_data = tlefile.read(satellite, "TLE/geo.txt")
 
-        el = np.round(np.degrees(np.arccos(earth_circum*np.sin(b)/d)), 4)  # Satellite's elevation in degrees
-        az = np.round(a, 4) % 360.0  # Get the satellite's azimuth in degrees
+            sat = ephem.readtle(tle_data.platform, tle_data.line1, tle_data.line2)
+            self.observer.date = self.current_time()
+            sat.compute(self.observer)
 
-        c_time = self.current_time()  # Get the current time
-        ra, dec = np.round(np.degrees(self.observer.radec_of(np.radians(180 - az),
-                                                             np.radians(el))), 4)  # Get the RA and DEC coordinates
-        ha = np.round(self.hour_angle(c_time, ra), 4)  # Get the hour angle of the satellite
+            c_time = self.current_time()  # Get the current time
+            ha = np.round(self.hour_angle(c_time, math.degrees(sat.ra))
+                          , 4) % 360.0  # Get the hour angle of the satellite
+        except KeyError:
+            self.logD.exception("No satellite found. See traceback.")
 
-        return np.array([(el, az,), (ha, dec, )]).tolist()
+        return np.array([np.round(np.degrees((sat.alt, sat.az,)), 4),
+                         np.round((ha, np.degrees(sat.dec), ), 4)]).tolist()
+
