@@ -394,7 +394,8 @@ class Calculations(QtCore.QObject):
         az = np.round(a, 4) % 360.0  # Get the satellite's azimuth in degrees
 
         c_time = self.current_time()  # Get the current time
-        ra, dec = np.degrees(self.observer.radec_of(a, np.radians(el)))  # Get the RA and DEC coordinates
-        ha = self.hour_angle(c_time, ra)  # Get the hour angle of the satellite
+        ra, dec = np.round(np.degrees(self.observer.radec_of(np.radians(180 - az),
+                                                             np.radians(el))), 4)  # Get the RA and DEC coordinates
+        ha = np.round(self.hour_angle(c_time, ra), 4)  # Get the hour angle of the satellite
 
         return np.array([(el, az,), (ha, dec, )]).tolist()

@@ -5,14 +5,6 @@
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>478</width>
-    <height>254</height>
-   </rect>
-  </property>
   <property name="windowTitle">
    <string>Satellite selection</string>
   </property>
@@ -90,6 +82,12 @@
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QLabel" name="coord_1_Label">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;C_1:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -105,7 +103,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>100</width>
+            <width>80</width>
             <height>16777215</height>
            </size>
           </property>
@@ -123,6 +121,12 @@
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QLabel" name="coord_2_Label">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;C_2:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -138,7 +142,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>100</width>
+            <width>80</width>
             <height>16777215</height>
            </size>
           </property>

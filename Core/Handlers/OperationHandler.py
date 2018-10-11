@@ -576,6 +576,8 @@ class OpHandler(QtCore.QObject):
 
     def sat_coords_setter(self, satellite: str):
         sat = satellite.split(" ")
+        if len(sat) == 1:
+            sat = self.ui.sat_sel_diag.satSelectionList.currentItem().text().split(" ")
         sat_pos = (sat[-1][:-1], sat[-1][-1], )
 
         coords = self.astronomy.geo_sat_position(sat_pos)
@@ -630,6 +632,7 @@ class OpHandler(QtCore.QObject):
 
         self.ui.calib_win.repositionButton.clicked.connect(self.calibration_reposition)
         self.ui.sat_sel_diag.satSelectionList.currentTextChanged.connect(self.sat_coords_setter)
+        self.ui.sat_sel_diag.coordinateSystemBox.currentTextChanged.connect(self.sat_coords_setter)
 
         self.logD.debug("All signal connections made")
 
