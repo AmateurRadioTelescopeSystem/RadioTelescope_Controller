@@ -560,16 +560,24 @@ class OpHandler(QtCore.QObject):
     def calibration_reposition(self):
         if self.motors_enabled:
             system = self.calib_win.coordinatSystemcomboBox.currentText()
-            coord_1 = self.ui.calib_win.calibCoord_1_Text.text()
-            coord_2 = self.ui.calib_win.calibCoord_2_Text.text()
-            coord_tuple = (coord_1, coord_2, )
-            sys_date_tuple = (system, "Now", )
-            final_coords = self.astronomy.coordinate_transform(coord_tuple, sys_date_tuple)
-
             home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
-            transit_coords = self.astronomy.transit(final_coords[0], final_coords[1], -int(home_steps[0]),
-                                                    -int(home_steps[1]), 0)
-            command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
+            if system == "Satellite" and self.ui.calib_win.calibCoord_1_Label.text() != "Satellite...":
+                satellite = self.ui.sat_sel_diag.satSelectionList.currentItem().text().spli(" ")
+                sat_pos = (satellite[-1][:-1], satellite[-1][-1],)
+                coords = self.astronomy.geo_sat_position(sat_pos)
+                coord_1 = coords[1][0]  # Get the HA
+                coord_2 = coords[1][1]  # Get the DEC
+                command = "TRNST_RA_%.5f_DEC_%.5f\n" % (coord_1 - float(home_steps[0]), coord_2 - float(home_steps[1]))
+            else:
+                coord_1 = self.ui.calib_win.calibCoord_1_Text.text()
+                coord_2 = self.ui.calib_win.calibCoord_2_Text.text()
+                coord_tuple = (coord_1, coord_2, )
+                sys_date_tuple = (system, "Now", )
+
+                final_coords = self.astronomy.coordinate_transform(coord_tuple, sys_date_tuple)
+                transit_coords = self.astronomy.transit(final_coords[0], final_coords[1], -int(home_steps[0]),
+                                                        -int(home_steps[1]), 0)
+                command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
             self.tcpClient.sendData.emit(command)  # Send the transit command to RPi, to set the calibration position
         else:
             self.ui.motorsDisabledSig.emit()
