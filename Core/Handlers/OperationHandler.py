@@ -574,6 +574,13 @@ class OpHandler(QtCore.QObject):
         else:
             self.ui.motorsDisabledSig.emit()
 
+    def sat_coords_setter(self, satellite: str):
+        sat = satellite.split(" ")
+        sat_pos = (sat[-1][:-1], sat[-1][-1], )
+
+        coords = self.astronomy.geo_sat_position(sat_pos)
+        self.ui.updateCoordFieldsSig.emit(coords)
+
     # Make all the necessary signal connections
     def signalConnections(self):
         """
@@ -622,6 +629,7 @@ class OpHandler(QtCore.QObject):
         self.ui.sky_scan_win.startScanBtn.clicked.connect(self.skyScanStart)
 
         self.ui.calib_win.repositionButton.clicked.connect(self.calibration_reposition)
+        self.ui.sat_sel_diag.satSelectionList.currentTextChanged.connect(self.sat_coords_setter)
 
         self.logD.debug("All signal connections made")
 
