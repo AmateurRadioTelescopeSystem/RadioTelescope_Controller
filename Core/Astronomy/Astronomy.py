@@ -1,4 +1,5 @@
 from PyQt5 import QtCore
+from astropy.constants import iau2015 as const
 import numpy as np
 import logging
 import ephem
@@ -365,3 +366,35 @@ class Calculations(QtCore.QObject):
             ra, dec = np.degrees(ecliptical_posit.to_radec())  # Convert to RA and DEC from Ecliptic coordinate system
 
         return ra, dec  # Return the coordinate tuple
+
+    def geo_sat_position(self, sat_pos: tuple):
+        """
+        Get the satellite's position in degrees and its position relative to the prime meridian.
+        :param sat_pos: Tuple containing satellite's position
+        :return: Satellite's calculated Azimuth and Elevation (Altitude), for the current location
+        """
+        if sat_pos[1].lower() == "e":
+            sat_pos_deg = float(sat_pos[0])
+        else:
+            sat_pos_deg = -float(sat_pos[0])
+        lat = float(self.observer.lat)  # Value is in radians
+        lon = float(self.observer.lon)  # Value is in radians
+
+        # Calculate necessary constants
+        earth_radius = const.R_earth.to('km').value
+        earth_circum = 2.0 * np.pi * earth_radius
+
+        # All following math expressions are evaluated in radians, unless explicitly defined in degrees
+        p_angle = lon - np.radians(sat_pos_deg)  # Expression evaluated in radians
+        b = np.arccos(np.cos(p_angle) * np.cos(lat))
+        a = np.degrees(np.arcsin(np.sin(p_angle)/np.sin(b)))  # Convert the angle to degrees
+        d = np.sqrt(np.power(earth_radius, 2) + np.power(earth_circum, 2) - 2*earth_radius*earth_circum*np.cos(b))
+
+        el = np.round(np.degrees(np.arccos(earth_circum*np.sin(b)/d)), 4)  # Satellite's elevation in degrees
+        az = np.round(a, 4) % 360.0  # Get the satellite's azimuth in degrees
+
+        c_time = self.current_time()  # Get the current time
+        ra, dec = np.degrees(self.observer.radec_of(a, np.radians(el)))  # Get the RA and DEC coordinates
+        ha = self.hour_angle(c_time, ra)  # Get the hour angle of the satellite
+
+        return np.array([(el, az,), (ha, dec, )]).tolist()
