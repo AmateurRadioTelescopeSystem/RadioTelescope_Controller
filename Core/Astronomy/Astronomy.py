@@ -1,9 +1,9 @@
 from PyQt5 import QtCore
 from pyorbital import tlefile
 import numpy as np
-import traceback
 import logging
 import urllib3
+import certifi
 import ephem
 import math
 import time
@@ -376,7 +376,7 @@ class Calculations(QtCore.QObject):
         # TODO improve the function
         url = "https://www.celestrak.com/NORAD/elements/geo.txt"
         file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
-        http = urllib3.PoolManager()  # Create the HTTP pool manager object
+        http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())  # Create the HTTP pool manager
 
         try:
             tle = http.request('GET', url)
