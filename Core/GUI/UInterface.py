@@ -41,6 +41,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         # Initial setup of the message box
         self.tle_info_widg.setWindowTitle("TLE Retriever")
         self.tle_info_widg.setWindowModality(QtCore.Qt.ApplicationModal)
+        self.tle_info_widg.setStandardButtons(QtWidgets.QMessageBox.NoButton)
 
         # Set the icons for the GUI windows
         try:
@@ -659,16 +660,20 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         info = status.split("^")
         if status == "":
             self.tle_info_widg.setIcon(QtWidgets.QMessageBox.Information)
-            self.tle_info_widg.setInformativeText("")
+            self.tle_info_widg.setInformativeText("<html><head/><body><p align=\"center\"><span "
+                                                  "style=\" font-weight:600;\" "
+                                                  "style = \"color:#ffb400\">Wait...</span></p></body></html>")
             self.tle_info_widg.show()
 
         if info[0] == "Success":
             self.tle_info_widg.setIcon(QtWidgets.QMessageBox.Information)
             self.tle_info_widg.setInformativeText(formated_text_green % info[1])
+            self.tle_info_widg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         elif info[0] == "Error":
             self.tle_info_widg.setIcon(QtWidgets.QMessageBox.Warning)
             self.tle_info_widg.setInformativeText(formated_text_red % info[1])
-        self.tle_info_widg.maximumWidth()
+            self.tle_info_widg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+
         # Show the details regarding the error
         try:
             self.tle_info_widg.setDetailedText(info[2])
