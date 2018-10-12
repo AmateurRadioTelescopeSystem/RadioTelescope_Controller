@@ -1,8 +1,9 @@
 from PyQt5 import QtCore
 from pyorbital import tlefile
-from urllib import request
 import numpy as np
+import traceback
 import logging
+import urllib3
 import ephem
 import math
 import time
@@ -30,7 +31,6 @@ class Calculations(QtCore.QObject):
         self.observer.elevation = float(self.alt)  # Set the location's altitude in meters
 
         self.tle = ""  # Hold the read TLE data
-        self.tle_retriever()
 
     def hour_angle(self, date: tuple, obj_ra: float):
         self.observer.date = date
@@ -376,15 +376,27 @@ class Calculations(QtCore.QObject):
         # TODO improve the function
         url = "https://www.celestrak.com/NORAD/elements/geo.txt"
         file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
-        request.urlretrieve(url, file_dir)  # Get the TLE file from the URL
+        http = urllib3.PoolManager()  # Create the HTTP pool manager object
 
-        with open(file_dir) as tle_file:
-            self.tle = tle_file.read()  # Save the TLE file contents
+        try:
+            tle = http.request('GET', url)
+            self.tle = tle.data  # Save the retrieved data
+            with open(file_dir, 'wb') as tle_file:
+                tle_file.write(tle.data)  # Save the TLE file contents
+                tle_file.close()
+            error_details = ""
+            exit_code = True
+        except Exception as e:
+            self.logD.exception("Error occurred acquiring TLE file. See traceback.")
+            error_details = "%s" % e
+            exit_code = False
+
+        return [exit_code, error_details]
 
     def geo_sat_position(self, satellite: str):
         # TODO improve the funtion
         try:
-            tle_data = tlefile.read(satellite, "TLE/geo.txt")
+            tle_data = tlefile.read(satellite, os.path.abspath("TLE/geo.txt"))
 
             sat = ephem.readtle(tle_data.platform, tle_data.line1, tle_data.line2)
             self.observer.date = self.current_time()
@@ -393,9 +405,8 @@ class Calculations(QtCore.QObject):
             c_time = self.current_time()  # Get the current time
             ha = np.round(self.hour_angle(c_time, math.degrees(sat.ra))
                           , 4) % 360.0  # Get the hour angle of the satellite
+
+            return np.array([np.round(np.degrees((sat.alt, sat.az,)), 4),
+                             np.round((ha, np.degrees(sat.dec),), 4)]).tolist()
         except KeyError:
             self.logD.exception("No satellite found. See traceback.")
-
-        return np.array([np.round(np.degrees((sat.alt, sat.az,)), 4),
-                         np.round((ha, np.degrees(sat.dec), ), 4)]).tolist()
-
