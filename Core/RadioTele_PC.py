@@ -22,8 +22,10 @@ try:
         os.makedirs('logs')  # Create the logs directory
     if not os.path.exists('Settings'):
         os.makedirs('Settings')  # Create the settings directory
+    if not os.path.exists('TLE'):
+        os.makedirs('TLE')  # Make the TLE saving directory
 except Exception as excep:
-    print("There is a problem with the log directory. See tracback: \n%s" % excep, file=sys.stderr)
+    print("There is a problem creating directories. See tracback: \n%s" % excep, file=sys.stderr)
     sys.exit(-1)  # Exit the program if an error occurred
 
 # Check if the logging configuration file exists
