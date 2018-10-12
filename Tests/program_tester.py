@@ -26,6 +26,8 @@ try:
         os.makedirs('Tests/logs')
     if not os.path.exists('Tests/Settings'):
         os.makedirs('Tests/Settings')
+    if not os.path.exists('TLE'):
+        os.makedirs('TLE')  # Make the TLE saving directory
 except Exception as excep:
     print("There is a problem with the log directory. See tracback: \n%s" % excep, file=sys.stderr)
     sys.exit(-1)  # Exit the program if an error occurred
