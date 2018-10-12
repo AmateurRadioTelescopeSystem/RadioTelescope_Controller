@@ -66,6 +66,6 @@ while True:
             print("****Server Tester****")
             print(rec)
             print("*********************\n")
-            time.sleep(0.2)  # Wait a bit before closing
+            time.sleep(4)  # Wait a bit before closing
             connection.close()
             break
