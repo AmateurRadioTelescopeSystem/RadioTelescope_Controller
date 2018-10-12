@@ -77,6 +77,18 @@ class OpHandler(QtCore.QObject):
         autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
         autoconRPi = self.cfgData.getTCPAutoConnStatus()  # Auto-connection preference for the RPi server and client
 
+        # Try to get a new TLE, if the one we have is outdated
+        self.ui.tleStatusInfoSig.emit("")  # Just initialize the widget
+        tle_result = self.astronomy.tle_retriever()
+        if tle_result[0] is True:
+            tle_status_msg = "Success^TLE file(s) updated"
+        else:
+            tle_status_msg = "Error^There was a problem getting TLE file(s).^"
+            tle_status_msg += tle_result[1]
+        self.ui.tleStatusInfoSig.emit(tle_status_msg)
+        while not self.ui.tle_info_widg.clickedButton():
+            continue
+
         # If auto-connection is selected for thr TCP section, then do as requested
         if autoconStell == "yes":
             self.tcpStelThread.start()  # Start the server thread, since auto start is enabled
