@@ -16,6 +16,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     setManContStepsSig = QtCore.pyqtSignal(str, str, name='setManContSteps')
     setStyleSkyScanningSig = QtCore.pyqtSignal(tuple, name='setStylesheetForSkyScanning')
     updateCoordFieldsSig = QtCore.pyqtSignal(list, name='coordinateSetterSatelliteDialog')
+    tleStatusInfoSig = QtCore.pyqtSignal(str, name='tleStatusIndicatorSignal')
 
     def __init__(self, parent=None):
         super(Ui_RadioTelescopeControl, self).__init__(parent)
@@ -33,7 +34,13 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
         # Extra dialogs
         self.mapDialog = QtWidgets.QDialog()  # Create the location selection from map dialog
-        self.satelliteDialog = QtWidgets.QDialog()  # Create the satellite selction dialog
+        self.satelliteDialog = QtWidgets.QDialog()  # Create the satellite selection dialog
+        self.tle_info_widg = QtWidgets.QMessageBox()  # Message box to show TLE retrieval status
+        self.tle_info_widg.setParent(self.mainWin)  # Set the main program window to be the parent
+
+        # Initial setup of the message box
+        self.tle_info_widg.setWindowTitle("TLE Retriever")
+        self.tle_info_widg.setWindowModality(QtCore.Qt.ApplicationModal)
 
         # Set the icons for the GUI windows
         try:
@@ -116,6 +123,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.setStyleSkyScanningSig.connect(self.styleSetterSkyScan)
         self.setManContStepsSig.connect(self.manContStepSetter)
         self.updateCoordFieldsSig.connect(self.set_sat_coordinates)
+        self.tleStatusInfoSig.connect(self.tle_status)
 
         # Change between widgets
         self.main_widg.stellNextPageBtn.clicked.connect(lambda: self.main_widg.stackedWidget.setCurrentIndex(1))
@@ -637,6 +645,35 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.sky_scan_win.calculateScanMapBtn.setText("Simulate")
         else:
             self.sky_scan_win.calculateScanMapBtn.setText("Calculate")
+
+    @QtCore.pyqtSlot(str, name='tleStatusIndicatorSignal')
+    def tle_status(self, status: str):
+        formated_text_1 = "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\" " \
+                          "style = \"font-style:italic;\">%s</span></p></body></html>"
+        formated_text_green = "<html><head/><body><p align=\"center\"><span style=\" color:#00ff00;\" " \
+                              "style=\"font-weight:600;\">%s</span></p></body></html>"
+        formated_text_red = "<html><head/><body><p align=\"center\"><span style=\" color:#ff0000;\" " \
+                            "style=\"font-weight:600;\">%s</span></p></body></html>"
+        self.tle_info_widg.setText(formated_text_1 % "Updating TLE files....")
+
+        info = status.split("^")
+        if status == "":
+            self.tle_info_widg.setIcon(QtWidgets.QMessageBox.Information)
+            self.tle_info_widg.setInformativeText("")
+            self.tle_info_widg.show()
+
+        if info[0] == "Success":
+            self.tle_info_widg.setIcon(QtWidgets.QMessageBox.Information)
+            self.tle_info_widg.setInformativeText(formated_text_green % info[1])
+        elif info[0] == "Error":
+            self.tle_info_widg.setIcon(QtWidgets.QMessageBox.Warning)
+            self.tle_info_widg.setInformativeText(formated_text_red % info[1])
+        self.tle_info_widg.maximumWidth()
+        # Show the details regarding the error
+        try:
+            self.tle_info_widg.setDetailedText(info[2])
+        except IndexError:
+            self.tle_info_widg.setDetailedText("")
 
     # Show current date and time on the GUI
     def dateTime(self):
