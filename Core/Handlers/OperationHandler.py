@@ -602,6 +602,24 @@ class OpHandler(QtCore.QObject):
         coords = self.astronomy.geo_sat_position(satellite)
         self.ui.updateCoordFieldsSig.emit(coords)
 
+    def save_tle_settings(self):
+        self.cfgData.setTLEURL(self.ui.tle_settings_diag.tleURL.text())
+        self.cfgData.setTLEautoUpdate(self.ui.tle_settings_diag.autoUpdateSelection.isChecked())
+        self.cfgData.setTLEupdateInterval(self.ui.tle_settings_diag.intervalValue.value())
+
+    def show_tle_info(self):
+        auto_updt = self.cfgData.getTLEautoUpdate()
+        url = self.cfgData.getTLEURL()
+        interval = self.cfgData.getTLEupdateInterval()
+
+        values = (auto_updt, url, interval)
+        self.ui.setTLEDataSig.emit(values)
+
+    @QtCore.pyqtSlot(str, name='notifierToSaveTheSettingsSignal')
+    def settings_saver(self, window: str):
+        if window == "TLE":
+            self.save_tle_settings()
+
     # Make all the necessary signal connections
     def signalConnections(self):
         """
@@ -652,6 +670,10 @@ class OpHandler(QtCore.QObject):
         self.ui.calib_win.repositionButton.clicked.connect(self.calibration_reposition)
         self.ui.sat_sel_diag.satSelectionList.currentTextChanged.connect(self.sat_coords_setter)
         self.ui.sat_sel_diag.coordinateSystemBox.currentTextChanged.connect(self.sat_coords_setter)
+
+        self.ui.saveSettingsSig.connect(self.settings_saver)
+        self.ui.tle_settings_diag.buttonBox.accepted.connect(partial(self.ui.saveWaringSig.emit, "TLE"))
+        self.ui.main_widg.actionTLE_Settings.triggered.connect(self.show_tle_info)
 
         self.logD.debug("All signal connections made")
 

@@ -928,8 +928,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>488</width>
-     <height>21</height>
+     <width>551</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuThis_is_a_menu">
@@ -945,7 +945,14 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionCalibration"/>
+    <widget class="QMenu" name="menuCalibration">
+     <property name="title">
+      <string>Calibration</string>
+     </property>
+     <addaction name="actionCalibrate"/>
+     <addaction name="actionTLE_Settings"/>
+    </widget>
+    <addaction name="menuCalibration"/>
     <addaction name="actionLocation"/>
     <addaction name="actionManual_Control"/>
     <addaction name="separator"/>
@@ -1032,17 +1039,6 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionCalibration">
-   <property name="text">
-    <string>Calibration</string>
-   </property>
-   <property name="statusTip">
-    <string>Calibrate the radio telescope's dish positioning</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+K</string>
-   </property>
-  </action>
   <action name="actionLocation">
    <property name="text">
     <string>Location</string>
@@ -1096,6 +1092,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionCalibrate">
+   <property name="text">
+    <string>Calibrate</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+K</string>
+   </property>
+  </action>
+  <action name="actionTLE_Settings">
+   <property name="text">
+    <string>TLE Settings</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
    </property>
   </action>
  </widget>

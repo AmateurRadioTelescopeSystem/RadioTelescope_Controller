@@ -17,6 +17,9 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     setStyleSkyScanningSig = QtCore.pyqtSignal(tuple, name='setStylesheetForSkyScanning')
     updateCoordFieldsSig = QtCore.pyqtSignal(list, name='coordinateSetterSatelliteDialog')
     tleStatusInfoSig = QtCore.pyqtSignal(str, name='tleStatusIndicatorSignal')
+    saveWaringSig = QtCore.pyqtSignal(str, name='saveWarningMessageShowSignal')
+    saveSettingsSig = QtCore.pyqtSignal(str, name='notifierToSaveTheSettingsSignal')
+    setTLEDataSig = QtCore.pyqtSignal(tuple, name='setTheGUIDataForTLESignal')
 
     def __init__(self, parent=None):
         super(Ui_RadioTelescopeControl, self).__init__(parent)
@@ -36,9 +39,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.mapDialog = QtWidgets.QDialog()  # Create the location selection from map dialog
         self.satelliteDialog = QtWidgets.QDialog()  # Create the satellite selection dialog
         self.tle_info_widg = QtWidgets.QMessageBox()  # Message box to show TLE retrieval status
-        self.tle_info_widg.setParent(self.mainWin)  # Set the main program window to be the parent
+        self.tle_settings_widg = QtWidgets.QDialog()  # Create the TLE settings widget
 
         # Initial setup of the message box
+        self.tle_info_widg.setParent(self.mainWin)  # Set the main program window to be the parent
         self.tle_info_widg.setWindowTitle("TLE Retriever")
         self.tle_info_widg.setWindowModality(QtCore.Qt.ApplicationModal)
         self.tle_info_widg.setStandardButtons(QtWidgets.QMessageBox.NoButton)
@@ -67,6 +71,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.sky_scan_win = uic.loadUi(os.path.abspath('UI_Files/SkyScanning.ui'), self.uiSkyScanningWin)
             self.sat_sel_diag = uic.loadUi(os.path.abspath('UI_Files/SatelliteSelectionDialog.ui'),
                                            self.satelliteDialog)
+            self.tle_settings_diag = uic.loadUi(os.path.abspath('UI_Files/TLESettingsDialog.ui'),
+                                                self.tle_settings_widg)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
@@ -107,11 +113,12 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.main_widg.actionSettings.triggered.connect(self.uiTCPWin.show)  # Show the TCP settings window
         self.main_widg.actionManual_Control.triggered.connect(self.uiManContWin.show)  # Show the manual control window
         self.main_widg.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
-        self.main_widg.actionCalibration.triggered.connect(self.uiCalibrationWin.show)
-        self.main_widg.actionCalibration.triggered.connect(self.coordinate_updater_calibration)
+        self.main_widg.actionCalibrate.triggered.connect(self.uiCalibrationWin.show)
+        self.main_widg.actionCalibrate.triggered.connect(self.coordinate_updater_calibration)
         self.main_widg.actionPlanetaryObject.triggered.connect(self.uiPlanetaryObjWin.show)
         self.main_widg.actionSky_Scanning.triggered.connect(self.uiSkyScanningWin.show)
         self.main_widg.actionSky_Scanning.triggered.connect(self.coordinate_updater_scanning)
+        self.main_widg.actionTLE_Settings.triggered.connect(self.tle_settings_diag.show)
         self.main_widg.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
 
         self.main_widg.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
@@ -125,6 +132,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.setManContStepsSig.connect(self.manContStepSetter)
         self.updateCoordFieldsSig.connect(self.set_sat_coordinates)
         self.tleStatusInfoSig.connect(self.tle_status)
+        self.saveWaringSig.connect(self.save_warning)
+        self.setTLEDataSig.connect(self.set_tle_data)
 
         # Change between widgets
         self.main_widg.stellNextPageBtn.clicked.connect(lambda: self.main_widg.stackedWidget.setCurrentIndex(1))
@@ -669,16 +678,45 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.tle_info_widg.setIcon(QtWidgets.QMessageBox.Information)
             self.tle_info_widg.setInformativeText(formated_text_green % info[1])
             self.tle_info_widg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            self.tle_info_widg.setDefaultButton(QtWidgets.QMessageBox.Ok)
         elif info[0] == "Error":
             self.tle_info_widg.setIcon(QtWidgets.QMessageBox.Warning)
             self.tle_info_widg.setInformativeText(formated_text_red % info[1])
             self.tle_info_widg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            self.tle_info_widg.setDefaultButton(QtWidgets.QMessageBox.Ok)
 
         # Show the details regarding the error
         try:
             self.tle_info_widg.setDetailedText(info[2])
         except IndexError:
             self.tle_info_widg.setDetailedText("")
+
+    @QtCore.pyqtSlot(tuple, name='setTheGUIDataForTLESignal')
+    def set_tle_data(self, data: tuple):
+        if data[0] == "yes":
+            self.tle_settings_diag.autoUpdateSelection.setCheckState(QtCore.Qt.Checked)
+        else:
+            self.tle_settings_diag.autoUpdateSelection.setCheckState(QtCore.Qt.Unchecked)
+        self.tle_settings_diag.intervalValue.setValue(int(data[2]))
+        self.tle_settings_diag.tleURL.setText(data[1])
+
+    # Handle the settings saving request
+    @QtCore.pyqtSlot(str, name='saveWarningMessageShowSignal')
+    def save_warning(self, objec: str):
+        if objec == "TLE":
+            window = self.tle_settings_diag
+        elif objec == "TCP":
+            window = self.tcp_widg
+
+        choice = QtWidgets.QMessageBox.warning(window, 'Save settings', "Do you really want to save the settings?",
+                                               QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                               QtWidgets.QMessageBox.No)
+
+        if choice == QtWidgets.QMessageBox.Yes:
+            self.saveSettingsSig.emit(objec)  # Send the saving signal
+            window.close()  # Close the window after saving
+        else:
+            pass
 
     # Show current date and time on the GUI
     def dateTime(self):
