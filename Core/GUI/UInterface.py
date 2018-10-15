@@ -38,14 +38,14 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         # Extra dialogs
         self.mapDialog = QtWidgets.QDialog()  # Create the location selection from map dialog
         self.satelliteDialog = QtWidgets.QDialog()  # Create the satellite selection dialog
-        self.tle_info_widg = QtWidgets.QMessageBox()  # Message box to show TLE retrieval status
-        self.tle_settings_widg = QtWidgets.QDialog()  # Create the TLE settings widget
+        self.tleInfoMsgBox = QtWidgets.QMessageBox()  # Message box to show TLE retrieval status
+        self.tleSettingsDialog = QtWidgets.QDialog()  # Create the TLE settings widget
 
         # Initial setup of the message box
-        self.tle_info_widg.setParent(self.mainWin)  # Set the main program window to be the parent
-        self.tle_info_widg.setWindowTitle("TLE Retriever")
-        self.tle_info_widg.setWindowModality(QtCore.Qt.ApplicationModal)
-        self.tle_info_widg.setStandardButtons(QtWidgets.QMessageBox.NoButton)
+        self.tleInfoMsgBox.setParent(self.mainWin)  # Set the main program window to be the parent
+        self.tleInfoMsgBox.setWindowTitle("TLE Retriever")
+        self.tleInfoMsgBox.setWindowModality(QtCore.Qt.ApplicationModal)
+        self.tleInfoMsgBox.setStandardButtons(QtWidgets.QMessageBox.NoButton)
 
         # Set the icons for the GUI windows
         try:
@@ -57,6 +57,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.uiPlanetaryObjWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/planetary.png')))
             self.uiSkyScanningWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/skyScanning.png')))
             self.satelliteDialog.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/satelliteSelection.png')))
+            self.mapDialog.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/maps.png')))
+            self.tleSettingsDialog.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/TLESettings.png')))
         except Exception:
             self.logD.exception("Problem setting window icons. See traceback below.")
 
@@ -71,8 +73,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.sky_scan_win = uic.loadUi(os.path.abspath('UI_Files/SkyScanning.ui'), self.uiSkyScanningWin)
             self.sat_sel_diag = uic.loadUi(os.path.abspath('UI_Files/SatelliteSelectionDialog.ui'),
                                            self.satelliteDialog)
-            self.tle_settings_diag = uic.loadUi(os.path.abspath('UI_Files/TLESettingsDialog.ui'),
-                                                self.tle_settings_widg)
+            self.tle_settings_widg = uic.loadUi(os.path.abspath('UI_Files/TLESettingsDialog.ui'),
+                                                self.tleSettingsDialog)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
@@ -118,7 +120,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.main_widg.actionPlanetaryObject.triggered.connect(self.uiPlanetaryObjWin.show)
         self.main_widg.actionSky_Scanning.triggered.connect(self.uiSkyScanningWin.show)
         self.main_widg.actionSky_Scanning.triggered.connect(self.coordinate_updater_scanning)
-        self.main_widg.actionTLE_Settings.triggered.connect(self.tle_settings_diag.show)
+        self.main_widg.actionTLE_Settings.triggered.connect(self.tle_settings_widg.show)
         self.main_widg.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
 
         self.main_widg.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
@@ -664,47 +666,47 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                               "style=\"font-weight:600;\">%s</span></p></body></html>"
         formated_text_red = "<html><head/><body><p align=\"center\"><span style=\" color:#ff0000;\" " \
                             "style=\"font-weight:600;\">%s</span></p></body></html>"
-        self.tle_info_widg.setText(formated_text_1 % "Updating TLE files....")
+        self.tleInfoMsgBox.setText(formated_text_1 % "Updating TLE files....")
 
         info = status.split("^")
         if status == "":
-            self.tle_info_widg.setIcon(QtWidgets.QMessageBox.Information)
-            self.tle_info_widg.setInformativeText("<html><head/><body><p align=\"center\"><span "
+            self.tleInfoMsgBox.setIcon(QtWidgets.QMessageBox.Information)
+            self.tleInfoMsgBox.setInformativeText("<html><head/><body><p align=\"center\"><span "
                                                   "style=\" font-weight:600;\" "
                                                   "style = \"color:#ffb400\">Wait...</span></p></body></html>")
-            self.tle_info_widg.show()
+            self.tleInfoMsgBox.show()
 
         if info[0] == "Success":
-            self.tle_info_widg.setIcon(QtWidgets.QMessageBox.Information)
-            self.tle_info_widg.setInformativeText(formated_text_green % info[1])
-            self.tle_info_widg.setStandardButtons(QtWidgets.QMessageBox.Ok)
-            self.tle_info_widg.setDefaultButton(QtWidgets.QMessageBox.Ok)
+            self.tleInfoMsgBox.setIcon(QtWidgets.QMessageBox.Information)
+            self.tleInfoMsgBox.setInformativeText(formated_text_green % info[1])
+            self.tleInfoMsgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            self.tleInfoMsgBox.setDefaultButton(QtWidgets.QMessageBox.Ok)
         elif info[0] == "Error":
-            self.tle_info_widg.setIcon(QtWidgets.QMessageBox.Warning)
-            self.tle_info_widg.setInformativeText(formated_text_red % info[1])
-            self.tle_info_widg.setStandardButtons(QtWidgets.QMessageBox.Ok)
-            self.tle_info_widg.setDefaultButton(QtWidgets.QMessageBox.Ok)
+            self.tleInfoMsgBox.setIcon(QtWidgets.QMessageBox.Warning)
+            self.tleInfoMsgBox.setInformativeText(formated_text_red % info[1])
+            self.tleInfoMsgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            self.tleInfoMsgBox.setDefaultButton(QtWidgets.QMessageBox.Ok)
 
         # Show the details regarding the error
         try:
-            self.tle_info_widg.setDetailedText(info[2])
+            self.tleInfoMsgBox.setDetailedText(info[2])
         except IndexError:
-            self.tle_info_widg.setDetailedText("")
+            self.tleInfoMsgBox.setDetailedText("")
 
     @QtCore.pyqtSlot(tuple, name='setTheGUIDataForTLESignal')
     def set_tle_data(self, data: tuple):
         if data[0] == "yes":
-            self.tle_settings_diag.autoUpdateSelection.setCheckState(QtCore.Qt.Checked)
+            self.tle_settings_widg.autoUpdateSelection.setCheckState(QtCore.Qt.Checked)
         else:
-            self.tle_settings_diag.autoUpdateSelection.setCheckState(QtCore.Qt.Unchecked)
-        self.tle_settings_diag.intervalValue.setValue(int(data[2]))
-        self.tle_settings_diag.tleURL.setText(data[1])
+            self.tle_settings_widg.autoUpdateSelection.setCheckState(QtCore.Qt.Unchecked)
+        self.tle_settings_widg.intervalValue.setValue(int(data[2]))
+        self.tle_settings_widg.tleURL.setText(data[1])
 
     # Handle the settings saving request
     @QtCore.pyqtSlot(str, name='saveWarningMessageShowSignal')
     def save_warning(self, objec: str):
         if objec == "TLE":
-            window = self.tle_settings_diag
+            window = self.tle_settings_widg
         elif objec == "TCP":
             window = self.tcp_widg
 

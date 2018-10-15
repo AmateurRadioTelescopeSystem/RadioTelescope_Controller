@@ -86,7 +86,7 @@ class OpHandler(QtCore.QObject):
             tle_status_msg = "Error^There was a problem getting TLE file(s).^"
             tle_status_msg += tle_result[1]
         self.ui.tleStatusInfoSig.emit(tle_status_msg)
-        while not self.ui.tle_info_widg.clickedButton():
+        while not self.ui.tleInfoMsgBox.clickedButton():
             continue
 
         # If auto-connection is selected for thr TCP section, then do as requested
@@ -603,9 +603,9 @@ class OpHandler(QtCore.QObject):
         self.ui.updateCoordFieldsSig.emit(coords)
 
     def save_tle_settings(self):
-        self.cfgData.setTLEURL(self.ui.tle_settings_diag.tleURL.text())
-        self.cfgData.setTLEautoUpdate(self.ui.tle_settings_diag.autoUpdateSelection.isChecked())
-        self.cfgData.setTLEupdateInterval(self.ui.tle_settings_diag.intervalValue.value())
+        self.cfgData.setTLEURL(self.ui.tle_settings_widg.tleURL.text())
+        self.cfgData.setTLEautoUpdate(self.ui.tle_settings_widg.autoUpdateSelection.isChecked())
+        self.cfgData.setTLEupdateInterval(self.ui.tle_settings_widg.intervalValue.value())
 
     def show_tle_info(self):
         auto_updt = self.cfgData.getTLEautoUpdate()
@@ -672,7 +672,7 @@ class OpHandler(QtCore.QObject):
         self.ui.sat_sel_diag.coordinateSystemBox.currentTextChanged.connect(self.sat_coords_setter)
 
         self.ui.saveSettingsSig.connect(self.settings_saver)
-        self.ui.tle_settings_diag.buttonBox.accepted.connect(partial(self.ui.saveWaringSig.emit, "TLE"))
+        self.ui.tle_settings_widg.buttonBox.accepted.connect(partial(self.ui.saveWaringSig.emit, "TLE"))
         self.ui.main_widg.actionTLE_Settings.triggered.connect(self.show_tle_info)
 
         self.logD.debug("All signal connections made")
