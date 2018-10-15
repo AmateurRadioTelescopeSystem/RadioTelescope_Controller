@@ -162,6 +162,29 @@ class confData(object):
         self.root.find("Steps").set("dec_to_home", str(dec))
         self.tree.write(self.filename)
 
+    def getTLEURL(self):
+        url = self.getConfig("TLE", "url")
+        return url
+
+    def setTLEURL(self, url: str):
+        self.setConfig("TLE", "url", url)
+
+    def getTLEautoUpdate(self):
+        return self.root.find("TLE").get("autoupdate")
+
+    def setTLEautoUpdate(self, status: bool):
+        if status is True:
+            val = "yes"
+        else:
+            val = "no"
+        self.root.find("TLE").set("autoupdate", val)
+
+    def getTLEupdateInterval(self):
+        return self.getConfig("TLE", "updt_interval")
+
+    def setTLEupdateInterval(self, interval):
+        self.setConfig("TLE", "updt_interval", str(interval))
+
     def getAllConfiguration(self):
         loc = list(self.root.find("location"))
         tcp = list(self.root.find("TCP"))
