@@ -570,19 +570,21 @@ class OpHandler(QtCore.QObject):
             self.ui.motorsDisabledSig.emit()
 
     def calibration_reposition(self):
-        if self.motors_enabled:
-            system = self.calib_win.coordinatSystemcomboBox.currentText()
+        if not self.motors_enabled:
+            system = self.ui.calib_win.coordinatSystemcomboBox.currentText()
             home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
             if system == "Satellite" and self.ui.calib_win.calibCoord_1_Label.text() != "Satellite...":
-                satellite = self.ui.sat_sel_diag.satSelectionList.currentItem().text().spli(" ")
-                sat_pos = (satellite[-1][:-1], satellite[-1][-1],)
-                coords = self.astronomy.geo_sat_position(sat_pos)
+                coords = self.astronomy.geo_sat_position(self.ui.sat_sel_diag.satSelectionList.currentItem().text())
                 coord_1 = coords[1][0]  # Get the HA
                 coord_2 = coords[1][1]  # Get the DEC
-                command = "TRNST_RA_%.5f_DEC_%.5f\n" % (coord_1 - float(home_steps[0]), coord_2 - float(home_steps[1]))
-            else:
+                command = "TRNST_RA_%.5f_DEC_%.5f\n" % (coord_1, coord_2)
+            elif system == "Motor steps":
                 coord_1 = self.ui.calib_win.calibCoord_1_Text.text()
                 coord_2 = self.ui.calib_win.calibCoord_2_Text.text()
+                command = "MANCONT_MOVE_%d_%s_%s\n" % (200, coord_1, coord_2)
+            else:
+                coord_1 = float(self.ui.calib_win.calibCoord_1_Text.text())
+                coord_2 = float(self.ui.calib_win.calibCoord_2_Text.text())
                 coord_tuple = (coord_1, coord_2, )
                 sys_date_tuple = (system, "Now", )
 

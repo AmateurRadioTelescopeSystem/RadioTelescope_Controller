@@ -358,16 +358,17 @@ class Calculations(QtCore.QObject):
             epoch = self.current_time()  # Get the current time and date as the epoch
         else:
             epoch = system_and_date[1]
+        self.observer.date = epoch
 
         if system_and_date[0] == "Equatorial":
             ra, dec = coordinates
         elif system_and_date[0] == "Horizontal":
-            ra, dec = np.degrees(map(float, self.observer.radec_of(position[0], position[1])))
+            ra, dec = np.degrees(self.observer.radec_of(position[1], position[0]))
         elif system_and_date[0] == "Galactic":
-            galactic_posit = ephem.Galactic(position[0], position[1], epoch=epoch)
+            galactic_posit = ephem.Galactic(position[1], position[0], epoch=epoch)
             ra, dec = np.degrees(galactic_posit.to_radec())  # Convert point from Galactic to RA and DEC
         elif system_and_date[0] == "Ecliptic":
-            ecliptical_posit = ephem.Ecliptic(position[0], position[1], epoch=epoch)
+            ecliptical_posit = ephem.Ecliptic(position[1], position[0], epoch=epoch)
             ra, dec = np.degrees(ecliptical_posit.to_radec())  # Convert to RA and DEC from Ecliptic coordinate system
 
         return ra, dec  # Return the coordinate tuple
@@ -404,7 +405,7 @@ class Calculations(QtCore.QObject):
 
             c_time = self.current_time()  # Get the current time
             ha = np.round(self.hour_angle(c_time, math.degrees(sat.ra))
-                          , 4) % 360.0  # Get the hour angle of the satellite
+                          , 4)  # Get the hour angle of the satellite
 
             return np.array([np.round(np.degrees((sat.alt, sat.az,)), 4),
                              np.round((ha, np.degrees(sat.dec),), 4)]).tolist()
