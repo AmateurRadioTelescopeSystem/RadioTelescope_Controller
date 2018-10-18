@@ -134,7 +134,7 @@ def main():
     window_show = QtTest.QTest.qWaitForWindowExposed(ui.mainWin)  # Wait until the main window is shown
 
     QtTest.QTest.qWait(2000)  # Wait for the retrieval of TLE file
-    QtTest.QTest.mouseClick(ui.tle_info_widg.buttons()[0], QtCore.Qt.LeftButton)  # Click the GUI button to proceed
+    QtTest.QTest.mouseClick(ui.tleInfoMsgBox.buttons()[0], QtCore.Qt.LeftButton)  # Click the GUI button to proceed
     QtTest.QTest.qWait(1000)  # Wait for the client thread to start
 
     client_connected = (tcpClient.sock.state() == QtNetwork.QAbstractSocket.ConnectedState)  # Get the connection status
