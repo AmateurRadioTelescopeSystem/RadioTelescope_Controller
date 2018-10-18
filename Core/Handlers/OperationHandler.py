@@ -3,6 +3,8 @@ from Astronomy import Astronomy
 from Handlers import SimulationHandler
 from functools import partial
 import logging
+import time
+import os
 
 
 class OpHandler(QtCore.QObject):
@@ -78,16 +80,28 @@ class OpHandler(QtCore.QObject):
         autoconRPi = self.cfgData.getTCPAutoConnStatus()  # Auto-connection preference for the RPi server and client
 
         # Try to get a new TLE, if the one we have is outdated
-        self.ui.tleStatusInfoSig.emit("")  # Just initialize the widget
-        tle_result = self.astronomy.tle_retriever()
-        if tle_result[0] is True:
-            tle_status_msg = "Success^TLE file(s) updated"
-        else:
-            tle_status_msg = "Error^There was a problem getting TLE file(s).^"
-            tle_status_msg += tle_result[1]
-        self.ui.tleStatusInfoSig.emit(tle_status_msg)
-        while not self.ui.tleInfoMsgBox.clickedButton():
-            continue
+        try:
+            url = self.cfgData.getTLEURL()  # Get the URL from the settings file
+            file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
+
+            tle_mod_date = os.path.getmtime(file_dir)  # Get the last modified time in seconds
+            cur_time = time.time()  # Get the current time in seconds
+            delta_time = int((cur_time - tle_mod_date)/86400)  # Get the time passed since last modification in days
+
+            if delta_time >= int(self.cfgData.getTLEautoUpdate()):
+                self.ui.tleStatusInfoSig.emit("")  # Just initialize the widget
+                tle_result = self.astronomy.tle_retriever()
+                if tle_result[0] is True:
+                    tle_status_msg = "Success^TLE file(s) updated"
+                else:
+                    tle_status_msg = "Error^There was a problem getting TLE file(s).^"
+                    tle_status_msg += tle_result[1]
+                self.ui.tleStatusInfoSig.emit(tle_status_msg)
+                while not self.ui.tleInfoMsgBox.clickedButton():
+                    continue
+        except Exception as e:
+            self.logD.exception("There was a problem with the TLE. See traceback.")
+            self.ui.tleStatusInfoSig.emit("Error^There was a problem with the TLE file(s).^%s" % e)
 
         # If auto-connection is selected for thr TCP section, then do as requested
         if autoconStell == "yes":
@@ -570,7 +584,7 @@ class OpHandler(QtCore.QObject):
             self.ui.motorsDisabledSig.emit()
 
     def calibration_reposition(self):
-        if not self.motors_enabled:
+        if self.motors_enabled:
             system = self.ui.calib_win.coordinatSystemcomboBox.currentText()
             home_steps = self.cfgData.getHomeSteps()  # Return a list with the steps way from home position
             if system == "Satellite" and self.ui.calib_win.calibCoord_1_Label.text() != "Satellite...":
@@ -579,20 +593,27 @@ class OpHandler(QtCore.QObject):
                 coord_2 = coords[1][1]  # Get the DEC
                 command = "TRNST_RA_%.5f_DEC_%.5f\n" % (coord_1, coord_2)
             elif system == "Motor steps":
-                coord_1 = self.ui.calib_win.calibCoord_1_Text.text()
-                coord_2 = self.ui.calib_win.calibCoord_2_Text.text()
-                command = "MANCONT_MOVE_%d_%s_%s\n" % (200, coord_1, coord_2)
+                try:
+                    coord_1 = int(self.ui.calib_win.calibCoord_1_Text.text())
+                    coord_2 = int(self.ui.calib_win.calibCoord_2_Text.text())
+                    command = "MANCONT_MOVE_%d_%d_%d\n" % (200, coord_1, coord_2)
+                except ValueError:
+                    command = ""
             else:
-                coord_1 = float(self.ui.calib_win.calibCoord_1_Text.text())
-                coord_2 = float(self.ui.calib_win.calibCoord_2_Text.text())
-                coord_tuple = (coord_1, coord_2, )
-                sys_date_tuple = (system, "Now", )
+                try:
+                    coord_1 = float(self.ui.calib_win.calibCoord_1_Text.text())
+                    coord_2 = float(self.ui.calib_win.calibCoord_2_Text.text())
+                    coord_tuple = (coord_1, coord_2, )
+                    sys_date_tuple = (system, "Now", )
 
-                final_coords = self.astronomy.coordinate_transform(coord_tuple, sys_date_tuple)
-                transit_coords = self.astronomy.transit(final_coords[0], final_coords[1], -int(home_steps[0]),
-                                                        -int(home_steps[1]), 0)
-                command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
-            self.tcpClient.sendData.emit(command)  # Send the transit command to RPi, to set the calibration position
+                    final_coords = self.astronomy.coordinate_transform(coord_tuple, sys_date_tuple)
+                    transit_coords = self.astronomy.transit(final_coords[0], final_coords[1], -int(home_steps[0]),
+                                                            -int(home_steps[1]), 0)
+                    command = "TRNST_RA_%.5f_DEC_%.5f\n" % (transit_coords[0], transit_coords[1])
+                except ValueError:
+                    command = ""
+            if command != "":
+                self.tcpClient.sendData.emit(command)  # Send the transit command to set the calibration position
         else:
             self.ui.motorsDisabledSig.emit()
 
