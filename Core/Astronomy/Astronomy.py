@@ -375,7 +375,8 @@ class Calculations(QtCore.QObject):
 
     def tle_retriever(self):
         # TODO improve the function
-        url = "https://www.celestrak.com/NORAD/elements/geo.txt"
+        # TODO Add exception handling code in case of empty URL string
+        url = self.cfg_data.getTLEURL()  # Get the URL from the settings file
         file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
         http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())  # Create the HTTP pool manager
 
@@ -395,9 +396,13 @@ class Calculations(QtCore.QObject):
         return [exit_code, error_details]
 
     def geo_sat_position(self, satellite: str):
-        # TODO improve the funtion
+        # TODO improve the function
         try:
-            tle_data = tlefile.read(satellite, os.path.abspath("TLE/geo.txt"))
+            # Get the filename
+            url = self.cfg_data.getTLEURL()  # Get the URL from the settings file
+            file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
+
+            tle_data = tlefile.read(satellite, file_dir)
 
             sat = ephem.readtle(tle_data.platform, tle_data.line1, tle_data.line2)
             self.observer.date = self.current_time()
