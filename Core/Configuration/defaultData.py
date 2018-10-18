@@ -19,12 +19,15 @@ log_config_str = """Logging:
       level: DEBUG
       stream: ext://sys.stderr
     debugFile:
-      class: logging.FileHandler
+      class: Handlers.CLogFileHandler.CustomLogRotationHandler
       formatter: debugging
       level: DEBUG
       filename: logs/debugging_info.log
+      max_bytes: 1048576  # Set change size to 1MB
+      backup_count: 7  # Keep 7 days old files and delete older
+      enc: 'utf-8'  # Set the file encoding to utf-8
     radioTelescopeThread:
-      class: Handlers.CLogFileHandler.CustomLogHandler
+      class: Handlers.CLogFileHandler.CustomLogTimedRotationHandler
       formatter: mainFile
       level: INFO
       filename: logs/RadioTelescope_Logger.log
@@ -33,10 +36,15 @@ log_config_str = """Logging:
       enc: 'utf-8'  # Set the file encoding to utf-8
       utc: True  # Set the time of file creation to be UTC
 
+  loggers:
+    debugging_logger:
+      level: DEBUG
+      handlers: [debugFile]
+
   # Configure the root logger
   root:
     level: INFO
-    handlers: [console, debugFile, radioTelescopeThread]
+    handlers: [console, radioTelescopeThread]
 
 """
 
@@ -58,6 +66,10 @@ settings_xml_str = """<settings>
         <host>127.0.0.1</host>
         <port>10003</port>
     </TCPRPiServ>
+    <TLE autoupdate="yes">
+        <updt_interval>7</updt_interval>
+        <url>https://www.celestrak.com/NORAD/elements/geo.txt</url>
+    </TLE>
     <object stationary="yes">
         <name>Crab Nebula</name>
         <RA>83.63308333</RA>
