@@ -30,8 +30,6 @@ class Calculations(QtCore.QObject):
         self.observer.lat, self.observer.lon = self.latlon[0], self.latlon[1]  # Provide the observer's location
         self.observer.elevation = float(self.alt)  # Set the location's altitude in meters
 
-        self.tle = ""  # Hold the read TLE data
-
     def hour_angle(self, date: tuple, obj_ra: float):
         self.observer.date = date
         calculated_ha = float(self.observer.sidereal_time())*_rad_to_deg - obj_ra  # Ephem sidereal returns in rad
@@ -372,28 +370,6 @@ class Calculations(QtCore.QObject):
             ra, dec = np.degrees(ecliptical_posit.to_radec())  # Convert to RA and DEC from Ecliptic coordinate system
 
         return ra, dec  # Return the coordinate tuple
-
-    def tle_retriever(self):
-        # TODO improve the function
-        # TODO Add exception handling code in case of empty URL string
-        url = self.cfg_data.getTLEURL()  # Get the URL from the settings file
-        file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
-        http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())  # Create the HTTP pool manager
-
-        try:
-            tle = http.request('GET', url)
-            self.tle = tle.data  # Save the retrieved data
-            with open(file_dir, 'wb') as tle_file:
-                tle_file.write(tle.data)  # Save the TLE file contents
-                tle_file.close()
-            error_details = ""
-            exit_code = True
-        except Exception as e:
-            self.logD.exception("Error occurred acquiring TLE file. See traceback.")
-            error_details = "%s" % e
-            exit_code = False
-
-        return [exit_code, error_details]
 
     def geo_sat_position(self, satellite: str):
         # TODO improve the function
