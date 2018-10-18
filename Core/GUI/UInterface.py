@@ -524,7 +524,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             coord_1 = coord_1 % "RA:  "
             coord_2 = coord_2 % "DEC: "
             validator_coord_1.setRange(0.0, 360.0, 6)
-            validator_coord_2.setRange(0.0, 360.0, 6)
+            validator_coord_2.setRange(-18.0, 18.0, 6)
         elif system == "Galactic":
             coord_1 = coord_1 % "Lat: "
             coord_2 = coord_2 % "Lon: "
@@ -584,7 +584,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             coord_1 = coord_1 % "RA:  "
             coord_2 = coord_2 % "DEC: "
             validator_coord_1.setRange(0.0, 360.0, 6)
-            validator_coord_2.setRange(0.0, 360.0, 6)
+            validator_coord_2.setRange(-18.0, 18.0, 6)
         elif system == "Galactic":
             coord_1 = coord_1 % "Lat: "
             coord_2 = coord_2 % "Lon: "
