@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtNetwork
 from Astronomy import Astronomy
 from Handlers import SimulationHandler
+from Handlers import TLEHandler
 from functools import partial
 import logging
 import time
@@ -45,6 +46,8 @@ class OpHandler(QtCore.QObject):
         self.max_steps_to_targ_dec = 0
         self.simStarted = False
 
+        self.tle_operations = TLEHandler.TLEHandler(cfgData)  # Create the TLE handling object
+
         # Simulation thread operations
         self.simThread = QtCore.QThread()
         self.simHandler = SimulationHandler.SimulHandler(tcpStellarium)
@@ -80,28 +83,29 @@ class OpHandler(QtCore.QObject):
         autoconRPi = self.cfgData.getTCPAutoConnStatus()  # Auto-connection preference for the RPi server and client
 
         # Try to get a new TLE, if the one we have is outdated
-        try:
-            url = self.cfgData.getTLEURL()  # Get the URL from the settings file
-            file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
+        tle_expiry = self.tle_operations.tle_expiry_checker()  # Check the validity of the file
 
-            tle_mod_date = os.path.getmtime(file_dir)  # Get the last modified time in seconds
-            cur_time = time.time()  # Get the current time in seconds
-            delta_time = int((cur_time - tle_mod_date)/86400)  # Get the time passed since last modification in days
+        if (tle_expiry[0] is True and tle_expiry[1] is True) or \
+                (tle_expiry[0] is False and tle_expiry[2] == "File not found"):
+            self.ui.tleStatusInfoSig.emit("")  # Just initialize the widget
+            tle_result = self.tle_operations.tle_retriever()  # Get the new TLE file
 
-            if delta_time >= int(self.cfgData.getTLEautoUpdate()):
-                self.ui.tleStatusInfoSig.emit("")  # Just initialize the widget
-                tle_result = self.astronomy.tle_retriever()
-                if tle_result[0] is True:
-                    tle_status_msg = "Success^TLE file(s) updated"
-                else:
-                    tle_status_msg = "Error^There was a problem getting TLE file(s).^"
-                    tle_status_msg += tle_result[1]
-                self.ui.tleStatusInfoSig.emit(tle_status_msg)
-                while not self.ui.tleInfoMsgBox.clickedButton():
-                    continue
-        except Exception as e:
-            self.logD.exception("There was a problem with the TLE. See traceback.")
-            self.ui.tleStatusInfoSig.emit("Error^There was a problem with the TLE file(s).^%s" % e)
+            if tle_result[0] is True:
+                tle_status_msg = "Success^TLE file(s) updated"
+            else:
+                tle_status_msg = "Error^There was a problem getting TLE file(s).^"
+                tle_status_msg += tle_result[1]
+        elif tle_expiry[0] is False:
+            self.ui.tleStatusInfoSig.emit("")  # Just initialize the widget
+            tle_status_msg = "Error^There was a problem checking TLE file(s).^"
+            tle_status_msg += tle_expiry[2]
+        else:
+            tle_status_msg = ""
+
+        if tle_status_msg != "":
+            self.ui.tleStatusInfoSig.emit(tle_status_msg)
+            while not self.ui.tleInfoMsgBox.clickedButton():
+                continue
 
         # If auto-connection is selected for thr TCP section, then do as requested
         if autoconStell == "yes":
