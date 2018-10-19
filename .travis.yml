@@ -12,7 +12,7 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
   - chmod +x build_test.sh
 install:
-  - pip install -r requirements.txt
+  - ./configure.sh
 before_script:
   - nohup python3 Tests/server_tester.py &
 script:
