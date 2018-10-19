@@ -134,13 +134,26 @@ def main():
 
     window_show = QtTest.QTest.qWaitForWindowExposed(ui.main_widg)  # Wait until the main window is shown
 
-    time.sleep(2)  # Wait for the retrieval of TLE file
+    # Wait for the retrieval of TLE file
+    tmr = QtCore.QTimer()
+    tmr.setInterval(6000)
+    tmr.setSingleShot(True)
+    tmr.start()
+
+    while ui.tleInfoMsgBox.buttons() == [] and tmr.remainingTime() != -1:
+        QtWidgets.QApplication.processEvents()
+        continue
     try:
         QtTest.QTest.mouseClick(ui.tleInfoMsgBox.buttons()[0], QtCore.Qt.LeftButton)  # Click the GUI button to proceed
     except IndexError:
         pass
-    finally:
-        time.sleep(1)  # Wait for the client thread to start
+
+    # Wait for the client thread to start
+    tmr.setInterval(2000)
+    tmr.start()
+
+    while tmr.remainingTime() != -1:
+        QtWidgets.QApplication.processEvents()
 
     client_connected = (tcpClient.sock.state() == QtNetwork.QAbstractSocket.ConnectedState)  # Get the connection status
 
