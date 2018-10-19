@@ -28,18 +28,18 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
         # Create the main GUI window and the other windows
         self.mainWin = QtWidgets.QMainWindow()  # Create the main window of the GUI
-        self.uiManContWin = QtWidgets.QMainWindow()  # Create the Manual control window
-        self.uiTCPWin = QtWidgets.QMainWindow()  # Create the TCP settings window object
-        self.uiLocationWin = QtWidgets.QDialog()  # Create the location settings window object
-        self.uiCalibrationWin = QtWidgets.QMainWindow()  # Create the calibration window object
-        self.uiPlanetaryObjWin = QtWidgets.QMainWindow()  # Create the planetary object selection window
-        self.uiSkyScanningWin = QtWidgets.QMainWindow()  # Create the sky scanning control window
+        self.uiManContWin = QtWidgets.QMainWindow(parent=self.mainWin)  # Create the Manual control window
+        self.uiTCPWin = QtWidgets.QMainWindow(parent=self.mainWin)  # Create the TCP settings window object
+        self.uiLocationWin = QtWidgets.QDialog(parent=self.mainWin)  # Create the location settings window object
+        self.uiCalibrationWin = QtWidgets.QMainWindow(parent=self.mainWin)  # Create the calibration window object
+        self.uiPlanetaryObjWin = QtWidgets.QMainWindow(parent=self.mainWin)  # Create the planetary object selection GUI
+        self.uiSkyScanningWin = QtWidgets.QMainWindow(parent=self.mainWin)  # Create the sky scanning control window
 
         # Extra dialogs
-        self.mapDialog = QtWidgets.QDialog()  # Create the location selection from map dialog
-        self.satelliteDialog = QtWidgets.QDialog()  # Create the satellite selection dialog
+        self.mapDialog = QtWidgets.QDialog(parent=self.uiLocationWin)  # Create the location selection from map dialog
+        self.satelliteDialog = QtWidgets.QDialog(parent=self.uiCalibrationWin)  # Create the satellite selection dialog
+        self.tleSettingsDialog = QtWidgets.QDialog(parent=self.mainWin)  # Create the TLE settings widget
         self.tleInfoMsgBox = QtWidgets.QMessageBox()  # Message box to show TLE retrieval status
-        self.tleSettingsDialog = QtWidgets.QDialog()  # Create the TLE settings widget
 
         # Initial setup of the message box
         self.tleInfoMsgBox.setParent(self.mainWin)  # Set the main program window to be the parent
