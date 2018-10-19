@@ -87,7 +87,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.timer.timeout.connect(self.dateTime)  # Assign the timeout signal to date and time show
         self.timer.setInterval(1000)  # Update date and time ever second
 
-        QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create("Fusion"))  # Change the style of the GUI
+        #QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create('Fusion'))  # Change the style of the GUI
+        print(QtWidgets.QStyleFactory.keys())
 
     def setupUi(self):
         # Set the font according to the OS
@@ -114,19 +115,19 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.main_widg.dishHaultCommandCheckBox.stateChanged.connect(self.checkBoxDishHault)
         self.main_widg.motorCommandCheckBox.stateChanged.connect(self.checkBoxMotors)
 
-        self.main_widg.actionSettings.triggered.connect(self.uiTCPWin.show)  # Show the TCP settings window
-        self.main_widg.actionManual_Control.triggered.connect(self.uiManContWin.show)  # Show the manual control window
-        self.main_widg.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
-        self.main_widg.actionCalibrate.triggered.connect(self.uiCalibrationWin.show)
+        self.main_widg.actionSettings.triggered.connect(self.tcp_widg.show)  # Show the TCP settings window
+        self.main_widg.actionManual_Control.triggered.connect(self.man_cn_widg.show)  # Show the manual control window
+        self.main_widg.actionLocation.triggered.connect(self.loc_widg.show)  # Show the location settings dialog
+        self.main_widg.actionCalibrate.triggered.connect(self.calib_win.show)
         self.main_widg.actionCalibrate.triggered.connect(self.coordinate_updater_calibration)
-        self.main_widg.actionPlanetaryObject.triggered.connect(self.uiPlanetaryObjWin.show)
-        self.main_widg.actionSky_Scanning.triggered.connect(self.uiSkyScanningWin.show)
+        self.main_widg.actionPlanetaryObject.triggered.connect(self.plan_obj_win.show)
+        self.main_widg.actionSky_Scanning.triggered.connect(self.sky_scan_win.show)
         self.main_widg.actionSky_Scanning.triggered.connect(self.coordinate_updater_scanning)
         self.main_widg.actionTLE_Settings.triggered.connect(self.tle_settings_widg.show)
-        self.main_widg.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
+        self.main_widg.actionExit.triggered.connect(partial(self.close_application, objec=self.main_widg))
 
-        self.main_widg.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
-        self.main_widg.locatChangeBtn.clicked.connect(self.uiLocationWin.show)
+        self.main_widg.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.main_widg))
+        self.main_widg.locatChangeBtn.clicked.connect(self.loc_widg.show)
         self.main_widg.onTargetProgress.setVisible(False)  # Have the progrees bar invisible at first
 
         # Signal connections
@@ -150,7 +151,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tcp_widg.stellIPServBox.currentIndexChanged.connect(self.ipSelectionBoxStellServer)
 
         # Make connections for the location settings dialog
-        self.loc_widg.exitBtn.clicked.connect(self.uiLocationWin.close)  # Close the settings window when requested
+        self.loc_widg.exitBtn.clicked.connect(self.loc_widg.close)  # Close the settings window when requested
         self.loc_widg.locationTypeChoose.currentIndexChanged.connect(self.showMapSelection)
 
         # Make the webview widget for the map
@@ -429,7 +430,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         if not self.motor_warn_msg_shown:
             msg = QtWidgets.QMessageBox()  # Create the message box object
             self.motor_warn_msg_shown = True  # Set the show indicator before showing the window
-            msg.warning(self.mainWin, 'Motor Warning',
+            msg.warning(self.main_widg, 'Motor Warning',
                         "<html><head/><body><p align=\"center\"><span style = \""
                         "font-weight:600\" style = \"color:#ff0000;\">"
                         "Motors are disabled!!</span></p></body></html>"
@@ -739,7 +740,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         try:
             self.timer.start()  # Start the timer for the date and time label
             self.dateTime()  # Call that initially to render it on the GUI
-            self.mainWin.show()  # Show the GUI window
+            self.main_widg.show()  # Show the GUI window
         except Exception as e:
             print("Exception from UI show_app: %s" % e)
 
