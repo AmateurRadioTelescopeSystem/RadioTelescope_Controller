@@ -42,7 +42,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tleInfoMsgBox = QtWidgets.QMessageBox()  # Message box to show TLE retrieval status
 
         # Initial setup of the message box
-        self.tleInfoMsgBox.setParent(self.mainWin)  # Set the main program window to be the parent
+        self.tleInfoMsgBox.setAutoFillBackground(True)  # Auto fill the background of the message
         self.tleInfoMsgBox.setWindowTitle("TLE Retriever")
         self.tleInfoMsgBox.setWindowModality(QtCore.Qt.ApplicationModal)
         self.tleInfoMsgBox.setStandardButtons(QtWidgets.QMessageBox.NoButton)
@@ -63,6 +63,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
+        self.tleInfoMsgBox.setParent(self.main_widg)  # Set the main program window to be the parent
 
         # Set the icons for the GUI windows
         try:
