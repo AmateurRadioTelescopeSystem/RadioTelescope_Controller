@@ -20,9 +20,10 @@ This installation information are not the final ones, since more packages may be
 ### How do I get set up? ###
 
 * In the setup process the important part is to install the required package/packages
-* Use the `$ (sudo) pip install -r requirements.txt` command to install the necessary packages for python.
-* After the installtion of packages, you can run the main program from the `run.sh` script.
-* Running command: `$ ./run.sh`. Make sure the run script has executable permissions.
+* Use the `configure.sh` script to install the necessary packages for python and do the initial setup.
+* _Configuration command_: `$ (sudo) ./configure.sh`. Note that you may be required to run the script as sudo, in order to properly work.
+* After the installation of packages, you can run the main program from the `run.sh` script.
+* _Running command_: `$ ./run.sh`. Make sure the run script has executable permissions.
 * If executable permissions are needed for the run script type `$ chmod +x run.sh`, and the run the script as described above.
 
 
