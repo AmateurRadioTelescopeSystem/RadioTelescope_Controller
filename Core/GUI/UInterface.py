@@ -3,7 +3,6 @@
 
 from PySide2 import QtCore, QtGui, QtWidgets, QtUiTools, QtWebEngineWidgets
 from functools import partial
-from GUI import resources
 import logging
 import sys
 import os
@@ -26,6 +25,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.logD = logging.getLogger(__name__)  # Create the logger for the file
         self.motor_warn_msg_shown = False
 
+        # Load the resources binary file
+        resource_file = QtCore.QResource()
+        resource_file.registerResource("Core/GUI/resources.rcc")
+
         # Create the main GUI window and the other windows
         self.mainWin = QtWidgets.QMainWindow()  # Create the main window of the GUI
         self.uiManContWin = QtWidgets.QMainWindow(parent=self.mainWin)  # Create the Manual control window
@@ -46,6 +49,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tleInfoMsgBox.setWindowTitle("TLE Retriever")
         self.tleInfoMsgBox.setWindowModality(QtCore.Qt.ApplicationModal)
         self.tleInfoMsgBox.setStandardButtons(QtWidgets.QMessageBox.NoButton)
+        self.tleInfoMsgBox.setVisible(False)  # No need to be visible all the time
 
         try:
             self.main_widg = self.loadUiWidget(os.path.abspath('UI_Files/RadioTelescope.ui'))
@@ -138,6 +142,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tleStatusInfoSig.connect(self.tle_status)
         self.saveWaringSig.connect(self.save_warning)
         self.setTLEDataSig.connect(self.set_tle_data)
+
+        # Hide the message box
+        self.tleInfoMsgBox.accepted.connect(partial(self.tleInfoMsgBox.setVisible, False))
+        self.tleInfoMsgBox.rejected.connect(partial(self.tleInfoMsgBox.setVisible, False))
 
         # Change between widgets
         self.main_widg.stellNextPageBtn.clicked.connect(lambda: self.main_widg.stackedWidget.setCurrentIndex(1))
@@ -684,7 +692,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.tleInfoMsgBox.setInformativeText("<html><head/><body><p align=\"center\"><span "
                                                   "style=\" font-weight:600;\" "
                                                   "style = \"color:#ffb400\">Wait...</span></p></body></html>")
-            self.tleInfoMsgBox.show()
+            self.tleInfoMsgBox.setVisible(True)  # Set the message box visible before showing
+            self.tleInfoMsgBox.show()  # Show the message box
 
         if info[0] == "Success":
             self.tleInfoMsgBox.setIcon(QtWidgets.QMessageBox.Information)
