@@ -5,7 +5,7 @@ import os
 
 sys.path.append(os.path.abspath('Core/'))
 
-from PyQt5 import QtWidgets, QtCore, QtTest, QtNetwork
+from PySide2 import QtWidgets, QtCore, QtTest, QtNetwork
 from GUI import UInterface
 from Handlers import OperationHandler
 from Client import ClientThread
@@ -16,6 +16,7 @@ import defaultData
 import logging.config
 import logging
 import yaml
+import time
 
 # Required for successful operation of the pyinstaller
 from Handlers import CLogFileHandler
@@ -120,22 +121,26 @@ def main():
     s_alt = cfgData.getAltitude()  # Get the altitude from the settings file
 
     # Show location on the GUI
-    ui.mainWin.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
+    ui.main_widg.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
                                   "vertical-align:super;\">o</span></p></body></html>" % s_latlon[1])
-    ui.mainWin.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
+    ui.main_widg.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
                                   "vertical-align:super;\">o</span></p></body></html>" % s_latlon[0])
-    ui.mainWin.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % s_alt)
+    ui.main_widg.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % s_alt)
 
     # We quit from the operation handle thread and then we exit. All handling is done there
     app.aboutToQuit.connect(operHandlerThread.quit)
 
     ui.show_application()  # Render and show the GUI main window and start the application
 
-    window_show = QtTest.QTest.qWaitForWindowExposed(ui.mainWin)  # Wait until the main window is shown
+    window_show = QtTest.QTest.qWaitForWindowExposed(ui.main_widg)  # Wait until the main window is shown
 
-    QtTest.QTest.qWait(2000)  # Wait for the retrieval of TLE file
-    QtTest.QTest.mouseClick(ui.tleInfoMsgBox.buttons()[0], QtCore.Qt.LeftButton)  # Click the GUI button to proceed
-    QtTest.QTest.qWait(1000)  # Wait for the client thread to start
+    time.sleep(2)  # Wait for the retrieval of TLE file
+    try:
+        QtTest.QTest.mouseClick(ui.tleInfoMsgBox.buttons()[0], QtCore.Qt.LeftButton)  # Click the GUI button to proceed
+    except IndexError:
+        pass
+    finally:
+        time.sleep(1)  # Wait for the client thread to start
 
     client_connected = (tcpClient.sock.state() == QtNetwork.QAbstractSocket.ConnectedState)  # Get the connection status
 
