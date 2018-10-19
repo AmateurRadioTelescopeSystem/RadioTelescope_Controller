@@ -290,6 +290,7 @@ logs/*
 
 # Ignore the compiled resources file
 resources.py
+resources.rcc
 
 # Ignore the TLE directory
 TLE/*
