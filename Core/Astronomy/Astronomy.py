@@ -1,4 +1,4 @@
-from PyQt5 import QtCore
+from PySide2 import QtCore
 from pyorbital import tlefile
 import numpy as np
 import logging

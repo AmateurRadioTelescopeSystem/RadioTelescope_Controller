@@ -1,10 +1,10 @@
-from PyQt5 import QtCore
+from PySide2 import QtCore
 import logging
 
 
 class SimulHandler(QtCore.QObject):
-    simStartSig = QtCore.pyqtSignal(tuple, float, name='simulationStarter')
-    simStopSig = QtCore.pyqtSignal(name='stopCurrentSimulation')
+    simStartSig = QtCore.Signal(tuple, float, name='simulationStarter')
+    simStopSig = QtCore.Signal(name='stopCurrentSimulation')
 
     def __init__(self, tcpStellarium, parent=None):
         super(SimulHandler, self).__init__(parent)
@@ -36,14 +36,14 @@ class SimulHandler(QtCore.QObject):
             self.timer.stop()  # Stop the timer
             self.counter = 0  # Reset the count
 
-    @QtCore.pyqtSlot(tuple, float, name='simulationStarter')
+    @QtCore.Slot(tuple, float, name='simulationStarter')
     def simStarter(self, points: tuple, speed: float):
         self.map_points = points  # Save the map points
         self.counter = 0  # Reset the counter variable
         self.timer.setInterval(speed)  # Set the interval at which the point will move
         self.timer.start()  # Start the simulation timer
 
-    @QtCore.pyqtSlot(name='stopCurrentSimulation')
+    @QtCore.Slot(name='stopCurrentSimulation')
     def simStopper(self):
         self.timer.stop()  # Stop the timer as requested
         self.counter = 0  # Reset the counter

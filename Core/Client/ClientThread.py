@@ -1,14 +1,14 @@
-from PyQt5 import QtCore, QtNetwork
+from PySide2 import QtCore, QtNetwork
 import logging
 
 
 class ClientThread(QtCore.QObject):
     # Create the signals to be used for data handling
-    conStatSigC = QtCore.pyqtSignal(str, name='conClientStat')  # Connection indication signal
-    dataRcvSigC = QtCore.pyqtSignal(str, name='dataClientRX')  # Send the received data out
-    sendData = QtCore.pyqtSignal(str, name='sendDataClient')  # Data to be sent to the server
-    reConnectSigC = QtCore.pyqtSignal(name='reConnectClient')  # A reconnection signal originating from a button press
-    newConInitComms = QtCore.pyqtSignal(name='sendNewConCommands')  # Send the initial commands on each new connection
+    conStatSigC = QtCore.Signal(str, name='conClientStat')  # Connection indication signal
+    dataRcvSigC = QtCore.Signal(str, name='dataClientRX')  # Send the received data out
+    sendData = QtCore.Signal(str, name='sendDataClient')  # Data to be sent to the server
+    reConnectSigC = QtCore.Signal(name='reConnectClient')  # A reconnection signal originating from a button press
+    newConInitComms = QtCore.Signal(name='sendNewConCommands')  # Send the initial commands on each new connection
 
     def __init__(self, cfgData, parent=None):
         super(ClientThread, self).__init__(parent)  # Get the parent of the class
@@ -25,7 +25,7 @@ class ClientThread(QtCore.QObject):
         mut.unlock()  # Unlock the thread, since it has started successfully
 
     # The connect function is called if the signal is fired or in the start of the thread
-    @QtCore.pyqtSlot(name='reConnectClient')
+    @QtCore.Slot(name='reConnectClient')
     def connect(self):
         self.log.debug("Client connection initializer called")
         if self.sock.state() != QtNetwork.QAbstractSocket.ConnectedState:
@@ -46,7 +46,7 @@ class ClientThread(QtCore.QObject):
                 self.conStatSigC.emit("Disconnected")  # Indicate that we are not connected
                 self.log.warning("Client was unable to connect to: %s:%s" % (host, port))
 
-    @QtCore.pyqtSlot(str, name='sendDataClient')
+    @QtCore.Slot(str, name='sendDataClient')
     def sendC(self, data: str):
         if self.sock.state() == QtNetwork.QAbstractSocket.ConnectedState:
             self.sock.write(data.encode('utf-8'))  # Send the data to the server

@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtNetwork
+from PySide2 import QtCore, QtNetwork
 from Astronomy import Astronomy
 from Handlers import SimulationHandler
 from Handlers import TLEHandler
@@ -9,7 +9,7 @@ import os
 
 
 class OpHandler(QtCore.QObject):
-    posDataShow = QtCore.pyqtSignal(float, float, name='posDataShow')
+    posDataShow = QtCore.Signal(float, float, name='posDataShow')
 
     def __init__(self, tcpClient, tcpServer, tcpStellarium, tcpClThread, tcpServThread,
                  tcpStelThread, ui, cfgData, parent=None):
@@ -160,14 +160,14 @@ class OpHandler(QtCore.QObject):
         else:
             self.tcpClient.sendData.emit("ENABLE_MOTORS\n")
 
-    @QtCore.pyqtSlot(name='sendNewConCommands')
+    @QtCore.Slot(name='sendNewConCommands')
     def initialCommands(self):
         # TODO add more commands to send, like system check reports and others
         self.tcpClient.sendData.emit("SEND_HOME_STEPS\n")  # Get the steps from home for each motor
         self.tcpClient.sendData.emit("REPORT_MOTOR_STATUS\n")  # Get the current status of the motors
 
     # Dta received from the client connected to the RPi server
-    @QtCore.pyqtSlot(str, name='dataClientRX')
+    @QtCore.Slot(str, name='dataClientRX')
     def clientDataRx(self, data: str):
         """
         Data reception from the TCP client.
@@ -198,7 +198,7 @@ class OpHandler(QtCore.QObject):
         if type(data) is str:
             self.ui.setGUIFromClientSig.emit(data)  # If it is not split yet, send the command
 
-    @QtCore.pyqtSlot(list, name='clientCommandSendStell')
+    @QtCore.Slot(list, name='clientCommandSendStell')
     def stellCommSend(self, radec: list):
         """
         Send the appropriate command according to the selected mode. Data is received from Stellarium (sendClientConn)
@@ -223,7 +223,7 @@ class OpHandler(QtCore.QObject):
                 self.tcpClient.sendData.emit(command)  # Send the tracking command to the RPi
 
     # Received data from the server that the RPi is connected as a client. Signal is (dataRxFromServ)
-    @QtCore.pyqtSlot(str, name='rpiServDataRx')
+    @QtCore.Slot(str, name='rpiServDataRx')
     def rpiServRcvData(self, data: str):
         """
         Get the data sent from the RPi client.
@@ -259,7 +259,7 @@ class OpHandler(QtCore.QObject):
                 self.ui.main_widg.onTargetProgress.setValue(ratio)
 
     # Command to stop any motion of the radio telescope dish
-    @QtCore.pyqtSlot(name='stopRadioTele')
+    @QtCore.Slot(name='stopRadioTele')
     def stopMovingRT(self):
         # TODO change the command to the appropriate one
         self.tcpClient.sendData.emit("STOP\n")  # Send the request to stop moving to the RPi server
@@ -642,7 +642,7 @@ class OpHandler(QtCore.QObject):
         values = (auto_updt, url, interval)
         self.ui.setTLEDataSig.emit(values)
 
-    @QtCore.pyqtSlot(str, name='notifierToSaveTheSettingsSignal')
+    @QtCore.Slot(str, name='notifierToSaveTheSettingsSignal')
     def settings_saver(self, window: str):
         if window == "TLE":
             self.save_tle_settings()

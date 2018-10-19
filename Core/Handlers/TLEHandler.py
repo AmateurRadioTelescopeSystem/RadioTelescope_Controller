@@ -1,4 +1,4 @@
-from PyQt5 import QtCore
+from PySide2 import QtCore
 import logging
 import urllib3
 import certifi

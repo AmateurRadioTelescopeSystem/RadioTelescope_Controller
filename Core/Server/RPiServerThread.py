@@ -1,14 +1,14 @@
-from PyQt5 import QtCore, QtNetwork
+from PySide2 import QtCore, QtNetwork
 import logging
 
 
 class RPiServerThread(QtCore.QObject):
     # Create the signals to be used for data handling
-    conStatSigR = QtCore.pyqtSignal(str, name='conRPiStat')  # Raspberry pi connection indicator
-    dataRxFromServ = QtCore.pyqtSignal(str, name='rpiServDataRx')  # Data received from the server of RPi
-    reConnectSigR = QtCore.pyqtSignal(name='reConnectServer')  # A reconnection signal originating from a button press
-    clientNotice = QtCore.pyqtSignal(name='clientNotice')  # Notify the client that we have a connection
-    sendDataBack = QtCore.pyqtSignal(str, name='sendDtaBack')  # Send data to the RPi from the server
+    conStatSigR = QtCore.Signal(str, name='conRPiStat')  # Raspberry pi connection indicator
+    dataRxFromServ = QtCore.Signal(str, name='rpiServDataRx')  # Data received from the server of RPi
+    reConnectSigR = QtCore.Signal(name='reConnectServer')  # A reconnection signal originating from a button press
+    clientNotice = QtCore.Signal(name='clientNotice')  # Notify the client that we have a connection
+    sendDataBack = QtCore.Signal(str, name='sendDtaBack')  # Send data to the RPi from the server
 
     def __init__(self, cfgData, parent=None):
         super(RPiServerThread, self).__init__(parent)  # Get the parent of the class
@@ -25,7 +25,7 @@ class RPiServerThread(QtCore.QObject):
         self.connectServ()  # Start the server
         mut.unlock()  # Unlock the thread, since it has started successfully
 
-    @QtCore.pyqtSlot(name='reConnectServer')
+    @QtCore.Slot(name='reConnectServer')
     def connectServ(self):
         # Get the saved data from the settings file
         self.host = self.cfgData.getRPiHost()  # Get the TCP connection host
@@ -89,7 +89,7 @@ class RPiServerThread(QtCore.QObject):
         # Print and log any error occurred
         self.logD.error("RPi server reported an error: %s" % self.socket.errorString())
 
-    @QtCore.pyqtSlot(str, name='sendDtaBack')
+    @QtCore.Slot(str, name='sendDtaBack')
     def sendRPi(self, data: str):
         try:
             self.socket.write(data.encode('utf-8'))  # Send data back to the client

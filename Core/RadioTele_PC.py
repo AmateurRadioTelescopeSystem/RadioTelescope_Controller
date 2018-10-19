@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from PyQt5 import QtWidgets, QtCore
+from PySide2 import QtWidgets, QtCore
 from GUI import UInterface
 from Handlers import OperationHandler
 from Client import ClientThread
@@ -115,14 +115,15 @@ def main():
     s_alt = cfgData.getAltitude()  # Get the altitude from the settings file
 
     # Show location on the GUI
-    ui.mainWin.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
+    ui.main_widg.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
                                   "vertical-align:super;\">o</span></p></body></html>" % s_latlon[1])
-    ui.mainWin.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
+    ui.main_widg.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
                                   "vertical-align:super;\">o</span></p></body></html>" % s_latlon[0])
-    ui.mainWin.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % s_alt)
+    ui.main_widg.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % s_alt)
 
     # We quit from the operation handle thread and then we exit. All handling is done there
     app.aboutToQuit.connect(operHandlerThread.quit)
+    print("Everything OK??")
 
     ui.show_application()  # Render and show the GUI main window and start the application
     sys.exit(app.exec_())  # Execute the app until exit is selected

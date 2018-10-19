@@ -1,15 +1,15 @@
 from Stellarium import StellariumDataHandling
-from PyQt5 import QtCore, QtNetwork
+from PySide2 import QtCore, QtNetwork
 import logging
 
 
 class StellThread(QtCore.QObject):
     # Create the signals to be used for data handling
-    conStatSigS = QtCore.pyqtSignal(str, name='conStellStat')  # Stellarium connection status indication signal
-    dataShowSigS = QtCore.pyqtSignal(float, float, name='dataStellShow')  # Coordinates show in the GUI
-    sendClientConn = QtCore.pyqtSignal(list, name='clientCommandSendStell')  # Send the command to the radio telescope
-    sendDataStell = QtCore.pyqtSignal(float, float, name='stellariumDataSend')  # Send the data to Stellarium
-    reConnectSigS = QtCore.pyqtSignal(name='reConnectStell')  # A reconnection signal originating from a button press
+    conStatSigS = QtCore.Signal(str, name='conStellStat')  # Stellarium connection status indication signal
+    dataShowSigS = QtCore.Signal(float, float, name='dataStellShow')  # Coordinates show in the GUI
+    sendClientConn = QtCore.Signal(list, name='clientCommandSendStell')  # Send the command to the radio telescope
+    sendDataStell = QtCore.Signal(float, float, name='stellariumDataSend')  # Send the data to Stellarium
+    reConnectSigS = QtCore.Signal(name='reConnectStell')  # A reconnection signal originating from a button press
 
     def __init__(self, cfgData, parent = None):
         super(StellThread, self).__init__(parent)  # Get the parent of the class
@@ -27,7 +27,7 @@ class StellThread(QtCore.QObject):
         self.connectStell()  # Start the Stellarium server
         mut.unlock()  # Unlock the thread, since it has started successfully
 
-    @QtCore.pyqtSlot(name='reConnectStell')
+    @QtCore.Slot(name='reConnectStell')
     def connectStell(self):
         # Get the saved data from the settings file
         self.host = self.cfgData.getStellHost()  # Get the TCP connection host
@@ -90,7 +90,7 @@ class StellThread(QtCore.QObject):
         self.logD.error("Stellarium server reported an error: %s" % self.socket.errorString())
 
     # Thsi method is called whenever the signal to send data back is fired
-    @QtCore.pyqtSlot(float, float, name='stellariumDataSend')
+    @QtCore.Slot(float, float, name='stellariumDataSend')
     def send(self, ra: float, dec: float):
         try:
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:

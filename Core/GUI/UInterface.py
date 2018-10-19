@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # IP address regex: https://stackoverflow.com/questions/10086572/ip-address-validation-in-python-using-regex
 
-from PyQt5 import QtCore, QtGui, QtWidgets, uic, QtWebEngineWidgets
+from PySide2 import QtCore, QtGui, QtWidgets, QtUiTools, QtWebEngineWidgets
 from functools import partial
 from GUI import resources
 import logging
@@ -10,16 +10,16 @@ import os
 
 
 class Ui_RadioTelescopeControl(QtCore.QObject):
-    stopMovingRTSig = QtCore.pyqtSignal(name='stopRadioTele')  # Signal to stop dish's motion
-    motorsDisabledSig = QtCore.pyqtSignal(name='motorsDisabledUISignal')
-    setGUIFromClientSig = QtCore.pyqtSignal(str, name='setTheGUIFromClient')
-    setManContStepsSig = QtCore.pyqtSignal(str, str, name='setManContSteps')
-    setStyleSkyScanningSig = QtCore.pyqtSignal(tuple, name='setStylesheetForSkyScanning')
-    updateCoordFieldsSig = QtCore.pyqtSignal(list, name='coordinateSetterSatelliteDialog')
-    tleStatusInfoSig = QtCore.pyqtSignal(str, name='tleStatusIndicatorSignal')
-    saveWaringSig = QtCore.pyqtSignal(str, name='saveWarningMessageShowSignal')
-    saveSettingsSig = QtCore.pyqtSignal(str, name='notifierToSaveTheSettingsSignal')
-    setTLEDataSig = QtCore.pyqtSignal(tuple, name='setTheGUIDataForTLESignal')
+    stopMovingRTSig = QtCore.Signal(name='stopRadioTele')  # Signal to stop dish's motion
+    motorsDisabledSig = QtCore.Signal(name='motorsDisabledUISignal')
+    setGUIFromClientSig = QtCore.Signal(str, name='setTheGUIFromClient')
+    setManContStepsSig = QtCore.Signal(str, str, name='setManContSteps')
+    setStyleSkyScanningSig = QtCore.Signal(tuple, name='setStylesheetForSkyScanning')
+    updateCoordFieldsSig = QtCore.Signal(list, name='coordinateSetterSatelliteDialog')
+    tleStatusInfoSig = QtCore.Signal(str, name='tleStatusIndicatorSignal')
+    saveWaringSig = QtCore.Signal(str, name='saveWarningMessageShowSignal')
+    saveSettingsSig = QtCore.Signal(str, name='notifierToSaveTheSettingsSignal')
+    setTLEDataSig = QtCore.Signal(tuple, name='setTheGUIDataForTLESignal')
 
     def __init__(self, parent=None):
         super(Ui_RadioTelescopeControl, self).__init__(parent)
@@ -46,6 +46,8 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tleInfoMsgBox.setWindowTitle("TLE Retriever")
         self.tleInfoMsgBox.setWindowModality(QtCore.Qt.ApplicationModal)
         self.tleInfoMsgBox.setStandardButtons(QtWidgets.QMessageBox.NoButton)
+        
+        loader = QtUiTools.QUiLoader()
 
         # Set the icons for the GUI windows
         try:
@@ -63,17 +65,17 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.logD.exception("Problem setting window icons. See traceback below.")
 
         try:
-            self.main_widg = uic.loadUi(os.path.abspath('UI_Files/RadioTelescope.ui'), self.mainWin)
-            self.man_cn_widg = uic.loadUi(os.path.abspath('UI_Files/ManualControl.ui'), self.uiManContWin)
-            self.tcp_widg = uic.loadUi(os.path.abspath('UI_Files/TCPSettings.ui'), self.uiTCPWin)
-            self.loc_widg = uic.loadUi(os.path.abspath('UI_Files/Location.ui'), self.uiLocationWin)
-            self.map_diag = uic.loadUi(os.path.abspath('UI_Files/MapsDialog.ui'), self.mapDialog)
-            self.calib_win = uic.loadUi(os.path.abspath('UI_Files/Calibration.ui'), self.uiCalibrationWin)
-            self.plan_obj_win = uic.loadUi(os.path.abspath('UI_Files/PlanetaryObject.ui'), self.uiPlanetaryObjWin)
-            self.sky_scan_win = uic.loadUi(os.path.abspath('UI_Files/SkyScanning.ui'), self.uiSkyScanningWin)
-            self.sat_sel_diag = uic.loadUi(os.path.abspath('UI_Files/SatelliteSelectionDialog.ui'),
+            self.main_widg = loader.load(QtCore.QFile(os.path.abspath('UI_Files/RadioTelescope.ui'), self.mainWin))
+            self.man_cn_widg = loader.load(QtCore.QFile(os.path.abspath('UI_Files/ManualControl.ui'), self.uiManContWin))
+            self.tcp_widg = loader.load(QtCore.QFile(os.path.abspath('UI_Files/TCPSettings.ui'), self.uiTCPWin))
+            self.loc_widg = loader.load(QtCore.QFile(os.path.abspath('UI_Files/Location.ui'), self.uiLocationWin))
+            self.map_diag = loader.load(QtCore.QFile(os.path.abspath('UI_Files/MapsDialog.ui'), self.mapDialog))
+            self.calib_win = loader.load(QtCore.QFile(os.path.abspath('UI_Files/Calibration.ui'), self.uiCalibrationWin))
+            self.plan_obj_win = loader.load(QtCore.QFile(os.path.abspath('UI_Files/PlanetaryObject.ui'), self.uiPlanetaryObjWin))
+            self.sky_scan_win = loader.load(QtCore.QFile(os.path.abspath('UI_Files/SkyScanning.ui'), self.uiSkyScanningWin))
+            self.sat_sel_diag = loader.load(QtCore.QFile(os.path.abspath('UI_Files/SatelliteSelectionDialog.ui')),
                                            self.satelliteDialog)
-            self.tle_settings_widg = uic.loadUi(os.path.abspath('UI_Files/TLESettingsDialog.ui'),
+            self.tle_settings_widg = loader.load(QtCore.QFile(os.path.abspath('UI_Files/TLESettingsDialog.ui')),
                                                 self.tleSettingsDialog)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
@@ -322,7 +324,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             pass
 
     # Signal handler for GUI formatting used for the stellarium connection
-    @QtCore.pyqtSlot(str, name='conStellStat')
+    @QtCore.Slot(str, name='conStellStat')
     def stellTCPGUIHandle(self, data: str):
         if data == "Waiting":
             self.main_widg.connectStellariumBtn.setText("Stop")  # Change user's selection
@@ -358,13 +360,13 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.main_widg.transitTimeLablel.setEnabled(False)
 
     # Signal handler to show the received data fro Stellarium on the GUI
-    @QtCore.pyqtSlot(float, float, name='dataStellShow')
+    @QtCore.Slot(float, float, name='dataStellShow')
     def stellDataShow(self, ra: float, dec: float):
         self.main_widg.raPosInd_2.setText("%.5fh" % ra)  # Update the corresponding field
         self.main_widg.decPosInd_2.setText("%.5f" % dec + u"\u00b0")  # Update the corresponding field
 
     # Signal handler to show the status of the TCP client connected to RPi
-    @QtCore.pyqtSlot(str, name='conClientStat')
+    @QtCore.Slot(str, name='conClientStat')
     def clientTCPGUIHandle(self, data: str):
         if data == "Connecting":
             self.main_widg.connectRadioTBtn.setText("Stop")  # Change user's selection
@@ -383,7 +385,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
                                                      "color:#ff0000;\">Disconnected</span></p></body></html>")
 
     # Signal handler to show the status of the RPi server on the GUI
-    @QtCore.pyqtSlot(str, name='conRPiStat')
+    @QtCore.Slot(str, name='conRPiStat')
     def rpiTCPGUIHandle(self, data: str):
         if data == "Waiting":
             self.main_widg.serverRPiConnBtn.setText("Stop")  # Change user's selection
@@ -405,16 +407,16 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.main_widg.movTextInd.setText("<html><head/><body><p><span style=\" "
                                               "color:#ff0000;\">No</span></p></body></html>")
 
-    @QtCore.pyqtSlot(float, float, name='posDataShow')
+    @QtCore.Slot(float, float, name='posDataShow')
     def posDataShow(self, ra: float, dec: float):
         self.main_widg.raPosInd.setText("%.5fh" % ra)  # Show the RA of the dish on the GUI
         self.main_widg.decPosInd.setText("%.5f" % dec + u"\u00b0")  # Show the declination of the dish on the GUI
 
-    @QtCore.pyqtSlot(float, name='moveProgress')
+    @QtCore.Slot(float, name='moveProgress')
     def moveProgress(self, percent: float):
         self.main_widg.onTargetProgress.setValue(percent)  # Set the percentage of the progress according to position
 
-    @QtCore.pyqtSlot(name='motorsDisabledUISignal')
+    @QtCore.Slot(name='motorsDisabledUISignal')
     def motorsDisabled(self):
         if not self.motor_warn_msg_shown:
             msg = QtWidgets.QMessageBox()  # Create the message box object
@@ -429,7 +431,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             msg.show()  # Show the message to the user
             self.motor_warn_msg_shown = False  # It gets here only after the window is closed
 
-    @QtCore.pyqtSlot(str, name='setTheGUIFromClient')
+    @QtCore.Slot(str, name='setTheGUIFromClient')
     def setGUIFromClientCommand(self, command: str):
         if command == "OK":
             self.tcp_widg.clientStatus.setText("OK")  # Set the response if the client responded correctly
@@ -459,14 +461,14 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.main_widg.motorCommandCheckBox.setCheckState(QtCore.Qt.Checked)
             self.motorsDisabled()  # Call the disabled motors function
 
-    @QtCore.pyqtSlot(str, str, name='setManContSteps')
+    @QtCore.Slot(str, str, name='setManContSteps')
     def manContStepSetter(self, axis: str, steps: str):
         if axis == "RA":
             self.man_cn_widg.raStepText.setText(steps)  # Update the manual control window
         elif axis == "DEC":
             self.man_cn_widg.decStepText.setText(steps)
 
-    @QtCore.pyqtSlot(tuple, name='setStylesheetForSkyScanning')
+    @QtCore.Slot(tuple, name='setStylesheetForSkyScanning')
     def styleSetterSkyScan(self, points: tuple):
         # Make boxes red wherever there is no input
         if points[0][0] == "":
@@ -641,7 +643,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
         self.calib_win.calibCoord_1_Label.setText(formatter % satellite)
 
-    @QtCore.pyqtSlot(list, name='coordinateSetterSatelliteDialog')
+    @QtCore.Slot(list, name='coordinateSetterSatelliteDialog')
     def set_sat_coordinates(self, coords: list):
         if self.sat_sel_diag.coordinateSystemBox.currentText() == "Horizontal":
             c_1 = coords[0][0]
@@ -658,7 +660,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         else:
             self.sky_scan_win.calculateScanMapBtn.setText("Calculate")
 
-    @QtCore.pyqtSlot(str, name='tleStatusIndicatorSignal')
+    @QtCore.Slot(str, name='tleStatusIndicatorSignal')
     def tle_status(self, status: str):
         formated_text_1 = "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\" " \
                           "style = \"font-style:italic;\">%s</span></p></body></html>"
@@ -693,7 +695,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         except IndexError:
             self.tleInfoMsgBox.setDetailedText("")
 
-    @QtCore.pyqtSlot(tuple, name='setTheGUIDataForTLESignal')
+    @QtCore.Slot(tuple, name='setTheGUIDataForTLESignal')
     def set_tle_data(self, data: tuple):
         if data[0] == "yes":
             self.tle_settings_widg.autoUpdateSelection.setCheckState(QtCore.Qt.Checked)
@@ -703,7 +705,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tle_settings_widg.tleURL.setText(data[1])
 
     # Handle the settings saving request
-    @QtCore.pyqtSlot(str, name='saveWarningMessageShowSignal')
+    @QtCore.Slot(str, name='saveWarningMessageShowSignal')
     def save_warning(self, objec: str):
         if objec == "TLE":
             window = self.tle_settings_widg
