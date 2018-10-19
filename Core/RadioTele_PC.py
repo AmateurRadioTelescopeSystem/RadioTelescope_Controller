@@ -123,7 +123,6 @@ def main():
 
     # We quit from the operation handle thread and then we exit. All handling is done there
     app.aboutToQuit.connect(operHandlerThread.quit)
-    print("Everything OK??")
 
     ui.show_application()  # Render and show the GUI main window and start the application
     sys.exit(app.exec_())  # Execute the app until exit is selected

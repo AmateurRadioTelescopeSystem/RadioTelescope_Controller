@@ -65,17 +65,17 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.logD.exception("Problem setting window icons. See traceback below.")
 
         try:
-            self.main_widg = loader.load(QtCore.QFile(os.path.abspath('UI_Files/RadioTelescope.ui'), self.mainWin))
-            self.man_cn_widg = loader.load(QtCore.QFile(os.path.abspath('UI_Files/ManualControl.ui'), self.uiManContWin))
-            self.tcp_widg = loader.load(QtCore.QFile(os.path.abspath('UI_Files/TCPSettings.ui'), self.uiTCPWin))
-            self.loc_widg = loader.load(QtCore.QFile(os.path.abspath('UI_Files/Location.ui'), self.uiLocationWin))
-            self.map_diag = loader.load(QtCore.QFile(os.path.abspath('UI_Files/MapsDialog.ui'), self.mapDialog))
-            self.calib_win = loader.load(QtCore.QFile(os.path.abspath('UI_Files/Calibration.ui'), self.uiCalibrationWin))
-            self.plan_obj_win = loader.load(QtCore.QFile(os.path.abspath('UI_Files/PlanetaryObject.ui'), self.uiPlanetaryObjWin))
-            self.sky_scan_win = loader.load(QtCore.QFile(os.path.abspath('UI_Files/SkyScanning.ui'), self.uiSkyScanningWin))
-            self.sat_sel_diag = loader.load(QtCore.QFile(os.path.abspath('UI_Files/SatelliteSelectionDialog.ui')),
+            self.main_widg = self.loadUiWidget(os.path.abspath('UI_Files/RadioTelescope.ui'), self.mainWin)
+            self.man_cn_widg = self.loadUiWidget(os.path.abspath('UI_Files/ManualControl.ui'), self.uiManContWin)
+            self.tcp_widg = self.loadUiWidget(os.path.abspath('UI_Files/TCPSettings.ui'), self.uiTCPWin)
+            self.loc_widg = self.loadUiWidget(os.path.abspath('UI_Files/Location.ui'), self.uiLocationWin)
+            self.map_diag = self.loadUiWidget(os.path.abspath('UI_Files/MapsDialog.ui'), self.mapDialog)
+            self.calib_win = self.loadUiWidget(os.path.abspath('UI_Files/Calibration.ui'), self.uiCalibrationWin)
+            self.plan_obj_win = self.loadUiWidget(os.path.abspath('UI_Files/PlanetaryObject.ui'), self.uiPlanetaryObjWin)
+            self.sky_scan_win = self.loadUiWidget(os.path.abspath('UI_Files/SkyScanning.ui'), self.uiSkyScanningWin)
+            self.sat_sel_diag = self.loadUiWidget(os.path.abspath('UI_Files/SatelliteSelectionDialog.ui'),
                                            self.satelliteDialog)
-            self.tle_settings_widg = loader.load(QtCore.QFile(os.path.abspath('UI_Files/TLESettingsDialog.ui')),
+            self.tle_settings_widg = self.loadUiWidget(os.path.abspath('UI_Files/TLESettingsDialog.ui'),
                                                 self.tleSettingsDialog)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
@@ -214,6 +214,14 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.sky_scan_win.point3Coord_2Field.setValidator(double_validator)
         self.sky_scan_win.point4Coord_1Field.setValidator(double_validator)
         self.sky_scan_win.point4Coord_2Field.setValidator(double_validator)
+
+    def loadUiWidget(self, file_name, parent=None):
+        loader = QtUiTools.QUiLoader()
+        ui_file = QtCore.QFile(file_name)
+        ui_file.open(QtCore.QFile.ReadOnly)
+        ui = loader.load(ui_file, parent)
+        ui_file.close()
+        return ui
 
     # Function called every time the corresponding checkbox is selected
     def checkBoxTCPRTClient(self, state):
@@ -728,9 +736,12 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
     # Show the main GUI
     def show_application(self):
-        self.timer.start()  # Start the timer for the date and time label
-        self.dateTime()  # Call that initially to render it on the GUI
-        self.mainWin.show()  # Show the GUI window
+        try:
+            self.timer.start()  # Start the timer for the date and time label
+            self.dateTime()  # Call that initially to render it on the GUI
+            self.mainWin.show()  # Show the GUI window
+        except Exception as e:
+            print("Exception from UI show_app: %s" % e)
 
     # Ask before exiting the GUI
     def close_application(self, objec):
