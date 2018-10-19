@@ -77,45 +77,42 @@ class OpHandler(QtCore.QObject):
         :return: Nothing
         """
         self.logD.info("Operations handler thread started")
-        try:
-            self.signalConnections()  # Make all the necessary signal connections
+        self.signalConnections()  # Make all the necessary signal connections
 
-            autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
-            autoconRPi = self.cfgData.getTCPAutoConnStatus()  # Auto-connection preference for the RPi server and client
+        autoconStell = self.cfgData.getTCPStellAutoConnStatus()  # See if auto-connection at startup is enabled
+        autoconRPi = self.cfgData.getTCPAutoConnStatus()  # Auto-connection preference for the RPi server and client
 
-            # Try to get a new TLE, if the one we have is outdated
-            tle_expiry = self.tle_operations.tle_expiry_checker()  # Check the validity of the file
+        # Try to get a new TLE, if the one we have is outdated
+        tle_expiry = self.tle_operations.tle_expiry_checker()  # Check the validity of the file
 
-            if (tle_expiry[0] is True and tle_expiry[1] is True) or \
-                    (tle_expiry[0] is False and tle_expiry[2] == "File not found"):
-                self.ui.tleStatusInfoSig.emit("")  # Just initialize the widget
-                tle_result = self.tle_operations.tle_retriever()  # Get the new TLE file
+        if (tle_expiry[0] is True and tle_expiry[1] is True) or \
+                (tle_expiry[0] is False and tle_expiry[2] == "File not found"):
+            self.ui.tleStatusInfoSig.emit("")  # Just initialize the widget
+            tle_result = self.tle_operations.tle_retriever()  # Get the new TLE file
 
-                if tle_result[0] is True:
-                    tle_status_msg = "Success^TLE file(s) updated"
-                else:
-                    tle_status_msg = "Error^There was a problem getting TLE file(s).^"
-                    tle_status_msg += tle_result[1]
-            elif tle_expiry[0] is False:
-                self.ui.tleStatusInfoSig.emit("")  # Just initialize the widget
-                tle_status_msg = "Error^There was a problem checking TLE file(s).^"
-                tle_status_msg += tle_expiry[2]
+            if tle_result[0] is True:
+                tle_status_msg = "Success^TLE file(s) updated"
             else:
-                tle_status_msg = ""
+                tle_status_msg = "Error^There was a problem getting TLE file(s).^"
+                tle_status_msg += tle_result[1]
+        elif tle_expiry[0] is False:
+            self.ui.tleStatusInfoSig.emit("")  # Just initialize the widget
+            tle_status_msg = "Error^There was a problem checking TLE file(s).^"
+            tle_status_msg += tle_expiry[2]
+        else:
+            tle_status_msg = ""
 
-            if tle_status_msg != "":
-                self.ui.tleStatusInfoSig.emit(tle_status_msg)
-                while not self.ui.tleInfoMsgBox.clickedButton():
-                    continue
+        if tle_status_msg != "":
+            self.ui.tleStatusInfoSig.emit(tle_status_msg)
+            while not self.ui.tleInfoMsgBox.clickedButton():
+                continue
 
-            # If auto-connection is selected for thr TCP section, then do as requested
-            if autoconStell == "yes":
-                self.tcpStelThread.start()  # Start the server thread, since auto start is enabled
-            if autoconRPi == "yes":
-                self.tcpClThread.start()  # Start the client thread, since auto start is enabled
-                self.tcpServThread.start()  # Start the RPi server thread, since auto start is enabled
-        except Exception as e:
-            print("Op handler exception: %s" % e)
+        # If auto-connection is selected for thr TCP section, then do as requested
+        if autoconStell == "yes":
+            self.tcpStelThread.start()  # Start the server thread, since auto start is enabled
+        if autoconRPi == "yes":
+            self.tcpClThread.start()  # Start the client thread, since auto start is enabled
+            self.tcpServThread.start()  # Start the RPi server thread, since auto start is enabled
 
     # Client connection button handling method
     def connectButtonR(self):

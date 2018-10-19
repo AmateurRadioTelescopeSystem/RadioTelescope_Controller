@@ -116,9 +116,9 @@ def main():
 
     # Show location on the GUI
     ui.main_widg.lonTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
-                                  "vertical-align:super;\">o</span></p></body></html>" % s_latlon[1])
+                                    "vertical-align:super;\">o</span></p></body></html>" % s_latlon[1])
     ui.main_widg.latTextInd.setText("<html><head/><body><p align=\"center\">%s<span style=\" "
-                                  "vertical-align:super;\">o</span></p></body></html>" % s_latlon[0])
+                                    "vertical-align:super;\">o</span></p></body></html>" % s_latlon[0])
     ui.main_widg.altTextInd.setText("<html><head/><body><p align=\"center\">%sm</p></body></html>" % s_alt)
 
     # We quit from the operation handle thread and then we exit. All handling is done there
