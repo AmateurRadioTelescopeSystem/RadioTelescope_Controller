@@ -52,18 +52,16 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tleInfoMsgBox.setStandardButtons(QtWidgets.QMessageBox.NoButton)
 
         try:
-            self.main_widg = uic.loadUi(os.path.abspath('UI_Files/RadioTelescope.ui'), self.mainWin)
-            self.man_cn_widg = uic.loadUi(os.path.abspath('UI_Files/ManualControl.ui'), self.uiManContWin)
-            self.tcp_widg = uic.loadUi(os.path.abspath('UI_Files/TCPSettings.ui'), self.uiTCPWin)
-            self.loc_widg = uic.loadUi(os.path.abspath('UI_Files/Location.ui'), self.uiLocationWin)
-            self.map_diag = uic.loadUi(os.path.abspath('UI_Files/MapsDialog.ui'), self.mapDialog)
-            self.calib_win = uic.loadUi(os.path.abspath('UI_Files/Calibration.ui'), self.uiCalibrationWin)
-            self.plan_obj_win = uic.loadUi(os.path.abspath('UI_Files/PlanetaryObject.ui'), self.uiPlanetaryObjWin)
-            self.sky_scan_win = uic.loadUi(os.path.abspath('UI_Files/SkyScanning.ui'), self.uiSkyScanningWin)
-            self.sat_sel_diag = uic.loadUi(os.path.abspath('UI_Files/SatelliteSelectionDialog.ui'),
-                                           self.satelliteDialog)
-            self.tle_settings_widg = uic.loadUi(os.path.abspath('UI_Files/TLESettingsDialog.ui'),
-                                                self.tleSettingsDialog)
+            self.main_widg = self.uiLoader(':/UI_Files/RadioTelescope', self.mainWin)
+            self.man_cn_widg = self.uiLoader(':/UI_Files/ManualControl', self.uiManContWin)
+            self.tcp_widg = self.uiLoader(':/UI_Files/TCPSettings', self.uiTCPWin)
+            self.loc_widg = self.uiLoader(':/UI_Files/Location', self.uiLocationWin)
+            self.map_diag = self.uiLoader(':/UI_Files/MapsDialog', self.mapDialog)
+            self.calib_win = self.uiLoader(':/UI_Files/Calibration', self.uiCalibrationWin)
+            self.plan_obj_win = self.uiLoader(':/UI_Files/PlanetaryObject', self.uiPlanetaryObjWin)
+            self.sky_scan_win = self.uiLoader(':/UI_Files/SkyScanning', self.uiSkyScanningWin)
+            self.sat_sel_diag = self.uiLoader(':/UI_Files/SatelliteSelectionDialog', self.satelliteDialog)
+            self.tle_settings_widg = self.uiLoader(':/UI_Files/TLESettingsDialog', self.tleSettingsDialog)
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
@@ -71,16 +69,16 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
         # Set the icons for the GUI windows
         try:
-            self.main_widg.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/radiotelescope.png')))
-            self.man_cn_widg.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/manControl.png')))
-            self.tcp_widg.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/Net.png')))
-            self.loc_widg.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/location.png')))
-            self.calib_win.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/calibration.png')))
-            self.plan_obj_win.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/planetary.png')))
-            self.sky_scan_win.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/skyScanning.png')))
-            self.sat_sel_diag.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/satelliteSelection.png')))
-            self.map_diag.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/maps.png')))
-            self.tle_settings_widg.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/TLESettings.png')))
+            self.main_widg.setWindowIcon(QtGui.QIcon(':/Window_Icons/radiotelescope'))
+            self.man_cn_widg.setWindowIcon(QtGui.QIcon(':/Window_Icons/manControl'))
+            self.tcp_widg.setWindowIcon(QtGui.QIcon(':/Window_Icons/Net'))
+            self.loc_widg.setWindowIcon(QtGui.QIcon(':/Window_Icons/location'))
+            self.calib_win.setWindowIcon(QtGui.QIcon(':/Window_Icons/calibration'))
+            self.plan_obj_win.setWindowIcon(QtGui.QIcon(':/Window_Icons/planetary'))
+            self.sky_scan_win.setWindowIcon(QtGui.QIcon(':/Window_Icons/skyScanning'))
+            self.sat_sel_diag.setWindowIcon(QtGui.QIcon(':/Window_Icons/satelliteSelection'))
+            self.map_diag.setWindowIcon(QtGui.QIcon(':/Window_Icons/maps'))
+            self.tle_settings_widg.setWindowIcon(QtGui.QIcon(':/Window_Icons/TLESettings'))
         except Exception:
             self.logD.exception("Problem setting window icons. See traceback below.")
         self.setupUi()  # Call the function to make all the connections for the GUI things
@@ -91,6 +89,15 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.timer.setInterval(1000)  # Update date and time ever second
 
         QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create("Fusion"))  # Change the style of the GUI
+
+    def uiLoader(self, ui_resource, base=None):
+        ui_file = QtCore.QFile(ui_resource)
+        ui_file.open(QtCore.QFile.ReadOnly)
+        try:
+            ul = uic.loadUi(ui_file, base)
+            return ul
+        finally:
+            ui_file.close()
 
     def setupUi(self):
         # Set the font according to the OS

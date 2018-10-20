@@ -1,0 +1,30 @@
+<RCC>
+  <qresource prefix="GUI_Images">
+    <file>../Icons/GUI_Images/ScanExplanation.png</file>
+  </qresource>
+  <qresource prefix="Window_Icons">
+    <file alias="calibration">../Icons/calibration.png</file>
+    <file alias="location">../Icons/location.png</file>
+    <file alias="manControl">../Icons/manControl.png</file>
+    <file alias="maps">../Icons/maps.png</file>
+    <file alias="Net">../Icons/Net.png</file>
+    <file alias="planetary">../Icons/planetary.png</file>
+    <file alias="radiotelescope">../Icons/radiotelescope.png</file>
+    <file alias="satelliteSelection">../Icons/satelliteSelection.png</file>
+    <file alias="skyScanning">../Icons/skyScanning.png</file>
+    <file alias="TCP">../Icons/TCP.png</file>
+    <file alias="TLESettings">../Icons/TLESettings.png</file>
+  </qresource>
+  <qresource prefix="UI_Files">
+    <file alias="Calibration">../UI_Files/Calibration.ui</file>
+    <file alias="Location">../UI_Files/Location.ui</file>
+    <file alias="ManualControl">../UI_Files/ManualControl.ui</file>
+    <file alias="MapsDialog">../UI_Files/MapsDialog.ui</file>
+    <file alias="PlanetaryObject">../UI_Files/PlanetaryObject.ui</file>
+    <file alias="RadioTelescope">../UI_Files/RadioTelescope.ui</file>
+    <file alias="SatelliteSelectionDialog">../UI_Files/SatelliteSelectionDialog.ui</file>
+    <file alias="SkyScanning">../UI_Files/SkyScanning.ui</file>
+    <file alias="TCPSettings">../UI_Files/TCPSettings.ui</file>
+    <file alias="TLESettingsDialog">../UI_Files/TLESettingsDialog.ui</file>
+  </qresource>
+</RCC>
