@@ -3,7 +3,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets, uic, QtWebEngineWidgets
 from functools import partial
-from GUI import resources
 import logging
 import sys
 import os
@@ -26,6 +25,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.logD = logging.getLogger(__name__)  # Create the logger for the file
         self.motor_warn_msg_shown = False
 
+        # Load the resources binary
+        resource_file = QtCore.QResource()
+        resource_file.registerResource("Core/GUI/resources.rcc")
+
         # Create the main GUI window and the other windows
         self.mainWin = QtWidgets.QMainWindow()  # Create the main window of the GUI
         self.uiManContWin = QtWidgets.QMainWindow(parent=self.mainWin)  # Create the Manual control window
@@ -42,25 +45,12 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tleInfoMsgBox = QtWidgets.QMessageBox()  # Message box to show TLE retrieval status
 
         # Initial setup of the message box
+        self.tleInfoMsgBox.setVisible(False)  # No need to be visible all the time
         self.tleInfoMsgBox.setParent(self.mainWin)  # Set the main program window to be the parent
+        self.tleInfoMsgBox.setAutoFillBackground(True)
         self.tleInfoMsgBox.setWindowTitle("TLE Retriever")
         self.tleInfoMsgBox.setWindowModality(QtCore.Qt.ApplicationModal)
         self.tleInfoMsgBox.setStandardButtons(QtWidgets.QMessageBox.NoButton)
-
-        # Set the icons for the GUI windows
-        try:
-            self.mainWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/radiotelescope.png')))
-            self.uiManContWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/manControl.png')))
-            self.uiTCPWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/Net.png')))
-            self.uiLocationWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/location.png')))
-            self.uiCalibrationWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/calibration.png')))
-            self.uiPlanetaryObjWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/planetary.png')))
-            self.uiSkyScanningWin.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/skyScanning.png')))
-            self.satelliteDialog.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/satelliteSelection.png')))
-            self.mapDialog.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/maps.png')))
-            self.tleSettingsDialog.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/TLESettings.png')))
-        except Exception:
-            self.logD.exception("Problem setting window icons. See traceback below.")
 
         try:
             self.main_widg = uic.loadUi(os.path.abspath('UI_Files/RadioTelescope.ui'), self.mainWin)
@@ -78,6 +68,21 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         except (FileNotFoundError, Exception):
             self.logD.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
+
+        # Set the icons for the GUI windows
+        try:
+            self.main_widg.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/radiotelescope.png')))
+            self.man_cn_widg.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/manControl.png')))
+            self.tcp_widg.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/Net.png')))
+            self.loc_widg.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/location.png')))
+            self.calib_win.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/calibration.png')))
+            self.plan_obj_win.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/planetary.png')))
+            self.sky_scan_win.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/skyScanning.png')))
+            self.sat_sel_diag.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/satelliteSelection.png')))
+            self.map_diag.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/maps.png')))
+            self.tle_settings_widg.setWindowIcon(QtGui.QIcon(os.path.abspath('Icons/TLESettings.png')))
+        except Exception:
+            self.logD.exception("Problem setting window icons. See traceback below.")
         self.setupUi()  # Call the function to make all the connections for the GUI things
 
         # Timer for the date and time label
@@ -112,19 +117,19 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.main_widg.dishHaultCommandCheckBox.stateChanged.connect(self.checkBoxDishHault)
         self.main_widg.motorCommandCheckBox.stateChanged.connect(self.checkBoxMotors)
 
-        self.main_widg.actionSettings.triggered.connect(self.uiTCPWin.show)  # Show the TCP settings window
-        self.main_widg.actionManual_Control.triggered.connect(self.uiManContWin.show)  # Show the manual control window
-        self.main_widg.actionLocation.triggered.connect(self.uiLocationWin.show)  # Show the location settings dialog
-        self.main_widg.actionCalibrate.triggered.connect(self.uiCalibrationWin.show)
+        self.main_widg.actionSettings.triggered.connect(self.tcp_widg.show)  # Show the TCP settings window
+        self.main_widg.actionManual_Control.triggered.connect(self.man_cn_widg.show)  # Show the manual control window
+        self.main_widg.actionLocation.triggered.connect(self.loc_widg.show)  # Show the location settings dialog
+        self.main_widg.actionCalibrate.triggered.connect(self.calib_win.show)
         self.main_widg.actionCalibrate.triggered.connect(self.coordinate_updater_calibration)
-        self.main_widg.actionPlanetaryObject.triggered.connect(self.uiPlanetaryObjWin.show)
-        self.main_widg.actionSky_Scanning.triggered.connect(self.uiSkyScanningWin.show)
+        self.main_widg.actionPlanetaryObject.triggered.connect(self.plan_obj_win.show)
+        self.main_widg.actionSky_Scanning.triggered.connect(self.sky_scan_win.show)
         self.main_widg.actionSky_Scanning.triggered.connect(self.coordinate_updater_scanning)
         self.main_widg.actionTLE_Settings.triggered.connect(self.tle_settings_widg.show)
-        self.main_widg.actionExit.triggered.connect(partial(self.close_application, objec=self.mainWin))
+        self.main_widg.actionExit.triggered.connect(partial(self.close_application, objec=self.main_widg))
 
-        self.main_widg.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.mainWin))
-        self.main_widg.locatChangeBtn.clicked.connect(self.uiLocationWin.show)
+        self.main_widg.stopMovingBtn.clicked.connect(partial(self.stopMotion, objec=self.main_widg))
+        self.main_widg.locatChangeBtn.clicked.connect(self.loc_widg.show)
         self.main_widg.onTargetProgress.setVisible(False)  # Have the progrees bar invisible at first
 
         # Signal connections
@@ -137,6 +142,10 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.saveWaringSig.connect(self.save_warning)
         self.setTLEDataSig.connect(self.set_tle_data)
 
+        # Hide the message box when not needed
+        self.tleInfoMsgBox.accepted.connect(partial(self.tleInfoMsgBox.setVisible, False))
+        self.tleInfoMsgBox.rejected.connect(partial(self.tleInfoMsgBox.setVisible, False))
+
         # Change between widgets
         self.main_widg.stellNextPageBtn.clicked.connect(lambda: self.main_widg.stackedWidget.setCurrentIndex(1))
         self.main_widg.stellPrevPageBtn.clicked.connect(lambda: self.main_widg.stackedWidget.setCurrentIndex(0))
@@ -148,7 +157,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.tcp_widg.stellIPServBox.currentIndexChanged.connect(self.ipSelectionBoxStellServer)
 
         # Make connections for the location settings dialog
-        self.loc_widg.exitBtn.clicked.connect(self.uiLocationWin.close)  # Close the settings window when requested
+        self.loc_widg.exitBtn.clicked.connect(self.loc_widg.close)  # Close the settings window when requested
         self.loc_widg.locationTypeChoose.currentIndexChanged.connect(self.showMapSelection)
 
         # Make the webview widget for the map
@@ -199,7 +208,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.calib_win.coordinatSystemcomboBox.currentTextChanged.connect(self.coordinate_updater_calibration)
         self.sat_sel_diag.coordinateSystemBox.currentTextChanged.connect(self.coordinate_updater_satellite)
         self.sat_sel_diag.satSelectionList.currentTextChanged.connect(self.sat_selection_updater)
-        self.sat_sel_diag.selectionButton.clicked.connect(self.satelliteDialog.close)
+        self.sat_sel_diag.selectionButton.clicked.connect(self.sat_sel_diag.close)
 
         # Validate coordinate entry fields
         double_validator = QtGui.QDoubleValidator(-360.0, 360.0, 6)
@@ -305,7 +314,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.loc_widg.latEntry.setEnabled(False)
             self.loc_widg.lonEntry.setEnabled(False)
             self.loc_widg.altEntry.setEnabled(False)
-            self.mapDialog.show()
+            self.map_diag.show()
         else:
             self.loc_widg.latEntry.setEnabled(True)
             self.loc_widg.lonEntry.setEnabled(True)
@@ -419,7 +428,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         if not self.motor_warn_msg_shown:
             msg = QtWidgets.QMessageBox()  # Create the message box object
             self.motor_warn_msg_shown = True  # Set the show indicator before showing the window
-            msg.warning(self.mainWin, 'Motor Warning',
+            msg.warning(self.main_widg, 'Motor Warning',
                         "<html><head/><body><p align=\"center\"><span style = \""
                         "font-weight:600\" style = \"color:#ff0000;\">"
                         "Motors are disabled!!</span></p></body></html>"
@@ -606,7 +615,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.calib_win.calibCoord_1_Text.setVisible(False)
             self.calib_win.calibCoord_2_Text.setVisible(False)
             self.calib_win.calibCoord_2_Label.setVisible(False)
-            self.satelliteDialog.show()
+            self.sat_sel_diag.show()
 
         # Set first coordinate of the system
         self.calib_win.calibCoord_1_Label.setText(coord_1)
@@ -674,6 +683,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
             self.tleInfoMsgBox.setInformativeText("<html><head/><body><p align=\"center\"><span "
                                                   "style=\" font-weight:600;\" "
                                                   "style = \"color:#ffb400\">Wait...</span></p></body></html>")
+            self.tleInfoMsgBox.setVisible(True)  # Set the message box to visible before showing
             self.tleInfoMsgBox.show()
 
         if info[0] == "Success":
@@ -728,7 +738,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
     def show_application(self):
         self.timer.start()  # Start the timer for the date and time label
         self.dateTime()  # Call that initially to render it on the GUI
-        self.mainWin.show()  # Show the GUI window
+        self.main_widg.show()  # Show the GUI window
 
     # Ask before exiting the GUI
     def close_application(self, objec):
