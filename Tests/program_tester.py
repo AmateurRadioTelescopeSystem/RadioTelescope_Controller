@@ -134,7 +134,11 @@ def main():
     window_show = QtTest.QTest.qWaitForWindowExposed(ui.mainWin)  # Wait until the main window is shown
 
     QtTest.QTest.qWait(2000)  # Wait for the retrieval of TLE file
-    QtTest.QTest.mouseClick(ui.tleInfoMsgBox.buttons()[0], QtCore.Qt.LeftButton)  # Click the GUI button to proceed
+    try:
+        QtTest.QTest.mouseClick(ui.tleInfoMsgBox.buttons()[0], QtCore.Qt.LeftButton)  # Click the GUI button to proceed
+    except IndexError:
+        print("Possibly the file exists. \nDouble check to make sure that there is no other error.")
+        pass
     QtTest.QTest.qWait(1000)  # Wait for the client thread to start
 
     client_connected = (tcpClient.sock.state() == QtNetwork.QAbstractSocket.ConnectedState)  # Get the connection status
