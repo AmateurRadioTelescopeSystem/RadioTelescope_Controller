@@ -22,7 +22,7 @@ This installation information are not the final ones, since more packages may be
 * Before proceeding, make sure that `pip` is installed on your system.
 * _Installation command for pip_: `$ sudo apt-get install python3-pip`
 * Also you will need to run the command `$ sudo apt-get install qt5-defaults`, to make sure you have the required Qt5
-commands needed.
+commands.
 * In the setup process the important part is to install the required package/packages
 * Use the `configure.sh` script to install the necessary packages for python and do the initial setup.
 * _Configuration command_: `$ (sudo) ./configure.sh`. Note that you may be required to run the script as sudo, in order to properly work.
