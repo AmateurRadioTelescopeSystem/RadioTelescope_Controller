@@ -26,8 +26,11 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.motor_warn_msg_shown = False
 
         # Load the resources binary
-        resource_file = QtCore.QResource()
-        resource_file.registerResource(os.path.abspath("Core/GUI/resources.rcc"))
+        resource_obj = QtCore.QResource()
+        resource_file = resource_obj.registerResource(os.path.abspath("Core/GUI/resources.rcc"))
+        if resource_file.bit_length() == 0:
+            self.logD.error("Resources file could not be loaded. Program is exiting.")
+            sys.exit(-1)  # Indicate an error when exiting
 
         # Create the main GUI window and the other windows
         self.mainWin = QtWidgets.QMainWindow()  # Create the main window of the GUI
