@@ -659,7 +659,7 @@ class OpHandler(QtCore.QObject):
         self.tcpClient.newConInitComms.connect(self.initialCommands)
 
         self.tcpServer.dataRxFromServ.connect(self.rpiServRcvData)  # Receive data from the RPi server
-        self.tcpServer.clientNotice.connect(self.tcpClient.connect)  # Tell the client to reconnect
+        self.tcpServer.clientNotice.connect(self.tcpClient.connectCl)  # Tell the client to reconnect
 
         self.ui.stopMovingRTSig.connect(self.stopMovingRT)  # Send a motion stop command, once this signal is triggered
         self.ui.main_widg.stellPosUpdtBtn.clicked.connect(partial(self.tcpClient.sendData.emit, "SEND_POS_UPDATE\n"))

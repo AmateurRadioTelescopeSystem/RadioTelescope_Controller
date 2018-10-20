@@ -30,7 +30,8 @@ class TLEHandler(QtCore.QObject):
             error_details = ""
             exit_code = True
         except FileNotFoundError:
-            exit_code = expiration = False
+            exit_code = False
+            expiration = True
             error_details = "File not found"
         except Exception as e:
             self.logD.exception("Error occurred when checking the TLE file. See traceback.")
