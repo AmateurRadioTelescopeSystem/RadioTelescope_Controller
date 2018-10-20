@@ -647,6 +647,17 @@ class OpHandler(QtCore.QObject):
         if window == "TLE":
             self.save_tle_settings()
 
+    def getTLE(self):
+        self.ui.tleStatusInfoSig.emit("")  # Just initialize the widget
+        tle_result = self.tle_operations.tle_retriever()  # Get the new TLE file
+
+        if tle_result[0] is True:
+            tle_status_msg = "Success^TLE file(s) updated"
+        else:
+            tle_status_msg = "Error^There was a problem getting TLE file(s).^"
+            tle_status_msg += tle_result[1]
+        self.ui.tleStatusInfoSig.emit(tle_status_msg)
+
     # Make all the necessary signal connections
     def signalConnections(self):
         """
@@ -701,6 +712,7 @@ class OpHandler(QtCore.QObject):
         self.ui.saveSettingsSig.connect(self.settings_saver)
         self.ui.tle_settings_widg.buttonBox.accepted.connect(partial(self.ui.saveWaringSig.emit, "TLE"))
         self.ui.main_widg.actionTLE_Settings.triggered.connect(self.show_tle_info)
+        self.ui.tle_settings_widg.tleDownloadButton.clicked.connect(self.getTLE)  # Retrieve the TLE upon user request
 
         self.logD.debug("All signal connections made")
 
