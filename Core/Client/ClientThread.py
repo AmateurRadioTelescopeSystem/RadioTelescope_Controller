@@ -20,13 +20,13 @@ class ClientThread(QtCore.QObject):
         mut.lock()  # Lock the thread until it has started, to avoid any overlapping problems
         self.log.info("Client thread started")  # Indicate thread start
         self.sock = QtNetwork.QTcpSocket()  # Create the TCP socket
-        self.reConnectSigC.connect(self.connect)  # Do the reconnect signal connection
-        self.connect()  # Start a connection
+        self.reConnectSigC.connect(self.connectCl)  # Do the reconnect signal connection
+        self.connectCl()  # Start a connection
         mut.unlock()  # Unlock the thread, since it has started successfully
 
     # The connect function is called if the signal is fired or in the start of the thread
     @QtCore.pyqtSlot(name='reConnectClient')
-    def connect(self):
+    def connectCl(self):
         self.log.debug("Client connection initializer called")
         if self.sock.state() != QtNetwork.QAbstractSocket.ConnectedState:
             # Get the host and port from the settings file for the client connection
