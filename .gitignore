@@ -290,8 +290,12 @@ logs/*
 
 # Ignore the compiled resources file
 resources.py
+resources.rcc
 
 # Ignore the TLE directory
 TLE/*
+
+# Ignore the settings from the test directory
+Tests/Settings/*
 
 # End of https://www.gitignore.io/api/c,c++,linux,python,windows
