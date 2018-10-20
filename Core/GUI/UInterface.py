@@ -27,7 +27,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
 
         # Load the resources binary
         resource_file = QtCore.QResource()
-        resource_file.registerResource("Core/GUI/resources.rcc")
+        resource_file.registerResource(os.path.abspath("Core/GUI/resources.rcc"))
 
         # Create the main GUI window and the other windows
         self.mainWin = QtWidgets.QMainWindow()  # Create the main window of the GUI
