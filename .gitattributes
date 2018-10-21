@@ -13,6 +13,7 @@
 *.yaml text
 
 # Declare files that should have CRLF line endings on checkout.
+*.bat
 
 # Declare files that should have LF line endings on checkout.
 *.py text eol=lf
