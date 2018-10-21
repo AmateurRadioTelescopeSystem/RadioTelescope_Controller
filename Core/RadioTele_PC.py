@@ -143,6 +143,10 @@ def main():
 
 if __name__ == '__main__':
     log = logging.getLogger(__name__)  # Create the logger for the program
+
+    # Redirect sterr to the logging file
+    std_err_logger = logging.getLogger('STDERR')  # Create an STDERR logger
+    sys.stderr = CLogFileHandler.StreamToLogger(std_err_logger, logging.ERROR)  # Redirect stderr to the created logger
     try:
         main()  # Run the main program
     except (Exception, OSError):
