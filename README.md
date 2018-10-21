@@ -38,10 +38,9 @@ commands.
 <img src="https://vignette.wikia.nocookie.net/harimau-malaya/images/c/c9/Windows-logo.png/revision/latest?cb=20160322033433" width="12%" />
 </p>
 
-* First of all Python3.5+ needes to be installed, because Windows do not come with Python installed.
-To install Python go to [Python website](https://www.python.org/) and get the latest stable version.
-* It is important first to install Qt5, by downloading it from the [Qt website](https://www.qt.io).
-* Make sure that the installation of the Qt5 is in the direcory `C:\Qt` on your computer.
+* First of all Python3.5+ needs to be installed. To install Python go to [Python's website](https://www.python.org) and get the latest stable release.
+* It is important also to install Qt5, by downloading it from the [Qt's website](https://www.qt.io).
+* Make sure that the installation of the Qt5 is in the direcory `C:\Qt` on your computer and you have Qt5.
 * Also make sure that `pip` for Python is installed.
 * The next step is to open a terminal window in the program direcoty and execute the `configure_windows.bat` file.
 * If the execution of the configuration file is successful, then proceed with running the program by executing
