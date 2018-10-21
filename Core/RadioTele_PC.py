@@ -73,7 +73,7 @@ def main():
 
     # Create a Qt application instance
     app = QtWidgets.QApplication(sys.argv)
-    app.setFont(fnt)
+    app.setFont(fnt)  # Set the application's font
 
     ui = UInterface.Ui_RadioTelescopeControl()  # Instantiate the class object for the main window GUI
 
