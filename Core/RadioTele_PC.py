@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from PySide2 import QtWidgets, QtCore
+from PySide2 import QtWidgets, QtCore, QtGui
 from GUI import UInterface
 from Handlers import OperationHandler
 from Client import ClientThread
@@ -61,7 +61,20 @@ def main():
     logdata.info("Main thread started")  # Use that in debugging
     QtCore.QThreadPool.globalInstance().setMaxThreadCount(8)  # Set the global thread pool count
 
-    app = QtWidgets.QApplication(sys.argv)  # Create a Qt application instance
+    # Set the GUI Font according to the OS used
+    fnt = QtGui.QFont()  # Create the font object
+    fnt.setStyleHint(QtGui.QFont.Monospace)  # Set the a default font in case some of the following is not found
+    if sys.platform.startswith('linux'):
+        fnt.setFamily("Ubuntu")  # Set the font for Ubuntu/linux
+        fnt.setPointSize(11)
+    elif sys.platform.startswith('win32'):
+        fnt.setFamily("Segoe UI")  # Set the font for Windows
+        fnt.setPointSize(8)
+
+    # Create a Qt application instance
+    app = QtWidgets.QApplication(sys.argv)
+    app.setFont(fnt)
+
     ui = UInterface.Ui_RadioTelescopeControl()  # Instantiate the class object for the main window GUI
 
     # Exception handling code for the XML file process

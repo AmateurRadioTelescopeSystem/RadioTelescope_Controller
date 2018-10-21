@@ -94,20 +94,6 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         #QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create('Fusion'))  # Change the style of the GUI
 
     def setupUi(self):
-        # Set the font according to the OS
-        fnt = QtGui.QFont()  # Create the font object
-        fnt.setStyleHint(QtGui.QFont.Monospace)  # Set the a default font in case some of the following is not found
-        if sys.platform.startswith('linux'):
-            fnt.setFamily("Ubuntu")  # Set the font for Ubuntu/linux
-            fnt.setPointSize(11)
-        elif sys.platform.startswith('win32'):
-            fnt.setFamily("Segoe UI")  # Set the font for Windows
-            fnt.setPointSize(8)
-
-        # Set the font in the widgets
-        self.main_widg.setFont(fnt)
-        self.man_cn_widg.setFont(fnt)
-
         # Make all the necessary connections
         self.main_widg.clientRPiEnableLabel.stateChanged.connect(
             self.checkBoxTCPRTClient)  # Assign functionality to the checkbox
