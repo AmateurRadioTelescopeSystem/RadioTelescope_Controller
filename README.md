@@ -19,6 +19,10 @@ This installation information are not the final ones, since more packages may be
 
 ### How do I get set up? ###
 
+<p>
+<img src="https://assets.ubuntu.com/v1/048f7fde-ubuntu_black-orange_hex.jpg" width="10%" />
+</p>
+
 * Before proceeding, make sure that `pip` is installed on your system.
 * _Installation command for pip_: `$ sudo apt-get install python3-pip`
 * Also you will need to run the command `$ sudo apt-get install qt5-defaults`, to make sure you have the required Qt5
@@ -30,6 +34,18 @@ commands.
 * _Running command_: `$ ./run.sh`. Make sure the run script has executable permissions.
 * If executable permissions are needed for the run script type `$ chmod +x run.sh`, and the run the script as described above.
 
+<p>
+<img src="https://vignette.wikia.nocookie.net/harimau-malaya/images/c/c9/Windows-logo.png/revision/latest?cb=20160322033433" width="12%" />
+</p>
+
+* First of all Python3.5+ needes to be installed, because Windows do not come with Python installed.
+To install Python go to [Python website](https://www.python.org/) and get the latest stable version.
+* It is important first to install Qt5, by downloading it from the [Qt website](https://www.qt.io).
+* Make sure that the installation of the Qt5 is in the direcory `C:\Qt` on your computer.
+* Also make sure that `pip` for Python is installed.
+* The next step is to open a terminal window in the program direcoty and execute the `configure_windows.bat` file.
+* If the execution of the configuration file is successful, then proceed with running the program by executing
+`run_windows.bat`.
 
 ### Who do I talk to? ###
 
