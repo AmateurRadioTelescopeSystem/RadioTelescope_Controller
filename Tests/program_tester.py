@@ -3,6 +3,11 @@
 import sys
 import os
 
+# Create a virtual display for testing
+from pyvirtualdisplay import Display
+display = Display(visible=False, size=(1024, 768), color_depth=24)
+display.start()
+
 sys.path.append(os.path.abspath('Core/'))
 
 from PyQt5 import QtWidgets, QtCore, QtTest, QtNetwork
