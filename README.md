@@ -3,7 +3,7 @@
  [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg?style=plastic)](https://gitlab.com/amateur-radio-telescope-system/main-controller/PC_GUI_Application/blob/master/LICENSE)  
  [![Python 3.5+](https://img.shields.io/badge/python-3.5%2B-blue.svg?style=plastic)](https://www.python.org/downloads/release/python-350/)
 <p align="center">
-<img src="http://www.marysrosaries.com/collaboration/images/0/0b/Radio_Telescope_3_%28PSF%29.png" width="35%" />
+<img src="https://www.marysrosaries.com/collaboration/images/0/0b/Radio_Telescope_3_%28PSF%29.png" width="35%" />
 </p>
 
 [![Build Status](https://img.shields.io/travis/dimst23/RadioTelescope_Controller/master.svg?style=plastic&logo=travis)](https://travis-ci.org/dimst23/RadioTelescope_Controller)
