@@ -11,12 +11,12 @@
 Below you will find installation instructions to get the controller up and running on your own system.
 This installation information are not the final ones, since more packages may be used and/or a different approach will be used.
 
-### What is this repository for? ###
+## What is this repository for?
 
 In this repository you will find the necessary files to get the telescope controller software up and running on your system.  
 This is still a beta version and it is relatively unstable, but usable.
 
-### How do I get set up? ###
+## How do I get set up?
 
 <p>
 <img src="https://assets.ubuntu.com/v1/048f7fde-ubuntu_black-orange_hex.jpg" width="10%" />
@@ -45,6 +45,17 @@ commands.
 * If the execution of the configuration file is successful, then proceed with running the program by executing
 `run_windows.bat`.
 
-### Questions? ###
+## Versioning
+The versioning system that will be followed in this repo is the [SemVer](https://semver.org/).
+
+## Authors
+* **Dimitrios Stoupis** - *Initial work* - [GitHub](https://github.com/dimst23/), [GitLab](https://gitlab.com/dimst23)  
+
+All contributors in this project are listed [here](https://gitlab.com/ARtSystem/main-controller/pc-gui-app/graphs/master)
+
+## License
+This project is licensed under GNU GPLv3. Checkout the [LICENSE](https://gitlab.com/ARtSystem/main-controller/pc-gui-app/blob/master/LICENSE) file for details.
+
+## Questions?
 
 * You can contact the repo owner
