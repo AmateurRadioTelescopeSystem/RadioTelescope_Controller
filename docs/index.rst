@@ -10,7 +10,15 @@ Welcome to Radio Telescope Controller's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. include:: rst
+   GUI/modules
+   Astronomy/modules
+   Configuration/modules
+   Stellarium/modules
+   Server/modules
+   Client/modules
+   Handlers/modules
+.. PYTHON_MODULES_LIST_END
+
 
 
 
