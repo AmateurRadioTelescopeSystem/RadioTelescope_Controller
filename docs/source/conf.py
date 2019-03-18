@@ -30,17 +30,17 @@ for index, line in enumerate(file_content):
         modules_last_index = index - 1
 
 # Add all the necessary python file containing folder to search path
-sys.path.insert(0, os.path.abspath('../'))
-sys.path.append(os.path.abspath('../Core/'))
-for directory in os.listdir(os.path.abspath('../Core/')):
+sys.path.insert(0, os.path.abspath('../../'))
+sys.path.append(os.path.abspath('../../Core/'))
+for directory in os.listdir(os.path.abspath('../../Core/')):
     if directory.find("__") is -1 and directory.find(".py") is -1:
-        sys.path.append(os.path.abspath("../Core/" + directory))
+        sys.path.append(os.path.abspath("../../Core/" + directory))
 
         # Generate RST files for each python file containing folder
         if not os.path.exists("rst/" + directory):
             os.makedirs("rst/" + directory)
         if not os.listdir("rst/" + directory):
-            os.system("sphinx-apidoc -o rst/" + directory + " ../Core/" + directory)
+            os.system("sphinx-apidoc -o rst/" + directory + " ../../Core/" + directory)
 
         # Add the rst file locations in the index.rst
         if ("   " + file_content[modules_index].split("/")[0]) != ("   " + directory):
@@ -54,17 +54,16 @@ index_file = open("index.rst", "w")
 index_file.writelines(file_content)
 index_file.close()
 
-
 # -- Project information -----------------------------------------------------
 
-project = 'Radio Telescope Controller'
+project = 'Radio Telescope Main Controller'
 copyright = '2019, Dimitrios Stoupis'
 author = 'Dimitrios Stoupis'
 
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '1.0'
+release = '0.5'
 
 
 # -- General configuration ---------------------------------------------------
@@ -80,6 +79,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
+    'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
 ]
@@ -106,7 +106,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
@@ -144,7 +144,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'RadioTelescopeControllerdoc'
+htmlhelp_basename = 'RadioTelescopeMainControllerdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -171,7 +171,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'RadioTelescopeController.tex', 'Radio Telescope Controller Documentation',
+    (master_doc, 'RadioTelescopeMainController.tex', 'Radio Telescope Main Controller Documentation',
      'Dimitrios Stoupis', 'manual'),
 ]
 
@@ -181,7 +181,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'radiotelescopecontroller', 'Radio Telescope Controller Documentation',
+    (master_doc, 'radiotelescopemaincontroller', 'Radio Telescope Main Controller Documentation',
      [author], 1)
 ]
 
@@ -192,8 +192,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'RadioTelescopeController', 'Radio Telescope Controller Documentation',
-     author, 'RadioTelescopeController', 'One line description of project.',
+    (master_doc, 'RadioTelescopeMainController', 'Radio Telescope Main Controller Documentation',
+     author, 'RadioTelescopeMainController', 'One line description of project.',
      'Miscellaneous'),
 ]
 
