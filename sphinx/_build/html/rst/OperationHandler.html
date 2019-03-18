@@ -1,0 +1,358 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>OperationHandler module &#8212; Radio Telescope Controller 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SimulationHandler module" href="SimulationHandler.html" />
+    <link rel="prev" title="CLogFileHandler module" href="CLogFileHandler.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-OperationHandler">
+<span id="operationhandler-module"></span><h1>OperationHandler module<a class="headerlink" href="#module-OperationHandler" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="OperationHandler.OpHandler">
+<em class="property">class </em><code class="descclassname">OperationHandler.</code><code class="descname">OpHandler</code><span class="sig-paren">(</span><em>tcpClient</em>, <em>tcpServer</em>, <em>tcpStellarium</em>, <em>tcpClThread</em>, <em>tcpServThread</em>, <em>tcpStelThread</em>, <em>ui</em>, <em>cfgData</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtCore.QObject</span></code></p>
+<dl class="method">
+<dt id="OperationHandler.OpHandler.TCPSettingsHandle">
+<code class="descname">TCPSettingsHandle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.TCPSettingsHandle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.TCPSettingsHandle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.appExitRequest">
+<code class="descname">appExitRequest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.appExitRequest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.appExitRequest" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is called whenever the app is about to quit.
+First quit from the thread and then delete both the thread and the corresponding object
+Quit exits the thread and then wait is waiting for the thread exit
+deleteLater, deletes the thread object and the threaded object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.calcScanPoints">
+<code class="descname">calcScanPoints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.calcScanPoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.calcScanPoints" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.calibration_reposition">
+<code class="descname">calibration_reposition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.calibration_reposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.calibration_reposition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.clientDataRx">
+<code class="descname">clientDataRx</code><span class="sig-paren">(</span><em>data: str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.clientDataRx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.clientDataRx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data reception from the TCP client.
+Receive the data sent from client and decide how to act</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> – Data received from the client</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.connectButtonR">
+<code class="descname">connectButtonR</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.connectButtonR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.connectButtonR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.connectButtonRPi">
+<code class="descname">connectButtonRPi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.connectButtonRPi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.connectButtonRPi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.connectButtonS">
+<code class="descname">connectButtonS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.connectButtonS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.connectButtonS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.coordinateFormatter">
+<code class="descname">coordinateFormatter</code><span class="sig-paren">(</span><em>num: float</em>, <em>degree: bool</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.coordinateFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.coordinateFormatter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.getTLE">
+<code class="descname">getTLE</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.getTLE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.getTLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.homePositionReturn">
+<code class="descname">homePositionReturn</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.homePositionReturn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.homePositionReturn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.initialCommands">
+<code class="descname">initialCommands</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.initialCommands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.initialCommands" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.locationSettingsHandle">
+<code class="descname">locationSettingsHandle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.locationSettingsHandle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.locationSettingsHandle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.manCont_movBoth">
+<code class="descname">manCont_movBoth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.manCont_movBoth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.manCont_movBoth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.manCont_movDEC">
+<code class="descname">manCont_movDEC</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.manCont_movDEC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.manCont_movDEC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.manCont_movRA">
+<code class="descname">manCont_movRA</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.manCont_movRA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.manCont_movRA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.manCont_stop">
+<code class="descname">manCont_stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.manCont_stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.manCont_stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.motorsEnableButton">
+<code class="descname">motorsEnableButton</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.motorsEnableButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.motorsEnableButton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.planObjCommand">
+<code class="descname">planObjCommand</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.planObjCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.planObjCommand" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="OperationHandler.OpHandler.posDataShow">
+<code class="descname">posDataShow</code><a class="headerlink" href="#OperationHandler.OpHandler.posDataShow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.rpiServRcvData">
+<code class="descname">rpiServRcvData</code><span class="sig-paren">(</span><em>data: str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.rpiServRcvData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.rpiServRcvData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the data sent from the RPi client.
+Mainly the dish position will be sent</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> – Data received from the TCP connection</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.sat_coords_setter">
+<code class="descname">sat_coords_setter</code><span class="sig-paren">(</span><em>satellite: str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.sat_coords_setter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.sat_coords_setter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.saveLocationSettings">
+<code class="descname">saveLocationSettings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.saveLocationSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.saveLocationSettings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.saveTCPSettings">
+<code class="descname">saveTCPSettings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.saveTCPSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.saveTCPSettings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.save_tle_settings">
+<code class="descname">save_tle_settings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.save_tle_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.save_tle_settings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.settings_saver">
+<code class="descname">settings_saver</code><span class="sig-paren">(</span><em>window: str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.settings_saver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.settings_saver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.show_tle_info">
+<code class="descname">show_tle_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.show_tle_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.show_tle_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.signalConnections">
+<code class="descname">signalConnections</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.signalConnections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.signalConnections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect all the necessary signals from the different modules.
+This function is called at the start of the Operation handling thread.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.skyScanStart">
+<code class="descname">skyScanStart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.skyScanStart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.skyScanStart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializer of the thread.
+Make all the necessary initializations when the thread starts</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.stellCommSend">
+<code class="descname">stellCommSend</code><span class="sig-paren">(</span><em>radec: list</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.stellCommSend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.stellCommSend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the appropriate command according to the selected mode. Data is received from Stellarium (sendClientConn)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>radec</strong> – A list containing the data received from Stellarium</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.stopMovingRT">
+<code class="descname">stopMovingRT</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.stopMovingRT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.stopMovingRT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="OperationHandler.OpHandler.testConnButton">
+<code class="descname">testConnButton</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/OperationHandler.html#OpHandler.testConnButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#OperationHandler.OpHandler.testConnButton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Radio Telescope Controller</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Handlers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="CLogFileHandler.html">CLogFileHandler module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">OperationHandler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SimulationHandler.html">SimulationHandler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="TLEHandler.html">TLEHandler module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">Handlers</a><ul>
+      <li>Previous: <a href="CLogFileHandler.html" title="previous chapter">CLogFileHandler module</a></li>
+      <li>Next: <a href="SimulationHandler.html" title="next chapter">SimulationHandler module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Dimitrios Stoupis.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/rst/OperationHandler.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
