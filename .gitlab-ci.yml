@@ -30,7 +30,9 @@ pages:
   stage: deploy
   script:
     - mkdir public
-    - mv docs/build/html/* public
+    - cd docs/source
+    - make html
+    - mv ../build/html/* ../../public
   artifacts:
     paths:
     - public
