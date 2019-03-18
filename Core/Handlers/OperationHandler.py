@@ -15,6 +15,7 @@ class OpHandler(QtCore.QObject):
                  tcpStelThread, ui, cfgData, parent=None):
         """
         Operations handler class constructor.
+
         :param tcpClient:
         :param tcpServer:
         :param tcpStellarium:
@@ -71,9 +72,9 @@ class OpHandler(QtCore.QObject):
             "<td style=\"width: 29px;\">&nbsp;</td></tr></tbody></table><p>&nbsp;</p></html>")
 
     def start(self):
-        """
-        Initializer of the thread.
+        """Initializer of the thread.
         Make all the necessary initializations when the thread starts
+
         :return: Nothing
         """
         self.logD.info("Operations handler thread started")
@@ -172,6 +173,7 @@ class OpHandler(QtCore.QObject):
         """
         Data reception from the TCP client.
         Receive the data sent from client and decide how to act
+
         :param data: Data received from the client
         :return:
         """
@@ -202,6 +204,7 @@ class OpHandler(QtCore.QObject):
     def stellCommSend(self, radec: list):
         """
         Send the appropriate command according to the selected mode. Data is received from Stellarium (sendClientConn)
+
         :param radec: A list containing the data received from Stellarium
         :return: Nothing
         """
@@ -228,6 +231,7 @@ class OpHandler(QtCore.QObject):
         """
         Get the data sent from the RPi client.
         Mainly the dish position will be sent
+
         :param data: Data received from the TCP connection
         :return: Nothing
         """
@@ -663,6 +667,7 @@ class OpHandler(QtCore.QObject):
         """
         Connect all the necessary signals from the different modules.
         This function is called at the start of the Operation handling thread.
+
         :return: Nothing
         """
         self.tcpStellarium.sendClientConn.connect(self.stellCommSend)  # Send data from Stellarium to the RPi
@@ -718,10 +723,11 @@ class OpHandler(QtCore.QObject):
 
     def appExitRequest(self):
         """
-        #This function is called whenever the app is about to quit.
+        This function is called whenever the app is about to quit.
         First quit from the thread and then delete both the thread and the corresponding object
         Quit exits the thread and then wait is waiting for the thread exit
         deleteLater, deletes the thread object and the threaded object
+
         :return: Nothing
         """
         self.tcpClThread.quit()
