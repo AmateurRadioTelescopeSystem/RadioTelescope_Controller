@@ -17,6 +17,7 @@ Welcome to Radio Telescope Main Controller's documentation!
    rst/Server/modules
    rst/Client/modules
    rst/Handlers/modules
+.. PYTHON_MODULES_LIST_END
 
 
 Indices and tables
