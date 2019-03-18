@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtNetwork
-from Astronomy import Astronomy
-from Handlers import SimulationHandler
-from Handlers import TLEHandler
+from Core.Astronomy import Astronomy
+from Core.Handlers import SimulationHandler
+from Core.Handlers import TLEHandler
 from functools import partial
 import logging
 import time
