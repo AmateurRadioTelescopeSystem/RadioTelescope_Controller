@@ -36,3 +36,10 @@ pages:
     - public
   only:
   - master
+
+pylava:
+  stage: build
+  before_script:
+    - pip3 install pylava
+  script:
+    - ci/pylava.sh

@@ -2,8 +2,8 @@ from PyQt5 import QtCore
 from pyorbital import tlefile
 import numpy as np
 import logging
-import urllib3
-import certifi
+# import urllib3
+# import certifi
 import ephem
 import math
 import time
@@ -38,6 +38,7 @@ class Calculations(QtCore.QObject):
     def hour_angle_to_ra(self, obj_ha: float):
         """
         Return the current RA of an object provided its HA and having properly calibrated ephem.
+
         :param obj_ha: Hour angle of the desired object
         :return: The current right ascension of the object in JNOW
         """
@@ -52,6 +53,7 @@ class Calculations(QtCore.QObject):
         """
         Get the current time in GMT without daylight saving.
         Calculate the current day in decimal, which is needed for other calculations
+
         :return time_tuple: A tuple containing the year, month and decimal day
         """
         gmt = time.gmtime()  # Get the current time
@@ -69,6 +71,7 @@ class Calculations(QtCore.QObject):
         The final hour angle is calculated for a stationary object. We add the maximum time taken by any motor
         to go to the desired position, to the current time and then the hour angle at the latter position is calculated.
         Home position of the dish is considered to be 0h hour angle and 0 degrees declination.
+
         :param obj_ra: Provide the objects right ascension in degrees
         :param obj_dec: Provide the objects declination in degrees
         :param stp_to_home_ra: Give the number o steps away from home position for the right ascension motor
@@ -96,6 +99,7 @@ class Calculations(QtCore.QObject):
         Calculate object's position when the dish arrives at position.
         This function calculates the coordinates of the requested object, taking into account the delay of the dish
         until it moves to the desired position.
+
         :param objec: pyephem object type, which is the object of interest (e.g. ephem.Jupiter())
         :param stp_to_home_ra: Number of steps from home position for the right ascension motor
         :param stp_to_home_dec: Number of steps from home position for the declination motor
@@ -140,6 +144,7 @@ class Calculations(QtCore.QObject):
     def tracking_planetary(self, objec, stp_to_home_ra: int, stp_to_home_dec: int):
         """
         Calculate the rate of change for the coordinates of different planetary bodies.
+
         :param objec: pyephem object type, which is the object of interest (e.g. ephem.Jupiter())
         :param stp_to_home_ra: Number of steps from home position for the right ascension motor
         :param stp_to_home_dec: Number of steps from home position for the declination motor
@@ -187,6 +192,7 @@ class Calculations(QtCore.QObject):
     def scanning_map_generator(self, points: tuple, step_size: tuple, direction: str):
         """
         Generate a sky map of points to be scanned.
+
         :param points: Initial box points at four corners. Coordinate system and epoch is included
         :param step_size: Stepping size for each axis (a tuple)
         :param direction: Direction of scanning with respect to the first point
@@ -259,7 +265,7 @@ class Calculations(QtCore.QObject):
                 fill_reverse = True
 
             for i in range(0, int(num_boxes_y)):
-                if i is not 0:
+                if i != 0:
                     y_point -= step_size[1]  # Don't deduct the step on the first point
                 fill_reverse = not fill_reverse  # Negate the direction of point filling
 
@@ -280,7 +286,7 @@ class Calculations(QtCore.QObject):
                 fill_reverse = True
 
             for i in range(0, int(num_boxes_x)):
-                if i is not 0:
+                if i != 0:
                     x_point -= step_size[0]  # Don't deduct the step on the first point
                 fill_reverse = not fill_reverse  # Negate the direction of point filling
 
@@ -306,6 +312,7 @@ class Calculations(QtCore.QObject):
                                   int_time=0.0, objec=None):
         """
         Generate the scanning map in HA and DEC
+
         :param map_points:
         :param init_steps: Initial steps from home in RA and DEC axis
         :param step_size:
@@ -335,7 +342,7 @@ class Calculations(QtCore.QObject):
                 pass
             step_incr = (step_incr_ra, step_incr_dec, )
 
-            if int(int_time * 60.0) is not 0:
+            if int(int_time * 60.0) != 0:
                 tr_time = int(int_time * 60.0)
             else:
                 tr_time = 0
@@ -385,8 +392,7 @@ class Calculations(QtCore.QObject):
             sat.compute(self.observer)
 
             c_time = self.current_time()  # Get the current time
-            ha = np.round(self.hour_angle(c_time, math.degrees(sat.ra))
-                          , 4)  # Get the hour angle of the satellite
+            ha = np.round(self.hour_angle(c_time, math.degrees(sat.ra)), 4)  # Get the hour angle of the satellite
 
             return np.array([np.round(np.degrees((sat.alt, sat.az,)), 4),
                              np.round((ha, np.degrees(sat.dec),), 4)]).tolist()
