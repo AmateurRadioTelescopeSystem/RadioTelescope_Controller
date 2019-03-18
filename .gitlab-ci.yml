@@ -28,6 +28,8 @@ tests:
 
 pages:
   stage: deploy
+  script:
+    - echo "Nothing here"
   artifacts:
     paths:
     - public
