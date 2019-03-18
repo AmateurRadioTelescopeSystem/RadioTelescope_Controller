@@ -17,7 +17,14 @@ Welcome to Radio Telescope Main Controller's documentation!
    rst/Server/modules
    rst/Client/modules
    rst/Handlers/modules
+   
+.. PYTHON_MODULES_LIST_END
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Markdown
+
+   marTest
 
 Indices and tables
 ==================
