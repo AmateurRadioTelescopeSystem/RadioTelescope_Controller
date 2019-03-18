@@ -2,6 +2,7 @@
 
 import sys
 import os
+sys.path.insert(0, os.path.abspath('.'))  # noqa
 
 # Create a virtual display for testing
 from pyvirtualdisplay import Display
@@ -11,12 +12,12 @@ display.start()
 sys.path.append(os.path.abspath('Core/'))
 
 from PyQt5 import QtWidgets, QtCore, QtTest, QtNetwork
-from GUI import UInterface
-from Handlers import OperationHandler
-from Client import ClientThread
-from Server import RPiServerThread
-from Stellarium import StellariumThread
-from Configuration import configData
+from Core.GUI import UInterface
+from Core.Handlers import OperationHandler
+from Core.Client import ClientThread
+from Core.Server import RPiServerThread
+from Core.Stellarium import StellariumThread
+from Core.Configuration import configData
 import defaultData
 import logging.config
 import logging
