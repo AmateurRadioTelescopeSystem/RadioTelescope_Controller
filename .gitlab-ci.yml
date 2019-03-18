@@ -30,7 +30,7 @@ tests:
     - nohup python3 Tests/server_tester.py &
     - python3 Tests/program_tester.py
 
-documentation:
+pages:
   stage: deploy
   tags:
     - trd-runner
