@@ -30,9 +30,10 @@ pages:
   stage: deploy
   script:
     - mkdir public
-    - cd docs/source
-    - make html
-    - mv ../build/html/* ../../public
+    - cd docs
+    - sphinx-build -b html source build
+    - sphinx-build -b coverage source ../coverage
+    - mv build/html/* ../public
   artifacts:
     paths:
     - public
