@@ -11,6 +11,7 @@ cache:
 before_script:
   - python -V               # Print out python version for debugging
   - apt-get update -qq && apt-get install -y -qq python3 python3-pip
+  - apt-get install -y -qq libnss3 libnss3-dev libgl1
   - pip3 install --upgrade pip
 
 tests:
@@ -18,7 +19,7 @@ tests:
   tags:
     - trd-runner
   before_script:
-    - apt-get update -qq && apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default libnss3 libnss3-dev libgl1
+    - apt-get update -qq && apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
     - pip3 install virtualenv
     - virtualenv venv
     - source venv/bin/activate
@@ -41,6 +42,8 @@ documentation:
     - cd docs
     - sphinx-build -b html source build
     - sphinx-build -b coverage source ../coverage
+    - pwd
+    - ls -al
     - cp -r build/html/* ../public
   artifacts:
     paths:
