@@ -28,9 +28,6 @@ tests:
 
 pages:
   stage: deploy
-  script:
-    - chmod +x page_getter.sh
-    - ./page_getter.sh
   artifacts:
     paths:
     - public
