@@ -10,7 +10,7 @@ Welcome to Radio Telescope Controller's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   rst/modules
+.. include:: rst
 
 
 
