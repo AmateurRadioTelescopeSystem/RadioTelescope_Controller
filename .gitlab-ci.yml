@@ -37,14 +37,11 @@ documentation:
   before_script:
     - pip3 install sphinx
     - pip3 install -r requirements.txt
-    - mkdir public
   script:
     - cd docs
-    - sphinx-build -b html source build
-    - sphinx-build -b coverage source ../coverage
-    - pwd
-    - ls -al
-    - cp -r build/html/* ../public
+    - sphinx-build -b html docs/source public
+    - sphinx-build -b coverage docs/source coverage
+
   artifacts:
     paths:
     - public
