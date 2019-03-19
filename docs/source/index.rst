@@ -7,6 +7,12 @@ Welcome to Radio Telescope Main Controller's documentation!
 ===========================================================
 
 .. toctree::
+  :maxdepth: 2
+  :caption: Getting Started
+  
+  ../../README
+
+.. toctree::
    :maxdepth: 2
    :caption: Contents:
 
