@@ -1,5 +1,4 @@
 import os
-import sys
 import gzip
 import logging
 import logging.handlers
@@ -53,7 +52,7 @@ class CustomLogTimedRotationHandler(logging.Handler):
             self._handler.emit(record)  # Write to log file
         except (KeyboardInterrupt, SystemExit):
             raise
-        except:
+        except Exception:
             self.handleError(record)
 
     def close(self):
@@ -132,7 +131,7 @@ class CustomLogRotationHandler(logging.Handler):
             self._handler.emit(record)  # Write to log file
         except (KeyboardInterrupt, SystemExit):
             raise
-        except:
+        except Exception:
             self.handleError(record)
 
     def close(self):

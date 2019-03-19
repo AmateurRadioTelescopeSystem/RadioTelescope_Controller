@@ -4,8 +4,6 @@ from Core.Handlers import SimulationHandler
 from Core.Handlers import TLEHandler
 from functools import partial
 import logging
-import time
-import os
 
 
 class OpHandler(QtCore.QObject):
@@ -238,28 +236,28 @@ class OpHandler(QtCore.QObject):
         # TODO Remove the degree conversion for the RA, since MPU will send in degrees and not hours
         spltData = data.split("_")  # Split the string with the set delimiter
         if spltData[0] == "POSUPDATE":
-            ra = self.astronomy.hour_angle_to_ra(float(spltData[2])*15.0)  # Get the RA from the received position
+            ra = self.astronomy.hour_angle_to_ra(float(spltData[2]) * 15.0)  # Get the RA from the received position
             dec = spltData[4]  # Get the DEC from the received position
             if not (self.prev_pos[0] == ra and self.prev_pos[1] == dec and spltData[0] != "POSUPDATE"):
-                self.tcpStellarium.sendDataStell.emit(float(ra)/15.0, float(dec))  # Send the position to Stellarium
-                self.posDataShow.emit(float(ra)/15.0, float(dec))  # Send the updated values if they are different
+                self.tcpStellarium.sendDataStell.emit(float(ra) / 15.0, float(dec))  # Send the position to Stellarium
+                self.posDataShow.emit(float(ra) / 15.0, float(dec))  # Send the updated values if they are different
             self.prev_pos = [ra, dec]  # Save the values for later comparison
         elif spltData[0] == "DISHPOS":
-            ra_degrees = self.astronomy.hour_angle_to_ra(float(spltData[2])*15.0)  # Get the RA from the received HA
+            ra_degrees = self.astronomy.hour_angle_to_ra(float(spltData[2]) * 15.0)  # Get the RA from the received HA
             dec_degrees = spltData[4]  # Get the DEC from the received position
             ra_steps = spltData[7]
             dec_steps = spltData[9]
             self.ui.setManContStepsSig.emit("RA", ra_steps)  # Update the manual control window
             self.ui.setManContStepsSig.emit("DEC", dec_steps)
-            self.tcpStellarium.sendDataStell.emit(float(ra_degrees)/15.0, float(dec_degrees))
-            self.posDataShow.emit(float(ra_degrees)/15.0, float(dec_degrees))
+            self.tcpStellarium.sendDataStell.emit(float(ra_degrees) / 15.0, float(dec_degrees))
+            self.posDataShow.emit(float(ra_degrees) / 15.0, float(dec_degrees))
 
             # Update the progress bar
-            if self.max_steps_to_targ_ra is not 0:
-                ratio = int(ra_steps)/self.max_steps_to_targ_ra
+            if self.max_steps_to_targ_ra != 0:
+                ratio = int(ra_steps) / self.max_steps_to_targ_ra
                 self.ui.main_widg.onTargetProgress.setValue(ratio)
-            elif self.max_steps_to_targ_dec is not 0:
-                ratio = int(dec_steps)/self.max_steps_to_targ_dec
+            elif self.max_steps_to_targ_dec != 0:
+                ratio = int(dec_steps) / self.max_steps_to_targ_dec
                 self.ui.main_widg.onTargetProgress.setValue(ratio)
 
     # Command to stop any motion of the radio telescope dish
@@ -513,14 +511,14 @@ class OpHandler(QtCore.QObject):
 
     def calcScanPoints(self):
         point_1 = (self.ui.sky_scan_win.point1Coord_1Field.text(),
-                   self.ui.sky_scan_win.point1Coord_2Field.text(), )
+                   self.ui.sky_scan_win.point1Coord_2Field.text(),)
         point_2 = (self.ui.sky_scan_win.point2Coord_1Field.text(),
-                   self.ui.sky_scan_win.point2Coord_2Field.text(), )
+                   self.ui.sky_scan_win.point2Coord_2Field.text(),)
         point_3 = (self.ui.sky_scan_win.point3Coord_1Field.text(),
-                   self.ui.sky_scan_win.point3Coord_2Field.text(), )
+                   self.ui.sky_scan_win.point3Coord_2Field.text(),)
         point_4 = (self.ui.sky_scan_win.point4Coord_1Field.text(),
-                   self.ui.sky_scan_win.point4Coord_2Field.text(), )
-        self.ui.setStyleSkyScanningSig.emit((point_1, point_2, point_3, point_4, ))
+                   self.ui.sky_scan_win.point4Coord_2Field.text(),)
+        self.ui.setStyleSkyScanningSig.emit((point_1, point_2, point_3, point_4,))
 
         check_1 = point_1[0] != "" and point_1[1] != "" and point_2[0] != "" and point_2[1] != ""
         check_2 = point_3[0] != "" and point_3[1] != "" and point_4[0] != "" and point_4[1] != ""
@@ -532,14 +530,14 @@ class OpHandler(QtCore.QObject):
 
             step_x = self.ui.sky_scan_win.stepSizeBoxCoord1.value()
             step_y = self.ui.sky_scan_win.stepSizeBoxCoord2.value()
-            step_size = (step_x, step_y, )  # Step size in each axis
+            step_size = (step_x, step_y,)  # Step size in each axis
 
-            point_1 = (float(point_1[0]), float(point_1[1]), )
-            point_2 = (float(point_2[0]), float(point_2[1]), )
-            point_3 = (float(point_3[0]), float(point_3[1]), )
-            point_4 = (float(point_4[0]), float(point_4[1]), )
+            point_1 = (float(point_1[0]), float(point_1[1]),)
+            point_2 = (float(point_2[0]), float(point_2[1]),)
+            point_3 = (float(point_3[0]), float(point_3[1]),)
+            point_4 = (float(point_4[0]), float(point_4[1]),)
 
-            points = (point_1, point_2, point_3, point_4, coord_system, epoch, )
+            points = (point_1, point_2, point_3, point_4, coord_system, epoch,)
             map_points = self.astronomy.scanning_map_generator(points, step_size, direction)
             num_of_points = len(map_points[0])  # Number of points to be scanned
 
@@ -565,7 +563,7 @@ class OpHandler(QtCore.QObject):
             map_points = self.calcScanPoints()  # Get the mapping points
             if map_points is not ():
                 home_steps = self.cfgData.getHomeSteps()
-                init_steps = (int(home_steps[0]), int(home_steps[1]), )
+                init_steps = (int(home_steps[0]), int(home_steps[1]),)
 
                 step_x = self.ui.sky_scan_win.stepSizeBoxCoord1.value()
                 step_y = self.ui.sky_scan_win.stepSizeBoxCoord2.value()
@@ -584,8 +582,9 @@ class OpHandler(QtCore.QObject):
                 calc_points = self.astronomy.scanning_point_calculator(map_points, init_steps, step_size,
                                                                        int_time, objec)
                 self.tcpClient.sendData.emit("SKY-SCAN_RA_%f_DEC_%f_RA-SPEED_%f_DEC-SPEED_%f_INT-TIME_%.2f"
-                                             % (float(calc_points[0].split("_")[0]), float(calc_points[0].split("_")[2])
-                                                , float(calc_points[1][0]), float(calc_points[1][1]), int_time))
+                                             % (float(calc_points[0].split("_")[0]),
+                                                float(calc_points[0].split("_")[2]), float(calc_points[1][0]),
+                                                float(calc_points[1][1]), int_time))
                 self.tcpClient.sendData.emit("SKY-SCAN-MAP_%s" % calc_points[0])
                 print(calc_points[0])  # TODO Remove the print statement
         else:
@@ -611,8 +610,8 @@ class OpHandler(QtCore.QObject):
                 try:
                     coord_1 = float(self.ui.calib_win.calibCoord_1_Text.text())
                     coord_2 = float(self.ui.calib_win.calibCoord_2_Text.text())
-                    coord_tuple = (coord_1, coord_2, )
-                    sys_date_tuple = (system, "Now", )
+                    coord_tuple = (coord_1, coord_2,)
+                    sys_date_tuple = (system, "Now",)
 
                     final_coords = self.astronomy.coordinate_transform(coord_tuple, sys_date_tuple)
                     transit_coords = self.astronomy.transit(final_coords[0], final_coords[1], -int(home_steps[0]),
@@ -688,7 +687,8 @@ class OpHandler(QtCore.QObject):
         self.ui.main_widg.serverRPiConnBtn.clicked.connect(self.connectButtonRPi)  # TCP server connection button
         self.ui.main_widg.connectStellariumBtn.clicked.connect(
             self.connectButtonS)  # Stellarium TCP server connection button
-        self.ui.main_widg.motorCommandButton.clicked.connect(self.motorsEnableButton)  # Enable/Disable the motors on RPi
+        self.ui.main_widg.motorCommandButton.clicked.connect(
+            self.motorsEnableButton)  # Enable/Disable the motors on RPi
 
         self.ui.man_cn_widg.movRaBtn.clicked.connect(self.manCont_movRA)
         self.ui.man_cn_widg.movDecBtn.clicked.connect(self.manCont_movDEC)

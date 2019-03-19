@@ -11,7 +11,7 @@ class StellThread(QtCore.QObject):
     sendDataStell = QtCore.pyqtSignal(float, float, name='stellariumDataSend')  # Send the data to Stellarium
     reConnectSigS = QtCore.pyqtSignal(name='reConnectStell')  # A reconnection signal originating from a button press
 
-    def __init__(self, cfgData, parent = None):
+    def __init__(self, cfgData, parent=None):
         super(StellThread, self).__init__(parent)  # Get the parent of the class
         self.cfgData = cfgData  # Settings file object
         self.logD = logging.getLogger(__name__)  # Create the logger
@@ -110,4 +110,3 @@ class StellThread(QtCore.QObject):
         self.reConnectSigS.disconnect()  # Not needed any more since we are closing
         self.conStatSigS.emit("Disconnected")  # Indicate disconnection on the GUI
         self.logD.info("Stellarium server thread closed")  # Indicate that we closed
-

@@ -107,4 +107,3 @@ class RPiServerThread(QtCore.QObject):
         self.reConnectSigR.disconnect()  # Signal not used after thread exit (Reconnected at thread start)
         self.conStatSigR.emit("Disconnected")  # Indicate disconnection on the GUI
         self.logD.info("RPi server thread closed")
-

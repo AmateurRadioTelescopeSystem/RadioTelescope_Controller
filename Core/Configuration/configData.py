@@ -151,7 +151,7 @@ class confData(object):
             self.setConfig("object", "name", name)
             self.setConfig("object", "RA", str(ra))
             self.setConfig("object", "DEC", str(dec))
-    
+
     def getHomeSteps(self):
         ra = self.root.find("Steps").get("ra_to_home")
         dec = self.root.find("Steps").get("dec_to_home")
