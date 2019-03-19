@@ -19,6 +19,27 @@ before_script:
   - apt-get install -y -qq libnss3 libnss3-dev libgl1
   - pip3 install --upgrade pip
 
+pylava:
+  stage: build
+  tags:
+    - trd-runner
+  before_script:
+    - pip3 install pylava
+    - pylava --version
+  script:
+    - ci/pylava.sh
+
+pylint:
+  stage: build
+  tags:
+    - trd-runner
+  before_script:
+    - pip3 install pylint
+    - pylint --version
+    - cp ci/pylintrc ~/.pylintrc
+  script:
+    - ci/pylint.sh
+
 tests:
   stage: test
   tags:
@@ -51,13 +72,3 @@ pages:
     - public
   only:
   - master
-
-pylava:
-  stage: build
-  tags:
-    - trd-runner
-  before_script:
-    - pip3 install pylava
-    - pylava --version
-  script:
-    - ci/pylava.sh

@@ -1,13 +1,14 @@
-from PyQt5 import QtCore
-from pyorbital import tlefile
-import numpy as np
 import logging
 # import urllib3
 # import certifi
-import ephem
 import math
 import time
 import os
+import ephem
+import numpy as np
+from PyQt5 import QtCore
+from pyorbital import tlefile
+
 
 _rad_to_deg = 57.2957795131  # Radians to degrees conversion factor
 _sec_to_day = 1.1574074e-5  # How many days a second has
