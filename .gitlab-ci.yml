@@ -11,13 +11,14 @@ stages:
   - test
   - deploy
 
-before_script:
-  - apt-get update -qq && apt-get install -y -qq libnss3 libnss3-dev libgl1
-  - python3 -V              # Print out python version for debugging
-  - python3 -m pip install --upgrade pip
-  - python3 -m pip install virtualenv
-  - virtualenv venv
-  - source venv/bin/activate
+.standard_python_setup
+  before_script: &required_python_packages
+    - apt-get update -qq && apt-get install -y -qq libnss3 libnss3-dev libgl1
+    - python3 -V              # Print out python version for debugging
+    - python3 -m pip install --upgrade pip
+    - python3 -m pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
 
 pylava:
   stage: build
@@ -42,14 +43,12 @@ pylint:
 
 tests:
   stage: test
-  tags:
-    - trd-runner
   cache:
     paths:
       - .cache/pip
       - venv/
-  before_script:
-    - apt-get update -qq && apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
+  before_script: *required_python_packages
+    - apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
     - chmod +x build_test.sh
   script: 
     - ./configure.sh 
@@ -65,7 +64,7 @@ pages:
     paths:
       - .cache/pip
       - venv/
-  before_script:
+  before_script: *required_python_packages
     - python3 -m pip install sphinx recommonmark groundwork-sphinx-theme
     - python3 -m pip install -r requirements.txt
   script:
