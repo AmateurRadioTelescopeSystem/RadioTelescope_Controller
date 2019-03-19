@@ -27,6 +27,8 @@ pylava:
 pylint:
   stage: build
   image: alpine:latest
+  variables:
+    TERM: xterm-color
   before_script:
     - apk update && apk add python3 python3-dev build-base util-linux
     - python3 -m pip install --upgrade pip && python3 -m pip install pylint
