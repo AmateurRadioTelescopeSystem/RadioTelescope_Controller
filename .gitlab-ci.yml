@@ -12,11 +12,10 @@ stages:
   - deploy
 
 before_script:
-  - python -V               # Print out python version for debugging
-  - apt-get update -qq && apt-get install -y -qq python3 python3-pip
-  - apt-get install -y -qq libnss3 libnss3-dev libgl1
-  - pip3 install --upgrade pip
-  - pip3 install virtualenv
+  - apt-get update -qq && apt-get install -y -qq libnss3 libnss3-dev libgl1
+  - python3 -V              # Print out python version for debugging
+  - python3 -m pip install --upgrade pip
+  - python3 -m pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
 
@@ -53,11 +52,10 @@ tests:
       - venv/
   before_script:
     - apt-get update -qq && apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
-    
     - chmod +x build_test.sh
   script: 
     - ./configure.sh 
-    - pip3 install pyvirtualdisplay
+    - python3 -m pip install pyvirtualdisplay
     - nohup python3 Tests/server_tester.py &
     - python3 Tests/program_tester.py
 
@@ -70,8 +68,8 @@ pages:
       - .cache/pip
       - venv/
   before_script:
-    - pip3 install sphinx recommonmark groundwork-sphinx-theme
-    - pip3 install -r requirements.txt
+    - python3 -m pip install sphinx recommonmark groundwork-sphinx-theme
+    - python3 -m pip install -r requirements.txt
   script:
     - sphinx-build -b html docs/source public
     - sphinx-build -b coverage docs/source coverage
