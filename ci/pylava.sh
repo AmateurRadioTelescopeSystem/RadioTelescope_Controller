@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo -e "\033[0;34mPylava check is running\033[0m"
+echo -e "\e[1;32mPylava check is running\e[0m"
 
 cd Core/
 pylava -o ../ci/pylava.ini
