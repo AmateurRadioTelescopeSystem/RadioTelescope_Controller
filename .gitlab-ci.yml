@@ -35,7 +35,7 @@ pylint:
     - pylint --version
     - cp ci/pylintrc ~/.pylintrc
   script:
-    - script -c "sh -x ci/pylint.sh"  # Output the colors in the terminal
+    - ci/pylint.sh
 
 tests:
   stage: test
