@@ -21,8 +21,7 @@ before_script:
 
 pylava:
   stage: build
-  tags:
-    - trd-runner
+  image: alpine:latest
   before_script:
     - pip3 install pylava
     - pylava --version
@@ -31,8 +30,7 @@ pylava:
 
 pylint:
   stage: build
-  tags:
-    - trd-runner
+  image: alpine:latest
   before_script:
     - pip3 install pylint
     - pylint --version
@@ -66,7 +64,6 @@ pages:
   script:
     - sphinx-build -b html docs/source public
     - sphinx-build -b coverage docs/source coverage
-
   artifacts:
     paths:
     - public
