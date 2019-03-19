@@ -54,7 +54,7 @@ except Exception as excep:
 
 # Open the configuration and apply it on the logging module
 with open(os.path.abspath('Settings/logging_settings.yaml')) as config_file:
-    dictionary = yaml.load(config_file)  # Load the dictionary configuration
+    dictionary = yaml.safe_load(config_file)  # Load the dictionary configuration
     logging.config.dictConfig(dictionary['Logging'])  # Select the logging settings from the dictionary
 
 
