@@ -18,6 +18,7 @@ class CustomLogTimedRotationHandler(logging.Handler):
     def __init__(self, filename, when, backup_count, enc, utc):
         """
         Class constructor to make the necessary initializations.
+
         :param filename: The name of the logging file
         :param when: When to rotate
         :param backup_count: Max number of old files to keep
@@ -34,6 +35,7 @@ class CustomLogTimedRotationHandler(logging.Handler):
     def setFormatter(self, fmt):
         """
         Set the formatter for the file handler
+
         :param fmt: Formatter string as passed from the configuration
         :return: Nothing
         """
@@ -43,6 +45,7 @@ class CustomLogTimedRotationHandler(logging.Handler):
     def emit(self, record):
         """
         Emit the message to the new handler
+
         :param record: Message record
         :return: Nothing
         """
@@ -65,6 +68,7 @@ class CustomLogTimedRotationHandler(logging.Handler):
     def compressor(self, source, dest):
         """
         Compress the file on every rotation
+
         :param source: Source file name
         :param dest: Destination file name
         :return: Nothing
@@ -79,6 +83,7 @@ class CustomLogTimedRotationHandler(logging.Handler):
     def namer(self, name):
         """
         Append the appropriate suffix to the compressed file name
+
         :param name: File name to append suffix
         :return: Nothing
         """
@@ -92,6 +97,7 @@ class CustomLogRotationHandler(logging.Handler):
     def __init__(self, filename, max_bytes, backup_count, enc, delay=False):
         """
         Class constructor to make the necessary initializations.
+
         :param filename: The name of the logging file
         :param when: When to rotate
         :param backup_count: Max number of old files to keep
@@ -108,6 +114,7 @@ class CustomLogRotationHandler(logging.Handler):
     def setFormatter(self, fmt):
         """
         Set the formatter for the file handler
+
         :param fmt: Formatter string as passed from the configuration
         :return: Nothing
         """
@@ -117,6 +124,7 @@ class CustomLogRotationHandler(logging.Handler):
     def emit(self, record):
         """
         Emit the message to the new handler
+
         :param record: Message record
         :return: Nothing
         """
@@ -130,6 +138,7 @@ class CustomLogRotationHandler(logging.Handler):
     def close(self):
         """
         Close the handler upon request.
+
         :return: Nothing
         """
         if self._handler is not None:
@@ -139,6 +148,7 @@ class CustomLogRotationHandler(logging.Handler):
     def compressor(self, source, dest):
         """
         Compress the file on every rotation
+
         :param source: Source file name
         :param dest: Destination file name
         :return: Nothing
@@ -153,6 +163,7 @@ class CustomLogRotationHandler(logging.Handler):
     def namer(self, name):
         """
         Append the appropriate suffix to the compressed file name
+
         :param name: File name to append suffix
         :return: Nothing
         """

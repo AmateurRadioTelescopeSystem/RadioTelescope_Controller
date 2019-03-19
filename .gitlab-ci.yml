@@ -1,5 +1,10 @@
 image: python:latest
 
+stages:
+  - build
+  - test
+  - deploy
+
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
@@ -46,3 +51,10 @@ pages:
     - public
   only:
   - master
+
+pylava:
+  stage: build
+  before_script:
+    - pip3 install pylava
+  script:
+    - ci/pylava.sh

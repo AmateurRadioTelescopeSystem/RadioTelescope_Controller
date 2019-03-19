@@ -622,7 +622,7 @@ class Ui_RadioTelescopeControl(QtCore.QObject):
         self.calib_win.calibCoord_2_Text.setValidator(validator_coord_2)
 
     def coordinate_updater_satellite(self, system=""):
-        if system is "":
+        if system == "":
             system = self.sat_sel_diag.coordinateSystemBox.currentText()
         coord_1 = "<html><head/><body><p><span style=\" font-weight:600;\">%s</span></p></body></html>"
         coord_2 = "<html><head/><body><p><span style=\" font-weight:600;\">%s</span></p></body></html>"
