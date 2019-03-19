@@ -13,6 +13,9 @@ before_script:
   - apt-get update -qq && apt-get install -y -qq python3 python3-pip
   - apt-get install -y -qq libnss3 libnss3-dev libgl1
   - pip3 install --upgrade pip
+  - pip3 install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
 
 pylava:
   stage: build
@@ -30,7 +33,7 @@ pylint:
   variables:
     TERM: xterm-color
   before_script:
-    - apk update && apk add python3 python3-dev build-base util-linux
+    - apk update && apk add python3 python3-dev build-base
     - python3 -m pip install --upgrade pip && python3 -m pip install pylint
     - pylint --version
     - cp ci/pylintrc ~/.pylintrc
@@ -47,9 +50,7 @@ tests:
       - venv/
   before_script:
     - apt-get update -qq && apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
-    - pip3 install virtualenv
-    - virtualenv venv
-    - source venv/bin/activate
+    
     - chmod +x build_test.sh
   script: 
     - ./configure.sh 
@@ -61,6 +62,10 @@ pages:
   stage: deploy
   tags:
     - trd-runner
+  cache:
+    paths:
+      - .cache/pip
+      - venv/
   before_script:
     - pip3 install sphinx recommonmark groundwork-sphinx-theme
     - pip3 install -r requirements.txt
