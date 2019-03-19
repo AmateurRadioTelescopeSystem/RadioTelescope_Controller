@@ -5,6 +5,9 @@ variables:
   
 cache:
   key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+  paths:
+    - .cache/pip
+    - venv/
 
 stages:
   - build
@@ -55,10 +58,6 @@ pages:
   stage: deploy
   tags:
     - trd-runner
-  cache:
-    paths:
-      - .cache/pip
-      - venv/
   script:
     - python3 -m pip install sphinx recommonmark groundwork-sphinx-theme
     - python3 -m pip install -r requirements.txt
