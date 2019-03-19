@@ -56,8 +56,6 @@ tests:
 
 pages:
   stage: deploy
-  tags:
-    - trd-runner
   script:
     - python3 -m pip install sphinx recommonmark groundwork-sphinx-theme
     - python3 -m pip install -r requirements.txt
@@ -66,6 +64,6 @@ pages:
     - sphinx-build --color -b coverage docs/source coverage
   artifacts:
     paths:
-    - public
+      - public
   only:
     - master
