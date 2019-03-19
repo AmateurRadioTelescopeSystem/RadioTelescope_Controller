@@ -11,14 +11,13 @@ stages:
   - test
   - deploy
 
-.standard_python_setup:
-  before_script: &required_python_packages
-    - apt-get update -qq && apt-get install -y -qq libnss3 libnss3-dev libgl1
-    - python3 -V              # Print out python version for debugging
-    - python3 -m pip install --upgrade pip
-    - python3 -m pip install virtualenv
-    - virtualenv venv
-    - source venv/bin/activate
+before_script:
+  - apt-get update -qq && apt-get install -y -qq libnss3 libnss3-dev libgl1
+  - python3 -V              # Print out python version for debugging
+  - python3 -m pip install --upgrade pip
+  - python3 -m pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
 
 pylava:
   stage: build
@@ -46,11 +45,10 @@ tests:
     paths:
       - .cache/pip
       - venv/
-  before_script: *required_python_packages
-  script:
+  before_script:
     - apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
     - chmod +x build_test.sh
-  after_script:
+  script:
     - ./configure.sh 
     - python3 -m pip install pyvirtualdisplay
     - nohup python3 Tests/server_tester.py &
@@ -64,11 +62,10 @@ pages:
     paths:
       - .cache/pip
       - venv/
-  before_script: *required_python_packages
-  script:
+  before_script:
     - python3 -m pip install sphinx recommonmark groundwork-sphinx-theme
     - python3 -m pip install -r requirements.txt
-  after_script:
+  script:
     - sphinx-build --color -b html docs/source public
     - sphinx-build --color -b coverage docs/source coverage
   artifacts:
