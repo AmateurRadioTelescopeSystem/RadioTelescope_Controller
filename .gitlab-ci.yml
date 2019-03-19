@@ -1,17 +1,12 @@
 image: python:latest
 
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
 stages:
   - build
   - test
   - deploy
-
-variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-
-cache:
-  paths:
-    - .cache/pip
-    - venv/
 
 before_script:
   - python -V               # Print out python version for debugging
@@ -33,7 +28,7 @@ pylint:
   stage: build
   image: alpine:latest
   before_script:
-    - apk update && apk add python3
+    - apk update && apk add python3 gcc
     - python3 -m pip install --upgrade pip && python3 -m pip install pylint
     - pylint --version
     - cp ci/pylintrc ~/.pylintrc
@@ -44,6 +39,10 @@ tests:
   stage: test
   tags:
     - trd-runner
+  cache:
+    paths:
+      - .cache/pip
+      - venv/
   before_script:
     - apt-get update -qq && apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
     - pip3 install virtualenv
