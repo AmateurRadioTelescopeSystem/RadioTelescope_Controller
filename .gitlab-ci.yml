@@ -12,7 +12,6 @@ stages:
   - deploy
 
 before_script:
-  - apt-get update -qq && apt-get install -y -qq libnss3 libnss3-dev libgl1
   - python3 -V              # Print out python version for debugging
   - python3 -m pip install --upgrade pip
   - python3 -m pip install virtualenv
@@ -48,6 +47,7 @@ tests:
   before_script:
     - apt-get update -qq
     - apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
+    - apt-get install -y -qq libnss3 libnss3-dev libgl1
     - python3 -m pip --version
     - chmod +x build_test.sh
   script:
@@ -65,6 +65,8 @@ pages:
       - .cache/pip
       - venv/
   before_script:
+    - apt-get update -qq && apt-get install -y -qq libnss3 libnss3-dev libgl1
+    - python3 -m pip --version
     - python3 -m pip install sphinx recommonmark groundwork-sphinx-theme
     - python3 -m pip install -r requirements.txt
   script:
@@ -74,4 +76,4 @@ pages:
     paths:
     - public
   only:
-  - master
+    - master
