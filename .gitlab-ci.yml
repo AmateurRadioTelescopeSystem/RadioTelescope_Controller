@@ -41,10 +41,6 @@ pylint:
 
 tests:
   stage: test
-  cache:
-    paths:
-      - .cache/pip
-      - venv/
   script:
     - apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
     - python3 -m pip --version
