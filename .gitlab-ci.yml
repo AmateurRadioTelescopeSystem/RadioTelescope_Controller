@@ -54,6 +54,8 @@ pages:
 
 pylava:
   stage: build
+  tags:
+    - trd-runner
   before_script:
     - pip3 install pylava
   script:
