@@ -207,45 +207,45 @@ class Calculations(QtCore.QObject):
             initial_point = points[0]
             second_point = points[1]
             third_point = points[2]
-            fourth_point = points[3]
+            # fourth_point = points[3]
         elif direct == "R-Up":
             initial_point = points[3]
             second_point = points[2]
             third_point = points[1]
-            fourth_point = points[0]
+            # fourth_point = points[0]
         elif direct == "L-Down":
             initial_point = points[1]
             second_point = points[0]
             third_point = points[3]
-            fourth_point = points[2]
+            # fourth_point = points[2]
         elif direct == "L-Up":
             initial_point = points[2]
             second_point = points[3]
             third_point = points[0]
-            fourth_point = points[1]
+            # fourth_point = points[1]
         elif direct == "Up-R":
             initial_point = points[3]
             second_point = points[0]
             third_point = points[1]
-            fourth_point = points[2]
+            # fourth_point = points[2]
             second_axis = True
         elif direct == "Up-L":
             initial_point = points[2]
             second_point = points[1]
             third_point = points[0]
-            fourth_point = points[3]
+            # fourth_point = points[3]
             second_axis = True
         elif direct == "Down-R":
             initial_point = points[0]
             second_point = points[3]
             third_point = points[2]
-            fourth_point = points[1]
+            # fourth_point = points[1]
             second_axis = True
         elif direct == "Down-L":
             initial_point = points[1]
             second_point = points[2]
             third_point = points[3]
-            fourth_point = points[0]
+            # fourth_point = points[0]
             second_axis = True
         # TODO implement a fix to include the last box without overlap
         num_boxes_x = math.floor(abs(second_point[0] - initial_point[0])/step_size[0])
