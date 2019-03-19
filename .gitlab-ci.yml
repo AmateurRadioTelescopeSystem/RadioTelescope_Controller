@@ -11,7 +11,7 @@ stages:
   - test
   - deploy
 
-.standard_python_setup
+.standard_python_setup:
   before_script: &required_python_packages
     - apt-get update -qq && apt-get install -y -qq libnss3 libnss3-dev libgl1
     - python3 -V              # Print out python version for debugging
