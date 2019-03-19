@@ -37,7 +37,6 @@ pylint:
     - apk update && apk add python3 python3-dev py3-qt5 build-base
     - python3 -m pip install --upgrade pip && python3 -m pip install pylint
     - pylint --version
-    - cp ci/pylintrc ~/.pylintrc
   script:
     - ci/pylint.sh
 
@@ -48,9 +47,10 @@ tests:
       - .cache/pip
       - venv/
   before_script: *required_python_packages
+  script:
     - apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
     - chmod +x build_test.sh
-  script: 
+  after_script:
     - ./configure.sh 
     - python3 -m pip install pyvirtualdisplay
     - nohup python3 Tests/server_tester.py &
@@ -65,9 +65,10 @@ pages:
       - .cache/pip
       - venv/
   before_script: *required_python_packages
+  script:
     - python3 -m pip install sphinx recommonmark groundwork-sphinx-theme
     - python3 -m pip install -r requirements.txt
-  script:
+  after_script:
     - sphinx-build --color -b html docs/source public
     - sphinx-build --color -b coverage docs/source coverage
   artifacts:
