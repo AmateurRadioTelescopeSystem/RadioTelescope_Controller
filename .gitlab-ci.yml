@@ -9,6 +9,26 @@ cache:
   paths:
     - .cache/pip
 
+# Define a template for Python testing
+.python_stack: &python_version_testing
+  stage: test
+  cache:
+    key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+    paths:
+      - .cache/pip
+      - venv/
+  script:
+    - python3 -m pip install virtualenv
+    - virtualenv venv  # Create the virtual environment directory
+    - source venv/bin/activate  # Activate the virtual environment
+    - apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
+    - chmod +x build_test.sh
+  after_script:
+    - ./configure.sh 
+    - python3 -m pip install pyvirtualdisplay
+    - nohup python3 Tests/server_tester.py &
+    - python3 Tests/program_tester.py
+
 # Define the stages of thi CI
 stages:
   - build
@@ -44,24 +64,17 @@ pylint:
     - ci/pylint.sh
 
 # Unit and integration testing
-tests:
-  stage: test
-  cache:
-    key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
-    paths:
-      - .cache/pip
-      - venv/
-  script:
-    - python3 -m pip install virtualenv
-    - virtualenv venv  # Create the virtual environment directory
-    - source venv/bin/activate  # Activate the virtual environment
-    - apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
-    - chmod +x build_test.sh
-  after_script:
-    - ./configure.sh 
-    - python3 -m pip install pyvirtualdisplay
-    - nohup python3 Tests/server_tester.py &
-    - python3 Tests/program_tester.py
+tests-python-latest:
+  image: python:latest
+  <<: *python_version_testing
+
+tests-python-3.6:
+  image: python:3.6
+  <<: *python_version_testing
+
+tests-python-3.5:
+  image: python:3.5
+  <<: *python_version_testing  
 
 # Deployment section
 pages:
