@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # IP address regex: https://stackoverflow.com/questions/10086572/ip-address-validation-in-python-using-regex
 
-from PyQt5 import QtCore, QtGui, QtWidgets, uic
-from functools import partial
-import logging
-import sys
 import os
+import sys
+import logging
+from functools import partial
+from PyQt5 import QtCore, QtGui, QtWidgets, uic
 
 
 class Ui_RadioTelescopeControl(QtCore.QObject):

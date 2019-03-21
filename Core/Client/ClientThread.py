@@ -1,5 +1,5 @@
-from PyQt5 import QtCore, QtNetwork
 import logging
+from PyQt5 import QtCore, QtNetwork
 
 
 class ClientThread(QtCore.QObject):

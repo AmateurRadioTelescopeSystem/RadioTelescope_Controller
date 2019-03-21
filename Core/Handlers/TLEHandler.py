@@ -1,9 +1,9 @@
-from PyQt5 import QtCore
 import logging
-import urllib3
-import certifi
 import time
 import os
+import urllib3
+import certifi
+from PyQt5 import QtCore
 
 
 class TLEHandler(QtCore.QObject):

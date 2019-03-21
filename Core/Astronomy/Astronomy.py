@@ -1,9 +1,9 @@
 import logging
 # import urllib3
 # import certifi
+import os
 import math
 import time
-import os
 import ephem
 import numpy as np
 from PyQt5 import QtCore
@@ -144,7 +144,7 @@ class Calculations(QtCore.QObject):
         :return: A list containing the object's coordinates at the antenna's requested position
         """
         if objec == "Sun":
-            objec = ephem.Sun()  # Select the Sun object
+            objec = ephem.Sun()  # Select the Sun object #noqa pylint: disable=no-member
         elif objec == "Jupiter":
             objec = ephem.Jupiter()  # Select Jupiter as object
         elif objec == "Mars":

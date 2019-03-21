@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 
+import logging.config
+import logging
 import sys
 import os
-sys.path.insert(0, os.path.abspath('.'))  # noqa
+sys.path.append(os.path.abspath('.'))  # noqa
 
+# pylint: disable=wrong-import-position
+
+import yaml
 from PyQt5 import QtWidgets, QtCore, QtGui
 from Core.GUI import UInterface
 from Core.Handlers import OperationHandler
@@ -11,9 +16,8 @@ from Core.Client import ClientThread
 from Core.Server import RPiServerThread
 from Core.Stellarium import StellariumThread
 from Core.Configuration import configData, defaultData
-import logging.config
-import logging
-import yaml
+
+# pylint: disable=wrong-import-position
 
 # Required for successful operation of the pyinstaller
 from Core.Handlers import CLogFileHandler

@@ -1,9 +1,9 @@
+import logging
+from functools import partial
 from PyQt5 import QtCore, QtNetwork
 from Core.Astronomy import Astronomy
 from Core.Handlers import SimulationHandler
 from Core.Handlers import TLEHandler
-from functools import partial
-import logging
 
 
 class OpHandler(QtCore.QObject):
