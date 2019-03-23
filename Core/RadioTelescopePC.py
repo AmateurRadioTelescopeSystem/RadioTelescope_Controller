@@ -15,7 +15,7 @@ from Core.Handlers import OperationHandler
 from Core.Client import ClientThread
 from Core.Server import RPiServerThread
 from Core.Stellarium import StellariumThread
-from Core.Configuration import configData, defaultData
+from Core.Configuration import ConfigData, DefaultData
 
 # pylint: disable=wrong-import-position
 
@@ -39,7 +39,7 @@ try:
     if not os.path.exists(os.path.abspath('Settings/logging_settings.yaml')):
         print("Logging configuration file not found. Creating the default.", file=sys.stderr)
         log_file = open(os.path.abspath('Settings/logging_settings.yaml'), "w+")  # Open file in writing mode
-        log_file.write(defaultData.log_config_str)  # Write the default dat to the file
+        log_file.write(DefaultData.log_config_str)  # Write the default dat to the file
         log_file.close()  # Close the file, since no other operation required
 except Exception as excep:
     print("There is a problem creating the configuration file. See tracback: \n%s" % excep, file=sys.stderr)
@@ -50,7 +50,7 @@ try:
     if not os.path.exists(os.path.abspath('Settings/settings.xml')):
         print("Settings file not found. Creating the default.", file=sys.stderr)
         setngs_file = open(os.path.abspath('Settings/settings.xml'), "w+")  # Open the settings file in writing mode
-        setngs_file.write(defaultData.settings_xml_str)  # Write the default dat to the file
+        setngs_file.write(DefaultData.settings_xml_str)  # Write the default dat to the file
         setngs_file.close()  # Close the file, since no other operation required
 except Exception as excep:
     print("There is a problem creating the settings file. See tracback: \n%s" % excep, file=sys.stderr)
@@ -85,7 +85,7 @@ def main():
 
     # Exception handling code for the XML file process
     try:
-        cfgData = configData.confData(os.path.abspath('Settings/settings.xml'))
+        cfgData = ConfigData.confData(os.path.abspath('Settings/settings.xml'))
     except Exception:
         logdata.exception("There is a problem with the XML file handling. Program terminates.")
         sys.exit(1)  # Terminate the script
