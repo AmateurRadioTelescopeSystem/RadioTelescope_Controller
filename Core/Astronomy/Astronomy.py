@@ -45,11 +45,11 @@ class Calculations(QtCore.QObject):
         self.logger = logging.getLogger(__name__)  # Create the logger for the file
         self.cfg_data = cfg_data
 
-        lat_lon = cfg_data.getLatLon()  # Get the latitude and longitude
+        lat_lon = cfg_data.get_lat_lon()  # Get the latitude and longitude
         self.location = EarthLocation(lat=lat_lon[0], lon=lat_lon[1])
         self.observer = ephem.Observer()  # Create the observer object
         self.observer.lat, self.observer.lon = lat_lon[0], lat_lon[1]  # Provide the observer's location
-        self.observer.elevation = float(cfg_data.getAltitude())  # Set the location's altitude in meters
+        self.observer.elevation = float(cfg_data.get_altitude())  # Set the location's altitude in meters
 
     def hour_angle(self, date: tuple, object_ra: float, object_dec: float):
         """
@@ -476,7 +476,7 @@ class Calculations(QtCore.QObject):
         # TODO improve the function
         try:
             # Get the filename
-            url = self.cfg_data.getTLEURL()  # Get the URL from the settings file
+            url = self.cfg_data.get_tle_url()  # Get the URL from the settings file
             file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
 
             tle_data = tlefile.read(satellite, file_dir)

@@ -9,20 +9,20 @@ from PyQt5 import QtCore
 class TLEHandler(QtCore.QObject):
     def __init__(self, cfg_data, parent=None):
         super(TLEHandler, self).__init__(parent)
-        self.logD = logging.getLogger(__name__)  # Create the logger for the file
+        self.logger = logging.getLogger(__name__)  # Create the logger for the file
         self.cfg_data = cfg_data
 
     def tle_expiry_checker(self):
         expiration = False  # Set the variable initially
         try:
-            url = self.cfg_data.getTLEURL()  # Get the URL from the settings file
+            url = self.cfg_data.get_tle_url()  # Get the URL from the settings file
             file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
 
             tle_mod_date = os.path.getmtime(file_dir)  # Get the last modified time in seconds
             cur_time = time.time()  # Get the current time in seconds
             delta_time = int((cur_time - tle_mod_date) / 86400)  # Get the time passed since last modification in days
 
-            if delta_time >= int(self.cfg_data.getTLEupdateInterval()):
+            if delta_time >= int(self.cfg_data.get_tle_update_interval()):
                 expiration = True
             else:
                 expiration = False
@@ -34,7 +34,7 @@ class TLEHandler(QtCore.QObject):
             expiration = True
             error_details = "File not found"
         except Exception as e:
-            self.logD.exception("Error occurred when checking the TLE file. See traceback.")
+            self.logger.exception("Error occurred when checking the TLE file. See traceback.")
             error_details = "%s\n\nProbably the required file does not exist!" % e
             exit_code = False
 
@@ -43,7 +43,7 @@ class TLEHandler(QtCore.QObject):
     def tle_retriever(self):
         # TODO improve the function
         # TODO Add exception handling code in case of empty URL string
-        url = self.cfg_data.getTLEURL()  # Get the URL from the settings file
+        url = self.cfg_data.get_tle_url()  # Get the URL from the settings file
         file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
         http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())  # Create the HTTP pool manager
 
@@ -56,7 +56,7 @@ class TLEHandler(QtCore.QObject):
             error_details = ""
             exit_code = True
         except Exception as e:
-            self.logD.exception("Error occurred acquiring TLE file. See traceback.")
+            self.logger.exception("Error occurred acquiring TLE file. See traceback.")
             error_details = "%s" % e
             exit_code = False
 

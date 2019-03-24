@@ -2,25 +2,25 @@ import xml.etree.ElementTree as etree
 import logging
 
 
-class confData(object):
+class Confdata:
     # Class constructor
     def __init__(self, filename):
         self.filename = filename  # Create a variable with the given filename
-        self.log = logging.getLogger(__name__)  # Create the logger for this module
+        self.logger = logging.getLogger(__name__)  # Create the logger for this module
         try:
             self.tree = etree.parse(self.filename)  # Try to parse the given file
             self.root = self.tree.getroot()  # Get the root from the XML file
         except Exception:
-            self.log.exception("There is an issue with the XML settings file. See traceback below.")
+            self.logger.exception("There is an issue with the XML settings file. See traceback below.")
 
     def parse(self):
         try:
             self.tree = etree.parse(self.filename)  # Try to parse the given file
             self.root = self.tree.getroot()  # Get the root from the XML file
         except Exception:
-            self.log.exception("There is an issue with the XML settings file. See traceback below.")
+            self.logger.exception("There is an issue with the XML settings file. See traceback below.")
 
-    def getConfig(self, child, subchild):
+    def get_config(self, child, subchild):
         children = list(self.root.find(child))
         for item in children:
             if item.tag == subchild:
@@ -28,7 +28,7 @@ class confData(object):
             else:
                 continue
 
-    def setConfig(self, element, child, value):
+    def set_config(self, element, child, value):
         elm = self.root.find(element)  # Get the required element from the tree
         children = list(elm)  # List the children of the element
         for item in children:
@@ -39,153 +39,153 @@ class confData(object):
             else:
                 continue
 
-    def getMapsSelect(self):
+    def get_maps_selection(self):
         return self.root.find("location").get("gmaps")
 
-    def setMapsSelect(self, stat):
+    def set_maps_selection(self, stat):
         self.root.find("location").set("gmaps", stat)
         self.tree.write(self.filename)
 
-    def getServRemote(self, element):
+    def get_server_remote(self, element):
         return self.root.find(element).get("remote")
 
-    def setServRemote(self, element, status):
+    def set_server_remote(self, element, status):
         self.root.find(element).set("remote", status)
         self.tree.write(self.filename)
 
-    def getLatLon(self):
-        lat = self.getConfig("location", "latitude")
-        lon = self.getConfig("location", "longitude")
+    def get_lat_lon(self):
+        lat = self.get_config("location", "latitude")
+        lon = self.get_config("location", "longitude")
         return [lat, lon]
 
-    def setLatLon(self, location):
-        self.setConfig("location", "latitude", str(location[0]))
-        self.setConfig("location", "longitude", str(location[1]))
+    def set_lat_lon(self, location):
+        self.set_config("location", "latitude", str(location[0]))
+        self.set_config("location", "longitude", str(location[1]))
 
-    def getAltitude(self):
-        return self.getConfig("location", "altitude")
+    def get_altitude(self):
+        return self.get_config("location", "altitude")
 
-    def setAltitude(self, altitude):
-        self.setConfig("location", "altitude", str(altitude))
+    def set_altitude(self, altitude):
+        self.set_config("location", "altitude", str(altitude))
 
     # TCP client data
-    def getHost(self):
-        return self.getConfig("TCP", "host")
+    def get_tcp_client_host(self):
+        return self.get_config("TCP", "host")
 
-    def setHost(self, host):
-        self.setConfig("TCP", "host", host)
+    def set_tcp_client_host(self, host):
+        self.set_config("TCP", "host", host)
 
-    def getPort(self):
-        return self.getConfig("TCP", "port")
+    def get_tcp_client_port(self):
+        return self.get_config("TCP", "port")
 
-    def setPort(self, port):
-        self.setConfig("TCP", "port", str(port))
+    def set_tcp_client_port(self, port):
+        self.set_config("TCP", "port", str(port))
 
-    def getTCPAutoConnStatus(self):
+    def get_tcp_client_auto_conn_status(self):
         return self.root.find("TCP").get("autoconnect")
 
-    def TCPAutoConnEnable(self):
+    def tcp_client_auto_conn_enable(self):
         self.root.find("TCP").set("autoconnect", "yes")
         self.tree.write(self.filename)
 
-    def TCPAutoConnDisable(self):
+    def tcp_client_auto_conn_disable(self):
         self.root.find("TCP").set("autoconnect", "no")
         self.tree.write(self.filename)
 
     # TCP Stellarium server data
-    def getStellHost(self):
-        return self.getConfig("TCPStell", "host")
+    def get_stell_host(self):
+        return self.get_config("TCPStell", "host")
 
-    def setStellHost(self, host):
-        self.setConfig("TCPStell", "host", host)
+    def set_stell_host(self, host):
+        self.set_config("TCPStell", "host", host)
 
-    def getStellPort(self):
-        return self.getConfig("TCPStell", "port")
+    def get_stell_port(self):
+        return self.get_config("TCPStell", "port")
 
-    def setStellPort(self, port):
-        self.setConfig("TCPStell", "port", str(port))
+    def set_stell_port(self, port):
+        self.set_config("TCPStell", "port", str(port))
 
-    def getTCPStellAutoConnStatus(self):
+    def get_tcp_stell_auto_conn_status(self):
         return self.root.find("TCPStell").get("autoconnect")
 
-    def TCPStellAutoConnEnable(self):
+    def tcp_stell_auto_conn_enable(self):
         self.root.find("TCPStell").set("autoconnect", "yes")
         self.tree.write(self.filename)
 
-    def TCPStellAutoConnDisable(self):
+    def tcp_stell_auto_conn_disable(self):
         self.root.find("TCPStell").set("autoconnect", "no")
         self.tree.write(self.filename)
 
     # TCP RPi server data (Auto-connection is dependant on the client)
-    def getRPiHost(self):
-        return self.getConfig("TCPRPiServ", "host")
+    def get_rpi_host(self):
+        return self.get_config("TCPRPiServ", "host")
 
-    def setRPiHost(self, host):
-        self.setConfig("TCPRPiServ", "host", host)
+    def set_rpi_host(self, host):
+        self.set_config("TCPRPiServ", "host", host)
 
-    def getRPiPort(self):
-        return self.getConfig("TCPRPiServ", "port")
+    def get_rpi_port(self):
+        return self.get_config("TCPRPiServ", "port")
 
-    def setRPiPort(self, port):
-        self.setConfig("TCPRPiServ", "port", str(port))
+    def set_rpi_port(self, port):
+        self.set_config("TCPRPiServ", "port", str(port))
 
     # Get the currently saved object
-    def getObject(self):
+    def get_object(self):
         stat_obj = self.root.find("object").get("stationary")
         if stat_obj == "no":
-            return [self.getConfig("object", "name"), -1]
+            return [self.get_config("object", "name"), -1]
         else:
-            name = self.getConfig("object", "name")
-            ra = self.getConfig("object", "RA")
-            dec = self.getConfig("object", "DEC")
+            name = self.get_config("object", "name")
+            ra = self.get_config("object", "RA")
+            dec = self.get_config("object", "DEC")
             return [name, ra, dec]
 
-    def setObject(self, name, ra=-1, dec=-1):
+    def set_object(self, name, ra=-1, dec=-1):
         if (ra == -1) or (dec == -1):
             self.root.find("object").set("stationary", "no")
-            self.setConfig("object", "name", name)
-            self.setConfig("object", "RA", str(-1))
-            self.setConfig("object", "DEC", str(-1))
+            self.set_config("object", "name", name)
+            self.set_config("object", "RA", str(-1))
+            self.set_config("object", "DEC", str(-1))
         else:
             self.root.find("object").set("stationary", "yes")
-            self.setConfig("object", "name", name)
-            self.setConfig("object", "RA", str(ra))
-            self.setConfig("object", "DEC", str(dec))
+            self.set_config("object", "name", name)
+            self.set_config("object", "RA", str(ra))
+            self.set_config("object", "DEC", str(dec))
 
-    def getHomeSteps(self):
+    def get_home_steps(self):
         ra = self.root.find("Steps").get("ra_to_home")
         dec = self.root.find("Steps").get("dec_to_home")
         return [ra, dec]
 
-    def setHomeSteps(self, ra, dec):
+    def set_home_steps(self, ra, dec):
         self.root.find("Steps").set("ra_to_home", str(ra))
         self.root.find("Steps").set("dec_to_home", str(dec))
         self.tree.write(self.filename)
 
-    def getTLEURL(self):
-        url = self.getConfig("TLE", "url")
+    def get_tle_url(self):
+        url = self.get_config("TLE", "url")
         return url
 
-    def setTLEURL(self, url: str):
-        self.setConfig("TLE", "url", url)
+    def set_tle_url(self, url: str):
+        self.set_config("TLE", "url", url)
 
-    def getTLEautoUpdate(self):
+    def get_tle_auto_update(self):
         return self.root.find("TLE").get("autoupdate")
 
-    def setTLEautoUpdate(self, status: bool):
+    def set_tle_auto_update(self, status: bool):
         if status is True:
             val = "yes"
         else:
             val = "no"
         self.root.find("TLE").set("autoupdate", val)
 
-    def getTLEupdateInterval(self):
-        return self.getConfig("TLE", "updt_interval")
+    def get_tle_update_interval(self):
+        return self.get_config("TLE", "updt_interval")
 
-    def setTLEupdateInterval(self, interval):
-        self.setConfig("TLE", "updt_interval", str(interval))
+    def set_tle_update_interval(self, interval):
+        self.set_config("TLE", "updt_interval", str(interval))
 
-    def getAllConfiguration(self):
+    def get_all_configuration(self):
         loc = list(self.root.find("location"))
         tcp = list(self.root.find("TCP"))
         data = []

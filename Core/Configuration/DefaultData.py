@@ -1,6 +1,6 @@
 # Strings of the default file settings are included here
 
-log_config_str = """Logging:
+LOG_CONFIG_DEFAULT = """Logging:
   version: 1
   disable_existing_loggers: True
 
@@ -48,7 +48,7 @@ log_config_str = """Logging:
 
 """
 
-settings_xml_str = """<settings>
+SETTINGS_XML_DEFAULT = """<settings>
     <location gmaps="no">
         <altitude>50</altitude>
         <latitude>40.6306</latitude>

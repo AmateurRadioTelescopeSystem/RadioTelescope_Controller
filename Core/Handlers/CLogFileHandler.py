@@ -169,7 +169,6 @@ class CustomLogRotationHandler(logging.Handler):
         return name + ".gz"
 
 
-
 class StreamToLogger(object):
     """
     Fake file-like stream object that redirects writes to a logger instance.
