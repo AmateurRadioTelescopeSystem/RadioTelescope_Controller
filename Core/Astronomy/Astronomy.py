@@ -4,12 +4,14 @@ import logging
 import os
 import math
 import time
+import datetime
 import ephem
 import numpy as np
 from PyQt5 import QtCore
 from pyorbital import tlefile
 from astropy.coordinates import SkyCoord, EarthLocation, FK5
 from astropy.time import Time
+from skyfield.api import load
 import astropy.units as units
 
 
@@ -46,18 +48,18 @@ class Calculations(QtCore.QObject):
         self.cfg_data = cfg_data
 
         lat_lon = cfg_data.get_lat_lon()  # Get the latitude and longitude
-        self.location = EarthLocation(lat=lat_lon[0], lon=lat_lon[1])
+        self.location = EarthLocation(lat=lat_lon[0], lon=lat_lon[1])  # Astropy location object
         self.observer = ephem.Observer()  # Create the observer object
         self.observer.lat, self.observer.lon = lat_lon[0], lat_lon[1]  # Provide the observer's location
         self.observer.elevation = float(cfg_data.get_altitude())  # Set the location's altitude in meters
 
-    def hour_angle(self, date: tuple, object_ra: float, object_dec: float):
+    def hour_angle(self, object_ra: float, object_dec: float, date=None):
         """
         Converts the provided right ascension (RA) of an object to its corresponding hour angle (HA), based on the
         provided date.
 
         Args:
-            date (tuple): Desired date for the calculation of the hour angle
+            date: Desired date for the calculation of the hour angle
             object_ra (float): The right ascension of the object in J2000
             object_dec (float): Object's declination in J2000
 
@@ -67,41 +69,75 @@ class Calculations(QtCore.QObject):
         Todo:
             Also add a solid documentation for the whole file, explaining in detail the parsed arguments
 
+        Todo:
+            Update the docstring of this function because there is a major change.
+
         Returns:
             float: Calculated hour angle
         """
-        self.observer.date = date
-        coordinates = SkyCoord(ra=str(object_ra), dec=str(object_dec), unit='deg')
-        tm = Time('2019-03-23 22:00:00', scale='utc', location=self.location)  # todo: Parse time the correct way
+        if date is None:
+            date = self.current_time()
+        else:
+            if len(date) == 3:
+                day = int(date[2])
+                hour = (date[2] - day) * 24
+                minute = (hour - int(hour)) * 60
+                second = int(minute - int(minute)) * 60
+                date = (date[0], date[1], day, int(hour), int(minute), second)
 
-        ra = coordinates.transform_to(FK5(equinox=tm)).ra
-        calculated_ha = float(self.observer.sidereal_time()) * RAD_TO_DEG - float(ra.to_string(decimal=True))
+        object_coordinates = SkyCoord(ra=str(object_ra), dec=str(object_dec), unit='deg')
+        equinox_time = Time(datetime.datetime(*date), scale='utc', location=self.location, format='datetime')
+        ra = object_coordinates.transform_to(FK5(equinox=equinox_time)).ra  # Get the corrected right ascension
 
-        return calculated_ha
+        # Get the local sidereal time
+        time_scale = load.timescale()
+        utc_time = time_scale.utc(*date)
+        local_sidereal_time = utc_time.gast * 15 + self.location.lon.degree
 
-    def hour_angle_to_ra(self, obj_ha: float, date=None):
+        return round(local_sidereal_time - ra.degree, 6)  # Return the calculated hour angle
+
+    def hour_angle_to_ra(self, object_ha: float, object_dec: float, date=None):
         """
         Convert the provided object's hour angle to its corresponding right ascension. This method assumes that ephem is
         properly calibrated. Also the date is assumed to be now.
 
+        Todo:
+            Check what happens in every case and if the conversion of degrees is needed
+
         Args:
-            obj_ha (float): Hour angle of the desired object
+            object_ha (float): Hour angle of the desired object
+            object_dec (float): Declination of the object
             date (tuple): The desired date
 
         Returns:
-            The current right ascension of the object in JNOW
+            The current right ascension of the object in J2000
         """
+        # Get the local sidereal time
         if date is None:
-            self.observer.date = self.current_time()  # Get the current time and date as needed by ephem
+            date = self.current_time()  # Get the current time and date as needed
         else:
-            self.observer.date = date
-        calculated_ra = float(self.observer.sidereal_time()) * RAD_TO_DEG - obj_ha  # Calculate the right ascension
+            if len(date) == 3:
+                day = int(date[2])
+                hour = (date[2] - day)*24
+                minute = (hour - int(hour))*60
+                second = int(minute - int(minute))*60
+                date = (date[0], date[1], day, int(hour), int(minute), second)
 
-        if calculated_ra < 0.0:
-            calculated_ra = calculated_ra + 359.9955
-        return calculated_ra
+        # Calculate the desired right ascension
+        time_scale = load.timescale()
+        utc_time = time_scale.utc(*date)
+        local_sidereal_time = utc_time.gast * 15 + self.location.lon.degree
+        calculated_ra = local_sidereal_time - object_ha  # Calculate the right ascension in JNOW
 
-    def current_time(self):
+        # Calculate the right ascension of the provided object in J2000
+        equinox_time = Time(datetime.datetime(*date), scale='utc', location=self.location, format='datetime')
+        object_coordinates = SkyCoord(ra=str(calculated_ra), dec=str(object_dec), unit='deg',
+                                      frame=FK5, equinox=equinox_time)
+        ra = object_coordinates.transform_to(FK5(equinox='J2000.0')).ra  # Get the corrected right ascension in J2000
+
+        return round(ra.degree, 6)
+
+    def current_time(self, decimal_day=False):
         """
         Get the current GMT time without daylight saving.
 
@@ -112,13 +148,12 @@ class Calculations(QtCore.QObject):
             tuple: A tuple containing the current year, month and decimal day
         """
         gmt = time.gmtime()  # Get the current time
-        day = gmt.tm_mday  # Save the current day
-        hour = gmt.tm_hour  # Save the current hour
-        mint = gmt.tm_min  # Save the current minute
-        decimal_day = float(day) + float(hour)/24.0 + float(mint)/(24.0*60.0) + float(gmt.tm_sec)/(24.0*60.0*60.0)
-        time_tuple = (gmt.tm_year, gmt.tm_mon, decimal_day)
-
-        return time_tuple
+        if decimal_day:
+            decimal_day = float(gmt.tm_mday) + float(gmt.tm_hour)/24.0 + float(gmt.tm_min)/(24.0*60.0) + \
+                          float(gmt.tm_sec)/(24.0*60.0*60.0)
+            return gmt.tm_year, gmt.tm_mon, decimal_day
+        else:
+            return gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, gmt.tm_min, gmt.tm_sec
 
     def transit(self, obj_ra: float, obj_dec: float, stp_to_home_ra: int, stp_to_home_dec: int, transit_time: int):
         """
@@ -139,14 +174,14 @@ class Calculations(QtCore.QObject):
         """
         # TODO may be needed to add some "safety" seconds
         cur_time = self.current_time()  # Get the current time in tuple
-        cur_ha = self.hour_angle(cur_time, obj_ra, obj_dec)  # Get the current object hour angle
+        cur_ha = self.hour_angle(obj_ra, obj_dec, cur_time)  # Get the current object hour angle
         step_distance_ra = abs(stp_to_home_ra + cur_ha * MOTOR_RA_STEPS_PER_DEGREE)
         step_distance_dec = abs(stp_to_home_dec + obj_dec * MOTOR_DEC_STEPS_PER_DEGREE)
 
         max_distance = max(step_distance_ra, step_distance_dec)  # Calculate the maximum distance, to calculate max time
         max_move_time = max_distance / MAX_STEP_FREQUENCY  # Maximum time required for any motor, calculated in seconds
         target_time = (cur_time[0], cur_time[1], cur_time[2] + (max_move_time + transit_time) * SEC_TO_DAY)
-        target_ha = self.hour_angle(target_time, obj_ra, obj_dec)  # Calculate the hour angle at the target location
+        target_ha = self.hour_angle(obj_ra, obj_dec, target_time)  # Calculate the hour angle at the target location
 
         # self.logD.debug("RA %f, DEC %f, time %f" % (target_ha, obj_dec, cur_time[1]))  # Debugging log
 
@@ -187,7 +222,7 @@ class Calculations(QtCore.QObject):
         obj_ra = float(objec.a_ra) * RAD_TO_DEG
         obj_dec = float(objec.a_dec) * RAD_TO_DEG
 
-        cur_ha = self.hour_angle(cur_time, obj_ra)  # Get the current object hour angle
+        cur_ha = self.hour_angle(obj_ra, obj_dec, cur_time)  # Get the current object hour angle
         step_distance_ra = abs(stp_to_home_ra + cur_ha * MOTOR_RA_STEPS_PER_DEGREE)
         step_distance_dec = abs(stp_to_home_dec + obj_dec * MOTOR_DEC_STEPS_PER_DEGREE)
 
@@ -199,7 +234,7 @@ class Calculations(QtCore.QObject):
         objec.compute(cur_time, epoch=date)
         obj_ra = float(objec.a_ra) * RAD_TO_DEG
         obj_dec = float(objec.a_dec) * RAD_TO_DEG
-        target_ha = self.hour_angle(target_time, obj_ra)  # Calculate the hour angle at the target location
+        target_ha = self.hour_angle(obj_ra, obj_dec, target_time)  # Calculate the hour angle at the target location
 
         return [target_ha, obj_dec]
 
@@ -209,14 +244,13 @@ class Calculations(QtCore.QObject):
         are the same as the transit functions. Knowing the rate of change allows for real time corrections of motor
         position.
 
-        :type objec: object
-        :type stp_to_home_ra: int
-        :type stp_to_home_dec: int
-        :rtype: list
-        :param objec: pyephem object type, which is the object of interest (e.g. ephem.Jupiter())
-        :param stp_to_home_ra: Number of steps from home position for the right ascension motor
-        :param stp_to_home_dec: Number of steps from home position for the declination motor
-        :return: A list containing the object's coordinates on transit and the rate of change for the coordinates
+        Args:
+            objec: pyephem object type, which is the object of interest (e.g. ephem.Jupiter())
+            stp_to_home_ra (int): Number of steps from home position for the right ascension motor
+            stp_to_home_dec (int): Number of steps from home position for the declination motor
+
+        Returns:
+            list: Contains the object's coordinates on transit and the rate of change for the coordinates
         """
         sum_ra = sum_dec = 0.0  # Variable to hold the sum for averaging
         prev_ra = prev_dec = 0.0  # Initialize the variables
@@ -262,13 +296,13 @@ class Calculations(QtCore.QObject):
         Generate a sky map of points to be scanned. Each points corresponds to the sky point at the time when the
         antenna passes through.
 
-        :type points: tuple
-        :type step_size: tuple
-        :type direction: str
-        :param points: Initial box points at four corners. Coordinate system and epoch should be included
-        :param step_size: Stepping size for each axis (a tuple)
-        :param direction: Direction of scanning with respect to the first point
-        :return: Map points in celestial coordinates
+        Args:
+            points (tuple): Initial box points at four corners. Coordinate system and epoch should be included
+            step_size (tuple): Stepping size for each axis (a tuple)
+            direction (str): Direction of scanning with respect to the first point
+
+        Returns:
+            list: Map points in celestial coordinates
         """
         epoch = points[5]  # Get the epoch provided
         coord_system = points[4]  # Get the coordinate system of the provided coordinates
@@ -385,18 +419,15 @@ class Calculations(QtCore.QObject):
         """
         Generate the scanning map in HA and DEC, providing the integration and the initial steps.
 
-        :type map_points: tuple
-        :type init_steps: tuple
-        :type step_size: tuple
-        :type int_time: float
-        :type objec: object
-        :rtype: list
-        :param map_points: Map points generated from the `scanning_map_generator`
-        :param init_steps: Initial steps from home in RA and DEC axis
-        :param step_size: Motor step size
-        :param int_time: Integration time for the signal reception
-        :param objec: Planetary object passing. Default is none.
-        :return: The calculated position of the points for scanning
+        Args:
+            map_points: Map points generated from the `scanning_map_generator`
+            init_steps: Initial steps from home in RA and DEC axis
+            step_size: Motor step size
+            int_time: Integration time for the signal reception
+            objec: Planetary object passing. Default is none.
+
+        Returns:
+            list: The calculated position of the points for scanning
         """
         if objec is None:
             first_point = self.transit(map_points[0][0], map_points[0][1], init_steps[0], init_steps[1], 0)
@@ -437,13 +468,13 @@ class Calculations(QtCore.QObject):
 
     def coordinate_transform(self, coordinates: tuple, system_and_date: tuple):
         """
+        Transform coordinates from other systems to celestial coordinates
 
-        :type coordinates: tuple
-        :type system_and_date: tuple
-        :rtype: tuple
-        :param coordinates:
-        :param system_and_date:
-        :return:
+        Args:
+            coordinates (tuple):
+            system_and_date (tuple):
+
+        Returns:
         """
         position = np.radians(coordinates)  # Convert coordinates from degrees to radians
         if system_and_date[1] == "Now":
@@ -468,10 +499,12 @@ class Calculations(QtCore.QObject):
     def geo_sat_position(self, satellite: str):
         """
 
-        :type satellite: str
-        :rtype: np.array
-        :param satellite:
-        :return:
+
+        Args:
+            satellite (str): Name of the satellite
+
+        Returns:
+            np.array: Array containing the ra and dec of the satellite
         """
         # TODO improve the function
         try:
@@ -486,7 +519,8 @@ class Calculations(QtCore.QObject):
             sat.compute(self.observer)
 
             c_time = self.current_time()  # Get the current time
-            ha = np.round(self.hour_angle(c_time, math.degrees(sat.ra)), 4)  # Get the hour angle of the satellite
+            ha = np.round(self.hour_angle(math.degrees(sat.ra), math.degrees(sat.dec), c_time), 4)  # Get the hour
+            # angle of the satellite
 
             return np.array([np.round(np.degrees((sat.alt, sat.az,)), 4),
                              np.round((ha, np.degrees(sat.dec),), 4)]).tolist()

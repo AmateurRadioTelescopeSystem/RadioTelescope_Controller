@@ -1,7 +1,7 @@
 import unittest
-import Tests.Astronomy
+import Tests.test_astronomy
 
 
 if __name__ == "__main__":
     run = unittest.TextTestRunner()
-    run.run(Tests.Astronomy.TestConversions())
+    run.run(Tests.test_astronomy.TestConversions())
