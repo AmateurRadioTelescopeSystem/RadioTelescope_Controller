@@ -1,70 +1,72 @@
 #!/usr/bin/env python3
 
-import sys
 import os
-sys.path.insert(0, os.path.abspath('.'))  # noqa
+import sys
+import yaml
+import logging
+import logging.config
+sys.path.append(os.path.abspath('.'))  # noqa
+sys.path.append(os.path.abspath('../Core/'))  # noqa
 
-# Create a virtual display for testing
-from pyvirtualdisplay import Display
-display = Display(visible=False, size=(1024, 768), color_depth=24)
-display.start()
-
-sys.path.append(os.path.abspath('Core/'))
-
+import Tests.DefaultData
 from PyQt5 import QtWidgets, QtCore, QtTest, QtNetwork
 from Core.GUI import UInterface
 from Core.Handlers import OperationHandler
 from Core.Client import ClientThread
 from Core.Server import RPiServerThread
 from Core.Stellarium import StellariumThread
-from Core.Configuration import configData
-import defaultData
-import logging.config
-import logging
-import yaml
+from Core.Configuration import ConfigData
+
+# Create a virtual display for testing
+#from pyvirtualdisplay import Display
+#display = Display(visible=False, size=(1024, 768), color_depth=24)
+#display.start()
+
 
 # Required for successful operation of the pyinstaller
 from Handlers import CLogFileHandler
 
-# Create the directory for the log files if it does not exist already
-try:
-    if not os.path.exists('Tests/logs'):
-        os.makedirs('Tests/logs')
-    if not os.path.exists('Tests/Settings'):
-        os.makedirs('Tests/Settings')
-    if not os.path.exists('TLE'):
-        os.makedirs('TLE')  # Make the TLE saving directory
-except Exception as excep:
-    print("There is a problem with the log directory. See tracback: \n%s" % excep, file=sys.stderr)
-    sys.exit(-1)  # Exit the program if an error occurred
 
-# Check if the logging configuration file exists
-try:
-    if not os.path.exists(os.path.abspath('Tests/Settings/logging_settings.yaml')):
-        print("Logging configuration file not found. Creating the default.", file=sys.stderr)
-        log_file = open(os.path.abspath('Tests/Settings/logging_settings.yaml'), "w+")  # Open file in writing mode
-        log_file.write(defaultData.log_config_str)  # Write the default dat to the file
-        log_file.close()  # Close the file, since no other operation required
-except Exception as excep:
-    print("There is a problem creating the configuration file. See tracback: \n%s" % excep, file=sys.stderr)
-    sys.exit(-1)  # Exit the program if an error occurred
+def parse_files():
+    # Create the directory for the log files if it does not exist already
+    try:
+        if not os.path.exists(os.path.abspath('Tests/logs')):
+            os.makedirs(os.path.abspath('Tests/logs'))
+        if not os.path.exists(os.path.abspath('Tests/Settings')):
+            os.makedirs(os.path.abspath('Tests/Settings'))
+        if not os.path.exists(os.path.abspath('TLE')):
+            os.makedirs(os.path.abspath('TLE'))  # Make the TLE saving directory
+    except Exception as excep:
+        print("There is a problem with the log directory. See tracback: \n%s" % excep, file=sys.stderr)
+        sys.exit(-1)  # Exit the program if an error occurred
 
-# Check if the settings XML file exists
-try:
-    if not os.path.exists(os.path.abspath('Tests/Settings/settings.xml')):
-        print("Settings file not found. Creating the default.", file=sys.stderr)
-        setngs_file = open(os.path.abspath('Tests/Settings/settings.xml'),
-                           "w+")  # Open the settings file in writing mode
-        setngs_file.write(defaultData.settings_xml_str)  # Write the default dat to the file
-        setngs_file.close()  # Close the file, since no other operation required
-except Exception as excep:
-    print("There is a problem creating the settings file. See tracback: \n%s" % excep, file=sys.stderr)
-    sys.exit(-1)  # Exit the program if an error occurred
+    # Check if the logging configuration file exists
+    try:
+        if not os.path.exists(os.path.abspath('Tests/Settings/logging_settings.yaml')):
+            print("Logging configuration file not found. Creating the default.", file=sys.stderr)
+            log_file = open(os.path.abspath('Tests/Settings/logging_settings.yaml'), "w+")  # Open file in writing mode
+            log_file.write(Tests.DefaultData.log_config_str)  # Write the default dat to the file
+            log_file.close()  # Close the file, since no other operation required
+    except Exception as excep:
+        print("There is a problem creating the configuration file. See tracback: \n%s" % excep, file=sys.stderr)
+        sys.exit(-1)  # Exit the program if an error occurred
 
-# Open the configuration and apply it on the logging module
-with open(os.path.abspath('Tests/Settings/logging_settings.yaml')) as config_file:
-    dictionary = yaml.load(config_file)  # Load the dictionary configuration
-    logging.config.dictConfig(dictionary['Logging'])  # Select the logging settings from the dictionary
+    # Check if the settings XML file exists
+    try:
+        if not os.path.exists(os.path.abspath('Tests/Settings/settings.xml')):
+            print("Settings file not found. Creating the default.", file=sys.stderr)
+            setngs_file = open(os.path.abspath('Tests/Settings/settings.xml'),
+                               "w+")  # Open the settings file in writing mode
+            setngs_file.write(Tests.DefaultData.settings_xml_str)  # Write the default dat to the file
+            setngs_file.close()  # Close the file, since no other operation required
+    except Exception as excep:
+        print("There is a problem creating the settings file. See tracback: \n%s" % excep, file=sys.stderr)
+        sys.exit(-1)  # Exit the program if an error occurred
+
+    # Open the configuration and apply it on the logging module
+    with open(os.path.abspath('Tests/Settings/logging_settings.yaml')) as config_file:
+        dictionary = yaml.safe_load(config_file)  # Load the dictionary configuration
+        logging.config.dictConfig(dictionary['Logging'])  # Select the logging settings from the dictionary
 
 
 def main():
@@ -77,7 +79,7 @@ def main():
 
     # Exception handling code for the XML file process
     try:
-        cfgData = configData.confData(os.path.abspath('Tests/Settings/settings.xml'))
+        cfgData = ConfigData.confData(os.path.abspath('Tests/Settings/settings.xml'))
     except:
         logdata.exception("There is a problem with the XML file handling. Program terminates.")
         sys.exit(1)  # Terminate the script
@@ -167,6 +169,7 @@ def main():
 if __name__ == '__main__':
     log = logging.getLogger(__name__)  # Create the logger for the program
     try:
+        parse_files()
         main()  # Run the main program
     except (Exception, OSError):
         log.exception("An major error occurred. See the traceback below.")

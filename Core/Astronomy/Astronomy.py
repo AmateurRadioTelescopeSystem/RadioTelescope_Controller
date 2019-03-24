@@ -26,10 +26,16 @@ class Calculations(QtCore.QObject):
     """
     The Calculations class contains methods which perform the necessary astronomical conversions. Apart from coordinate
     conversion, there are methods to calculate the transit time of an object and also create a map of scanning points.
+
+    Todo:
+        Replace deprecated PyEphem with astropy and skyfield
     """
     def __init__(self, cfg_data, parent=None):
         """
         Calculations class constructor to initialize the required variables. Also the logger object is created.
+
+        Todo:
+            Remove super if it is not required
 
         Args:
             cfg_data: The XML parser object
@@ -62,7 +68,7 @@ class Calculations(QtCore.QObject):
             Also add a solid documentation for the whole file, explaining in detail the parsed arguments
 
         Returns:
-            Calculated hour angle
+            float: Calculated hour angle
         """
         self.observer.date = date
         coordinates = SkyCoord(ra=str(object_ra), dec=str(object_dec), unit='deg')
@@ -99,8 +105,11 @@ class Calculations(QtCore.QObject):
         """
         Get the current GMT time without daylight saving.
 
-        :rtype: tuple
-        :return time_tuple: A tuple containing the current year, month and decimal day
+        Todo:
+            Determine if this function is required
+
+        Returns:
+            tuple: A tuple containing the current year, month and decimal day
         """
         gmt = time.gmtime()  # Get the current time
         day = gmt.tm_mday  # Save the current day
@@ -118,29 +127,26 @@ class Calculations(QtCore.QObject):
         to go at the desired position, to the current time and then the hour angle at the latter position is calculated.
         Home position of the dish is considered to be 0h hour angle and 0 degrees declination.
 
-        :type obj_ra: float
-        :type obj_dec: float
-        :type stp_to_home_ra: int
-        :type stp_to_home_dec: int
-        :type transit_time: int
-        :rtype: list
-        :param obj_ra: Objects right ascension in degrees
-        :param obj_dec: Objects declination in degrees
-        :param stp_to_home_ra: Number of steps away from home position for the right ascension motor
-        :param stp_to_home_dec: Number of steps away from home for the declination motor
-        :param transit_time: Time to transit position, provided in seconds
-        :return: A list containing the hour angle at the target location and the declination of the object
+        Args:
+            obj_ra (float): Objects right ascension in degrees
+            obj_dec (float): Objects declination in degrees
+            stp_to_home_ra (int): Number of steps away from home position for the right ascension motor
+            stp_to_home_dec (int): Number of steps away from home for the declination motor
+            transit_time (int): Time to transit position, provided in seconds
+
+        Returns:
+            A list containing the hour angle at the target location and the declination of the object
         """
         # TODO may be needed to add some "safety" seconds
         cur_time = self.current_time()  # Get the current time in tuple
-        cur_ha = self.hour_angle(cur_time, obj_ra)  # Get the current object hour angle
+        cur_ha = self.hour_angle(cur_time, obj_ra, obj_dec)  # Get the current object hour angle
         step_distance_ra = abs(stp_to_home_ra + cur_ha * MOTOR_RA_STEPS_PER_DEGREE)
         step_distance_dec = abs(stp_to_home_dec + obj_dec * MOTOR_DEC_STEPS_PER_DEGREE)
 
         max_distance = max(step_distance_ra, step_distance_dec)  # Calculate the maximum distance, to calculate max time
         max_move_time = max_distance / MAX_STEP_FREQUENCY  # Maximum time required for any motor, calculated in seconds
         target_time = (cur_time[0], cur_time[1], cur_time[2] + (max_move_time + transit_time) * SEC_TO_DAY)
-        target_ha = self.hour_angle(target_time, obj_ra)  # Calculate the hour angle at the target location
+        target_ha = self.hour_angle(target_time, obj_ra, obj_dec)  # Calculate the hour angle at the target location
 
         # self.logD.debug("RA %f, DEC %f, time %f" % (target_ha, obj_dec, cur_time[1]))  # Debugging log
 
@@ -153,16 +159,14 @@ class Calculations(QtCore.QObject):
         until it moves to the desired position. This is the same as the transit function, but here the transit is
         calculated for a planetary object.
 
-        :type objec: object
-        :type stp_to_home_ra: int
-        :type stp_to_home_dec: int
-        :type transit_time: int
-        :rtype: list
-        :param objec: pyephem object type, which is the object of interest (e.g. ephem.Jupiter())
-        :param stp_to_home_ra: Number of steps from home position for the right ascension motor
-        :param stp_to_home_dec: Number of steps from home position for the declination motor
-        :param transit_time: Time to transit position, provided in seconds
-        :return: A list containing the object's coordinates at the antenna's requested position
+        Args:
+            objec: pyephem object type, which is the object of interest (e.g. ephem.Jupiter())
+            stp_to_home_ra (int): Number of steps from home position for the right ascension motor
+            stp_to_home_dec (int): Number of steps from home position for the declination motor
+            transit_time (int): Time to transit position, provided in seconds
+
+        Returns:
+            A list containing the object's coordinates at the antenna's requested position
         """
         if objec == "Sun":
             objec = ephem.Sun()  # Select the Sun object #noqa pylint: disable=no-member

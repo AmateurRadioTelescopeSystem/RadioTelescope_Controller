@@ -299,4 +299,9 @@ TLE/*
 # Ignore the settings from the test directory
 Tests/Settings/*
 
+*.dat
+*.bsp
+*.preds
+*.data
+
 # End of https://www.gitignore.io/api/c,c++,linux,python,windows
