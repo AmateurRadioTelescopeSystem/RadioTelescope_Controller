@@ -33,6 +33,8 @@ def parse_files():
             os.makedirs('Settings')  # Create the settings directory
         if not os.path.exists('TLE'):
             os.makedirs('TLE')  # Make the TLE saving directory
+        if not os.path.exists('Astronomy Database'):
+            os.makedirs('Astronomy Database')
     except Exception as exception:
         print("There is a problem creating directories. See tracback: \n%s" % exception, file=sys.stderr)
         sys.exit(-1)  # Exit the program if an error occurred

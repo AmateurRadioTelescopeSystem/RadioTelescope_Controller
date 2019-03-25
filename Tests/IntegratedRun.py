@@ -36,6 +36,8 @@ def parse_files():
             os.makedirs(os.path.abspath('Tests/Settings'))
         if not os.path.exists(os.path.abspath('TLE')):
             os.makedirs(os.path.abspath('TLE'))  # Make the TLE saving directory
+        if not os.path.exists('Tests/Astronomy Database'):
+            os.makedirs('Tests/Astronomy Database')
     except Exception as excep:
         print("There is a problem with the log directory. See tracback: \n%s" % excep, file=sys.stderr)
         sys.exit(-1)  # Exit the program if an error occurred

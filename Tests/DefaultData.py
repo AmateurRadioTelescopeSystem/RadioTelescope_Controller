@@ -76,5 +76,6 @@ settings_xml_str = """<settings>
         <DEC>22.0145</DEC>
     </object>
     <Steps dec_to_home="0" ra_to_home="0" />
+    <Astronomy_Database directory="./Astronomy Database" />
 </settings>
 """
