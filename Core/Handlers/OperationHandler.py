@@ -189,7 +189,7 @@ class OpHandler(QtCore.QObject):
             self.motors_enabled = False
         else:
             split_str = data.split("_")  # Try to split the string, and if it splits then a command is sent
-            if len(split_str) > 0:
+            if len(split_str) > 1:
                 if split_str[0] == "STEPS-FROM-HOME":
                     self.cfg_data.set_home_steps(split_str[1], split_str[2])  # Set the current steps
                     self.ui.setManContStepsSig.emit("RA", split_str[1])
@@ -244,15 +244,19 @@ class OpHandler(QtCore.QObject):
         # TODO Remove the degree conversion for the RA, since MPU will send in degrees and not hours
         split_data = data.split("_")  # Split the string with the set delimiter
         if split_data[0] == "POSUPDATE":
-            ra = self.astronomy.hour_angle_to_ra(float(split_data[2]) * 15.0)  # Get the RA from the received position
-            dec = split_data[4]  # Get the DEC from the received position
-            if not (self.prev_pos[0] == ra and self.prev_pos[1] == dec and split_data[0] != "POSUPDATE"):
-                self.tcp_stellarium.sendDataStell.emit(float(ra) / 15.0, float(dec))  # Send the position to Stellarium
-                self.posDataShow.emit(float(ra) / 15.0, float(dec))  # Send the updated values if they are different
-            self.prev_pos = [ra, dec]  # Save the values for later comparison
-        elif split_data[0] == "DISHPOS":
-            ra_degrees = self.astronomy.hour_angle_to_ra(float(split_data[2]) * 15.0)  # Get the RA from the received HA
             dec_degrees = split_data[4]  # Get the DEC from the received position
+            ra_degrees = self.astronomy.hour_angle_to_ra(float(split_data[2]) * 15.0, float(dec_degrees))
+            if not (self.prev_pos[0] == ra_degrees and self.prev_pos[1] == dec_degrees
+                    and split_data[0] != "POSUPDATE"):
+                # Send the position to Stellarium
+                self.tcp_stellarium.sendDataStell.emit(float(ra_degrees) / 15.0, float(dec_degrees))
+
+                # Send the updated values if they are different
+                self.posDataShow.emit(float(ra_degrees) / 15.0, float(dec_degrees))
+            self.prev_pos = [ra_degrees, dec_degrees]  # Save the values for later comparison
+        elif split_data[0] == "DISHPOS":
+            dec_degrees = split_data[4]  # Get the DEC from the received position
+            ra_degrees = self.astronomy.hour_angle_to_ra(float(split_data[2]) * 15.0, float(dec_degrees))
             ra_steps = split_data[7]
             dec_steps = split_data[9]
             self.ui.setManContStepsSig.emit("RA", ra_steps)  # Update the manual control window
@@ -328,7 +332,7 @@ class OpHandler(QtCore.QObject):
         if autocon_rpi == "yes":
             self.ui.tcp_widget.teleAutoConChoice.setChecked(True)
 
-        if client_ip == "localhost" or client_ip == "127.0.0.1":
+        if client_ip in ("localhost", "127.0.0.1"):
             self.ui.tcp_widget.telClientBox.setCurrentIndex(0)
         else:
             self.ui.tcp_widget.telClientBox.setCurrentIndex(1)
@@ -558,8 +562,7 @@ class OpHandler(QtCore.QObject):
                 self.sim_handler.simStartSig.emit(map_points[0], sim_speed)  # Then send the new points
 
             return map_points[0]
-        else:
-            self.ui.sky_scan_win.pointOperationTabs.setCurrentIndex(0)
+        self.ui.sky_scan_win.pointOperationTabs.setCurrentIndex(0)
 
         return ()
 

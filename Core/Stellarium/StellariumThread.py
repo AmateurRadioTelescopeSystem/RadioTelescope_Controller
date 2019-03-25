@@ -91,12 +91,12 @@ class StellThread(QtCore.QObject):
 
     # Thsi method is called whenever the signal to send data back is fired
     @QtCore.pyqtSlot(float, float, name='stellariumDataSend')
-    def send(self, ra: float, dec: float):
+    def send(self, object_ra: float, object_dec: float):
         try:
             if self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
-                self.socket.write(self.data_handle.encode(ra, dec))  # Send data back to Stellarium
+                self.socket.write(self.data_handle.encode(object_ra, object_dec))  # Send data back to Stellarium
                 self.socket.waitForBytesWritten()  # Wait for the data to be written
-                self.logger.debug("Data sent to Stellarium: RA=%.5f, DEC=%.5f", ra, dec)
+                self.logger.debug("Data sent to Stellarium: RA=%.5f, DEC=%.5f", object_ra, object_dec)
         except Exception:
             self.logger.exception("Problem sending data to Stellarium. See traceback.")
 

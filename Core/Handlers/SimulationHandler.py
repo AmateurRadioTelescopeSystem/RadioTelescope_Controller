@@ -27,10 +27,10 @@ class SimulHandler(QtCore.QObject):
         num_points = len(self.map_points)
         if num_points > 0 and self.counter < num_points:
             if self.map_points[self.counter][0] < 0:
-                ra = (self.map_points[self.counter][0] + 23.9997)/15.0
+                ra_degrees = (self.map_points[self.counter][0] + 23.9997)/15.0
             else:
-                ra = self.map_points[self.counter][0]/15.0
-            self.tcp_stell.sendDataStell.emit(ra, float(self.map_points[self.counter][1]))
+                ra_degrees = self.map_points[self.counter][0]/15.0
+            self.tcp_stell.sendDataStell.emit(ra_degrees, float(self.map_points[self.counter][1]))
             self.counter += 1  # Increment the counter variable
         else:
             self.timer.stop()  # Stop the timer

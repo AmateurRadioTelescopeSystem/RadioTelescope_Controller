@@ -153,8 +153,7 @@ class Calculations(QtCore.QObject):
             decimal_day = float(gmt.tm_mday) + float(gmt.tm_hour)/24.0 + float(gmt.tm_min)/(24.0*60.0) + \
                           float(gmt.tm_sec)/(24.0*60.0*60.0)
             return gmt.tm_year, gmt.tm_mon, decimal_day
-        else:
-            return gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, gmt.tm_min, gmt.tm_sec
+        return gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, gmt.tm_min, gmt.tm_sec
 
     def transit(self, obj_ra: float, obj_dec: float, stp_to_home_ra: int, stp_to_home_dec: int, transit_time: int):
         """

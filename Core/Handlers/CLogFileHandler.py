@@ -120,7 +120,7 @@ class CustomLogRotationHandler(logging.Handler):
         logging.Handler.close(self)
 
 
-class StreamToLogger(object):
+class StreamToLogger:
     """
     Fake file-like stream object that redirects writes to a logger instance.
     """

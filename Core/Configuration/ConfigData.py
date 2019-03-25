@@ -20,13 +20,12 @@ class ConfData:
         except Exception:
             self.logger.exception("There is an issue with the XML settings file. See traceback below.")
 
-    def get_config(self, child, subchild):
+    def get_config(self, child, sub_child):
         children = list(self.root.find(child))
         for item in children:
-            if item.tag == subchild:
+            if item.tag == sub_child:
                 return item.text
-            else:
-                continue
+        return ""
 
     def set_config(self, element, child, value):
         elm = self.root.find(element)  # Get the required element from the tree
@@ -134,14 +133,13 @@ class ConfData:
         stat_obj = self.root.find("object").get("stationary")
         if stat_obj == "no":
             return [self.get_config("object", "name"), -1]
-        else:
-            name = self.get_config("object", "name")
-            ra = self.get_config("object", "RA")
-            dec = self.get_config("object", "DEC")
-            return [name, ra, dec]
+        name = self.get_config("object", "name")
+        object_ra = self.get_config("object", "RA")
+        object_dec = self.get_config("object", "DEC")
+        return [name, object_ra, object_dec]
 
-    def set_object(self, name, ra=-1, dec=-1):
-        if (ra == -1) or (dec == -1):
+    def set_object(self, name, object_ra=-1, object_dec=-1):
+        if (object_ra == -1) or (object_dec == -1):
             self.root.find("object").set("stationary", "no")
             self.set_config("object", "name", name)
             self.set_config("object", "RA", str(-1))
@@ -149,17 +147,17 @@ class ConfData:
         else:
             self.root.find("object").set("stationary", "yes")
             self.set_config("object", "name", name)
-            self.set_config("object", "RA", str(ra))
-            self.set_config("object", "DEC", str(dec))
+            self.set_config("object", "RA", str(object_ra))
+            self.set_config("object", "DEC", str(object_dec))
 
     def get_home_steps(self):
-        ra = self.root.find("Steps").get("ra_to_home")
-        dec = self.root.find("Steps").get("dec_to_home")
-        return [ra, dec]
+        ra_steps = self.root.find("Steps").get("ra_to_home")
+        dec_steps = self.root.find("Steps").get("dec_to_home")
+        return [ra_steps, dec_steps]
 
-    def set_home_steps(self, ra, dec):
-        self.root.find("Steps").set("ra_to_home", str(ra))
-        self.root.find("Steps").set("dec_to_home", str(dec))
+    def set_home_steps(self, ra_steps, dec_steps):
+        self.root.find("Steps").set("ra_to_home", str(ra_steps))
+        self.root.find("Steps").set("dec_to_home", str(dec_steps))
         self.tree.write(self.filename)
 
     def get_tle_url(self):

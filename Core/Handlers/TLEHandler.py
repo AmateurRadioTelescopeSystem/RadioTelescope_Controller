@@ -22,10 +22,8 @@ class TLEHandler(QtCore.QObject):
             cur_time = time.time()  # Get the current time in seconds
             delta_time = int((cur_time - tle_mod_date) / 86400)  # Get the time passed since last modification in days
 
-            if delta_time >= int(self.cfg_data.get_tle_update_interval()):
-                expiration = True
-            else:
-                expiration = False
+            # Check whether the current TLEs have expired
+            expiration = bool(delta_time >= int(self.cfg_data.get_tle_update_interval()))
 
             error_details = ""
             exit_code = True
@@ -33,9 +31,9 @@ class TLEHandler(QtCore.QObject):
             exit_code = False
             expiration = True
             error_details = "File not found"
-        except Exception as e:
+        except Exception as exception:
             self.logger.exception("Error occurred when checking the TLE file. See traceback.")
-            error_details = "%s\n\nProbably the required file does not exist!" % e
+            error_details = "%s\n\nProbably the required file does not exist!" % exception
             exit_code = False
 
         return [exit_code, expiration, error_details]
@@ -55,9 +53,9 @@ class TLEHandler(QtCore.QObject):
                 tle_file.close()
             error_details = ""
             exit_code = True
-        except Exception as e:
+        except Exception as exception:
             self.logger.exception("Error occurred acquiring TLE file. See traceback.")
-            error_details = "%s" % e
+            error_details = "%s" % exception
             exit_code = False
 
         return [exit_code, error_details]
