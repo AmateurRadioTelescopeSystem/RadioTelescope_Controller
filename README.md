@@ -6,7 +6,7 @@
 <img src="https://www.marysrosaries.com/collaboration/images/0/0b/Radio_Telescope_3_%28PSF%29.png" width="35%" />
 </p>
 
-[![Build Status](https://img.shields.io/travis/dimst23/RadioTelescope_Controller/master.svg?style=plastic&logo=travis)](https://travis-ci.org/dimst23/RadioTelescope_Controller)
+[![pipeline status](https://gitlab.com/ARtSystem/controller/pc-gui-app/badges/master/pipeline.svg)](https://gitlab.com/ARtSystem/controller/pc-gui-app/commits/master)
 
 Below you will find installation instructions to get the controller up and running on your own system.
 This installation information are not the final ones, since more packages may be used and/or a different approach will be used.
@@ -39,9 +39,9 @@ commands.
 
 * First of all **Python 3.5+** needs to be installed. To install Python go to [Python's website](https://www.python.org) and get the latest stable release.
 * It is important also to install Qt5, by downloading it from the [Qt's website](https://www.qt.io).
-* Make sure that the installation of the Qt5 is in the direcory `C:\Qt` on your computer and you have Qt5.
+* Make sure that the installation of the Qt5 is in the directory `C:\Qt` on your computer and you have Qt5.
 * Also make sure that `pip` for Python is installed.
-* The next step is to open a terminal window in the program direcoty and execute the `configure_windows.bat` file.
+* The next step is to open a terminal window in the program directory and execute the `configure_windows.bat` file.
 * If the execution of the configuration file is successful, then proceed with running the program by executing
 `run_windows.bat`.
 
