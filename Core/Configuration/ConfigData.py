@@ -183,6 +183,13 @@ class ConfData:
     def set_tle_update_interval(self, interval):
         self.set_config("TLE", "updt_interval", str(interval))
 
+    def get_astronomy_database_path(self):
+        return self.root.find("Astronomy_Database").get("directory")
+
+    def set_astronomy_database_path(self, path: str):
+        self.root.find("Astronomy_Database").set("directory", path)
+        self.tree.write(self.filename)
+
     def get_all_configuration(self):
         loc = list(self.root.find("location"))
         tcp = list(self.root.find("TCP"))

@@ -9,7 +9,7 @@ from PyQt5 import QtCore
 from pyorbital import tlefile
 from astropy.coordinates import SkyCoord, EarthLocation, FK5
 from astropy.time import Time
-from skyfield.api import load
+from skyfield.api import Loader, Topos
 
 
 RAD_TO_DEG = 57.2957795131  # Radians to degrees conversion factor
@@ -42,10 +42,13 @@ class Calculations(QtCore.QObject):
         """
         super(Calculations, self).__init__(parent)
         self.logger = logging.getLogger(__name__)  # Create the logger for the file
+        self.load = Loader(os.path.abspath(cfg_data.get_astronomy_database_path()))
         self.cfg_data = cfg_data
 
         lat_lon = cfg_data.get_lat_lon()  # Get the latitude and longitude
         self.location = EarthLocation(lat=lat_lon[0], lon=lat_lon[1])  # Astropy location object
+        self.time_scale = self.load.timescale()
+        self.planets = self.load('de421.bsp')
         self.observer = ephem.Observer()  # Create the observer object
         self.observer.lat, self.observer.lon = lat_lon[0], lat_lon[1]  # Provide the observer's location
         self.observer.elevation = float(cfg_data.get_altitude())  # Set the location's altitude in meters
@@ -87,8 +90,7 @@ class Calculations(QtCore.QObject):
         ra_jnow = object_coordinates.transform_to(FK5(equinox=equinox_time)).ra
 
         # Get the local sidereal time
-        time_scale = load.timescale()
-        utc_time = time_scale.utc(*date)
+        utc_time = self.time_scale.utc(*date)
         local_sidereal_time = utc_time.gast * 15 + self.location.lon.degree
 
         return round(local_sidereal_time - ra_jnow.degree, 6)  # Return the calculated hour angle
@@ -121,8 +123,7 @@ class Calculations(QtCore.QObject):
                 date = (date[0], date[1], day, int(hour), int(minute), second)
 
         # Calculate the desired right ascension
-        time_scale = load.timescale()
-        utc_time = time_scale.utc(*date)
+        utc_time = self.time_scale.utc(*date)
         local_sidereal_time = utc_time.gast * 15 + self.location.lon.degree
         calculated_ra = local_sidereal_time - object_ha  # Calculate the right ascension in JNOW
 
@@ -186,12 +187,15 @@ class Calculations(QtCore.QObject):
 
         return [target_ha, obj_dec]
 
-    def transit_planetary(self, objec, stp_to_home_ra: int, stp_to_home_dec: int, transit_time: int):
+    def transit_planetary(self, objec: str, stp_to_home_ra: int, stp_to_home_dec: int, transit_time: int):
         """
         Calculate object's position when the dish arrives at position.
         This function calculates the coordinates of the requested object, taking into account the delay of the dish
         until it moves to the desired position. This is the same as the transit function, but here the transit is
         calculated for a planetary object.
+
+        Todo:
+            Update the docstrings and check the functionality of the method
 
         Args:
             objec: pyephem object type, which is the object of interest (e.g. ephem.Jupiter())
@@ -202,46 +206,45 @@ class Calculations(QtCore.QObject):
         Returns:
             A list containing the object's coordinates at the antenna's requested position
         """
-        if objec == "Sun":
-            objec = ephem.Sun()  # Select the Sun object #noqa pylint: disable=no-member
-        elif objec == "Jupiter":
-            objec = ephem.Jupiter()  # Select Jupiter as object
-        elif objec == "Mars":
-            objec = ephem.Mars()  # Select Mars as the object
-        elif objec == "Venus":
-            objec = ephem.Venus()  # Select Venus as the object
-        elif objec == "Moon":
-            objec = ephem.Moon()  # Select moon as the object
 
-        cur_time = self.current_time()  # Get the current time in tuple
-        date = "%.0f/%.0f/%.6f" % (cur_time[0], cur_time[1], cur_time[2])  # Get the current date
-        objec.compute(cur_time, epoch=date)  # Compute the object's coordinates
+        try:
+            planetary_object = self.planets[objec]
+        except ValueError:
+            self.logger.exception("The provided object is not valid")
+            return []
+        place_on_earth = self.planets['earth'] + Topos(latitude_degrees=self.location.lat.degree,
+                                                       longitude_degrees=self.location.lon.degree)
+
+        utc_time = self.time_scale.now()
+        object_coordinates = planetary_object.at(utc_time).observe(place_on_earth).apparent()
 
         # Get the current coordinates for the planetary body
-        obj_ra = float(objec.a_ra) * RAD_TO_DEG
-        obj_dec = float(objec.a_dec) * RAD_TO_DEG
+        object_ra, object_dec = object_coordinates.radec(epoch=self.time_scale.J2000)
 
-        cur_ha = self.hour_angle(obj_ra, obj_dec, cur_time)  # Get the current object hour angle
+        cur_ha = self.hour_angle(object_ra, object_dec)  # Get the current object hour angle
         step_distance_ra = abs(stp_to_home_ra + cur_ha * MOTOR_RA_STEPS_PER_DEGREE)
-        step_distance_dec = abs(stp_to_home_dec + obj_dec * MOTOR_DEC_STEPS_PER_DEGREE)
+        step_distance_dec = abs(stp_to_home_dec + object_dec * MOTOR_DEC_STEPS_PER_DEGREE)
 
         max_distance = max(step_distance_ra, step_distance_dec)  # Calculate the maximum distance, to calculate max time
         max_move_time = max_distance / MAX_STEP_FREQUENCY  # Maximum time required for any motor, calculated in seconds
-        target_time = (cur_time[0], cur_time[1], cur_time[2] + (max_move_time + transit_time) * SEC_TO_DAY)
+
+        current_time = self.current_time()
+        conditioned_time = (*current_time[:5], current_time[5] + max_move_time + transit_time, )
 
         # Recalculate the coordinates for the new time
-        objec.compute(cur_time, epoch=date)
-        obj_ra = float(objec.a_ra) * RAD_TO_DEG
-        obj_dec = float(objec.a_dec) * RAD_TO_DEG
-        target_ha = self.hour_angle(obj_ra, obj_dec, target_time)  # Calculate the hour angle at the target location
+        object_ra, object_dec = object_coordinates.radec(epoch=self.time_scale.utc(*conditioned_time))
+        target_ha = self.hour_angle(object_ra, object_dec, conditioned_time)  # Hour angle at the target location
 
-        return [target_ha, obj_dec]
+        return [target_ha, object_dec]
 
     def tracking_planetary(self, objec, stp_to_home_ra: int, stp_to_home_dec: int):
         """
         Calculate the rate of change for the coordinates of different planetary bodies. The main calculations performed
         are the same as the transit functions. Knowing the rate of change allows for real time corrections of motor
         position.
+
+        Todo:
+            Major revision required
 
         Args:
             objec: pyephem object type, which is the object of interest (e.g. ephem.Jupiter())
@@ -256,21 +259,20 @@ class Calculations(QtCore.QObject):
         count = 0  # Counting variable used in the loop and averaging
         transit_coords = self.transit_planetary(objec, stp_to_home_ra, stp_to_home_dec, 0)  # Calculate transit first
 
-        # Get the right object
-        if objec == "Sun":
-            objec = ephem.Sun()  # Select the Sun object
-        elif objec == "Jupiter":
-            objec = ephem.Jupiter()  # Select Jupiter as object
-        elif objec == "Mars":
-            objec = ephem.Mars()  # Select Mars as the object
-        elif objec == "Venus":
-            objec = ephem.Venus()  # Select Venus as the object
-        elif objec == "Moon":
-            objec = ephem.Moon()  # Select moon as the object
+        try:
+            planetary_object = self.planets[objec]
+        except ValueError:
+            self.logger.exception("The provided object is not valid")
+            return []
+        place_on_earth = self.planets['earth'] + Topos(latitude_degrees=self.location.lat.degree,
+                                                       longitude_degrees=self.location.lon.degree)
 
         cur_time = self.current_time()  # Get the current time in tuple
         epoch_date = "%.0f/%.0f/%.6f" % (cur_time[0], cur_time[1], cur_time[2])  # Get the current date
         comp_date = epoch_date  # Set the dates to equal at first
+
+        utc_time = self.time_scale.now()
+        object_coordinates = planetary_object.at(utc_time).observe(place_on_earth).apparent()
 
         # Iterate for 24 hours to get enough points
         for count in range(0, 24):

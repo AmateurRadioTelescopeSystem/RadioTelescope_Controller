@@ -68,5 +68,14 @@ print((lst - int(lst))*60)
 print((((lst - int(lst))*60) - int((lst - int(lst))*60))*60)
 print(tm.gast)
 '''
+print("Planet section")
+ts = load.timescale()
+t = ts.now()
+planets = load('de421.bsp')
+mars = planets['Moon']
+print(ts.now().tt + 20)
+tup = (2019, 3, 23, 22, 0, 0)
+print((*tup[:5], 8))
+print(ts.utc(*tup[:5], tup[5] + 20).utc_datetime())
 
 
