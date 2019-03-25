@@ -203,7 +203,7 @@ class OpHandler(QtCore.QObject):
                         self.max_steps_to_target_ra = 0
             else:
                 self.logger.debug("Data received from client (Connected to remote RPi server): %s", data)
-        if type(data) is str:
+        if isinstance(data, str):
             self.ui.setGUIFromClientSig.emit(data)  # If it is not split yet, send the command
 
     @QtCore.pyqtSlot(list, name='clientCommandSendStell')

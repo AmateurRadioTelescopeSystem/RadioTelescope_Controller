@@ -64,7 +64,7 @@ class UIRadioTelescopeControl(QtCore.QObject):
             self.sky_scan_win = self.ui_loader(':/UI_Files/SkyScanning', self.ui_sky_scanning_win)
             self.sat_sel_diag = self.ui_loader(':/UI_Files/SatelliteSelectionDialog', self.satellite_dialog)
             self.tle_settings_widget = self.ui_loader(':/UI_Files/TLESettingsDialog', self.tle_settings_dialog)
-        except (FileNotFoundError, Exception):
+        except FileNotFoundError:
             self.logger.exception("Something happened when loading GUI files. See traceback")
             sys.exit(-1)  # Indicate a problematic shutdown
         self.tle_info_msg_box.setParent(self.main_widget)  # Set the main program window to be the parent
@@ -93,12 +93,13 @@ class UIRadioTelescopeControl(QtCore.QObject):
 
         QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create("Fusion"))  # Change the style of the GUI
 
-    def ui_loader(self, ui_resource, base=None):
+    @staticmethod
+    def ui_loader(ui_resource, base=None):
         ui_file = QtCore.QFile(ui_resource)
         ui_file.open(QtCore.QFile.ReadOnly)
         try:
-            ul = uic.loadUi(ui_file, base)
-            return ul
+            parsed_ui = uic.loadUi(ui_file, base)
+            return parsed_ui
         finally:
             ui_file.close()
 
@@ -156,12 +157,12 @@ class UIRadioTelescopeControl(QtCore.QObject):
 
         # Make the webview widget for the map
         # Disabled for the moment because it gives an error on Ubuntu
-        '''
+        """
         self.webView = QtWebEngineWidgets.QWebEngineView(self.map_diag.widget)
         self.webView.setUrl(QtCore.QUrl("https://www.google.com/maps"))
         self.webView.setObjectName("webView")
         self.map_diag.formLayout.addWidget(self.webView)
-        '''
+        """
 
         # Create validators for the TCP port settings entries
         ip_port_validator = QtGui.QIntValidator()  # Create an integer validator
@@ -358,9 +359,9 @@ class UIRadioTelescopeControl(QtCore.QObject):
 
     # Signal handler to show the received data fro Stellarium on the GUI
     @QtCore.pyqtSlot(float, float, name='dataStellShow')
-    def stell_data_show(self, ra: float, dec: float):
-        self.main_widget.raPosInd_2.setText("%.5fh" % ra)  # Update the corresponding field
-        self.main_widget.decPosInd_2.setText("%.5f" % dec + u"\u00b0")  # Update the corresponding field
+    def stell_data_show(self, received_ra: float, received_dec: float):
+        self.main_widget.raPosInd_2.setText("%.5fh" % received_ra)  # Update the corresponding field
+        self.main_widget.decPosInd_2.setText("%.5f" % received_dec + u"\u00b0")  # Update the corresponding field
 
     # Signal handler to show the status of the TCP client connected to RPi
     @QtCore.pyqtSlot(str, name='conClientStat')
@@ -405,9 +406,9 @@ class UIRadioTelescopeControl(QtCore.QObject):
                                                 "color:#ff0000;\">No</span></p></body></html>")
 
     @QtCore.pyqtSlot(float, float, name='pos_data_show')
-    def pos_data_show(self, ra: float, dec: float):
-        self.main_widget.raPosInd.setText("%.5fh" % ra)  # Show the RA of the dish on the GUI
-        self.main_widget.decPosInd.setText("%.5f" % dec + u"\u00b0")  # Show the declination of the dish on the GUI
+    def pos_data_show(self, show_ra: float, show_dec: float):
+        self.main_widget.raPosInd.setText("%.5fh" % show_ra)  # Show the RA of the dish on the GUI
+        self.main_widget.decPosInd.setText("%.5f" % show_dec + u"\u00b0")  # Show the declination of the dish on the GUI
 
     @QtCore.pyqtSlot(float, name='move_progress')
     def move_progress(self, percent: float):
@@ -732,8 +733,9 @@ class UIRadioTelescopeControl(QtCore.QObject):
         self.main_widget.show()  # Show the GUI window
 
     # Ask before exiting the GUI
-    def close_application(self, objec):
-        choice = QtWidgets.QMessageBox.question(objec, 'Exit', "Are you sure?",
+    @staticmethod
+    def close_application(window_object):
+        choice = QtWidgets.QMessageBox.question(window_object, 'Exit', "Are you sure?",
                                                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                                                 QtWidgets.QMessageBox.No)
         if choice == QtWidgets.QMessageBox.Yes:

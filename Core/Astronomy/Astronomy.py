@@ -84,14 +84,14 @@ class Calculations(QtCore.QObject):
 
         object_coordinates = SkyCoord(ra=str(object_ra), dec=str(object_dec), unit='deg')
         equinox_time = Time(datetime.datetime(*date), scale='utc', location=self.location, format='datetime')
-        ra = object_coordinates.transform_to(FK5(equinox=equinox_time)).ra  # Get the corrected right ascension
+        ra_jnow = object_coordinates.transform_to(FK5(equinox=equinox_time)).ra
 
         # Get the local sidereal time
         time_scale = load.timescale()
         utc_time = time_scale.utc(*date)
         local_sidereal_time = utc_time.gast * 15 + self.location.lon.degree
 
-        return round(local_sidereal_time - ra.degree, 6)  # Return the calculated hour angle
+        return round(local_sidereal_time - ra_jnow.degree, 6)  # Return the calculated hour angle
 
     def hour_angle_to_ra(self, object_ha: float, object_dec: float, date=None):
         """
@@ -130,9 +130,9 @@ class Calculations(QtCore.QObject):
         equinox_time = Time(datetime.datetime(*date), scale='utc', location=self.location, format='datetime')
         object_coordinates = SkyCoord(ra=str(calculated_ra), dec=str(object_dec), unit='deg',
                                       frame=FK5, equinox=equinox_time)
-        ra = object_coordinates.transform_to(FK5(equinox='J2000.0')).ra  # Get the corrected right ascension in J2000
+        ra_j2000 = object_coordinates.transform_to(FK5(equinox='J2000.0')).ra
 
-        return round(ra.degree, 6)
+        return round(ra_j2000.degree, 6)
 
     @staticmethod
     def current_time(decimal_day=False, dummy_time=None):
@@ -483,18 +483,18 @@ class Calculations(QtCore.QObject):
             epoch = system_and_date[1]
         self.observer.date = epoch
 
-        if system_and_date[0] == "Equatorial":
-            ra, dec = coordinates
-        elif system_and_date[0] == "Horizontal":
-            ra, dec = np.degrees(self.observer.radec_of(position[1], position[0]))
+        if system_and_date[0] == "Horizontal":
+            converted_ra, converted_dec = np.degrees(self.observer.radec_of(position[1], position[0]))
         elif system_and_date[0] == "Galactic":
             galactic_posit = ephem.Galactic(position[1], position[0], epoch=epoch)
-            ra, dec = np.degrees(galactic_posit.to_radec())  # Convert point from Galactic to RA and DEC
+            converted_ra, converted_dec = np.degrees(galactic_posit.to_radec())  # Convert from Galactic
         elif system_and_date[0] == "Ecliptic":
-            ecliptical_posit = ephem.Ecliptic(position[1], position[0], epoch=epoch)
-            ra, dec = np.degrees(ecliptical_posit.to_radec())  # Convert to RA and DEC from Ecliptic coordinate system
+            ecliptic_position = ephem.Ecliptic(position[1], position[0], epoch=epoch)
+            converted_ra, converted_dec = np.degrees(ecliptic_position.to_radec())  # Convert from Ecliptic coordinates
+        else:
+            converted_ra, converted_dec = coordinates
 
-        return ra, dec  # Return the coordinate tuple
+        return converted_ra, converted_dec  # Return the coordinate tuple
 
     def geo_sat_position(self, satellite: str):
         """
@@ -519,10 +519,10 @@ class Calculations(QtCore.QObject):
             sat.compute(self.observer)
 
             c_time = self.current_time()  # Get the current time
-            ha = np.round(self.hour_angle(math.degrees(sat.ra), math.degrees(sat.dec), c_time), 4)  # Get the hour
+            ha_sat = np.round(self.hour_angle(math.degrees(sat.ra), math.degrees(sat.dec), c_time), 4)  # Get the hour
             # angle of the satellite
 
             return np.array([np.round(np.degrees((sat.alt, sat.az,)), 4),
-                             np.round((ha, np.degrees(sat.dec),), 4)]).tolist()
+                             np.round((ha_sat, np.degrees(sat.dec),), 4)]).tolist()
         except KeyError:
             self.logger.exception("No satellite found. See traceback.")
