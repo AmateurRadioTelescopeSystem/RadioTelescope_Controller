@@ -86,6 +86,7 @@ pages:
       - .cache/pip
   script:
     - python3 -m pip install sphinx recommonmark groundwork-sphinx-theme
+    - python3 -m pip install sphinxcontrib-napoleon
   after_script:
     - sphinx-build --color -b html docs/source public
     - sphinx-build --color -b coverage docs/source coverage
