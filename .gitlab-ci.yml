@@ -26,8 +26,8 @@ cache:
   after_script:
     - ./configure.sh 
     - python3 -m pip install pyvirtualdisplay
-    - nohup python3 Tests/server_tester.py &
-    - python3 Tests/program_tester.py
+    - nohup python3 Tests/DummyTCPServer.py &
+    - python3 Tests/IntegratedRun.py
 
 # Define the stages of thi CI
 stages:
@@ -46,8 +46,6 @@ before_script:
 # Code linting
 pylava:
   stage: build
-  tags:
-    - trd
   image: alpine:latest
   before_script:
     - apk update && apk add python3
@@ -58,8 +56,6 @@ pylava:
 
 pylint:
   stage: build
-  tags:
-    - trd-runner
   image: alpine:latest
   before_script:
     - apk update && apk add python3 python3-dev py3-qt5 build-base

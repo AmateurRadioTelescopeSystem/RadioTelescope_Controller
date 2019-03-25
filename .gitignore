@@ -299,4 +299,13 @@ TLE/*
 # Ignore the settings from the test directory
 Tests/Settings/*
 
+# Ignore astronomy files
+*.dat
+*.bsp
+*.preds
+*.data
+
+# Ignore rst auto generated files
+docs/source/rst/
+
 # End of https://www.gitignore.io/api/c,c++,linux,python,windows
