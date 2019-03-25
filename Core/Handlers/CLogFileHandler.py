@@ -1,7 +1,6 @@
-import os
-import gzip
 import logging
 import logging.handlers
+from Core.Utilities.FileCompression import FileCompression
 
 
 # ============================================================================
@@ -28,8 +27,8 @@ class CustomLogTimedRotationHandler(logging.Handler):
 
         self._handler = logging.handlers.TimedRotatingFileHandler(
             filename, when, backupCount=backup_count, encoding=enc, utc=utc)
-        self._handler.rotator = self.compressor  # Compress the old file in every rotation
-        self._handler.namer = self.namer  # Name the compressed file
+        self._handler.rotator = FileCompression.compressor  # Compress the old file in every rotation
+        self._handler.namer = FileCompression.namer  # Name the compressed file
 
     def setFormatter(self, fmt):
         """
@@ -63,30 +62,6 @@ class CustomLogTimedRotationHandler(logging.Handler):
         if self._handler is not None:
             self._handler.close()
         logging.Handler.close(self)
-
-    def compressor(self, source, dest):
-        """
-        Compress the file on every rotation
-
-        :param source: Source file name
-        :param dest: Destination file name
-        :return: Nothing
-        """
-        with open(source, "rb") as source_file:
-            data = source_file.read()  # Read the data from file and compress them
-            compressed = gzip.compress(data, 9)  # Get the compressed binary data
-            with open(dest, "wb") as dest_file:
-                dest_file.write(compressed)  # Save the compressed data to file
-        os.remove(source)  # Remove uncompressed file
-
-    def namer(self, name):
-        """
-        Append the appropriate suffix to the compressed file name
-
-        :param name: File name to append suffix
-        :return: Nothing
-        """
-        return name + ".gz"
 
 
 class CustomLogRotationHandler(logging.Handler):
@@ -107,8 +82,8 @@ class CustomLogRotationHandler(logging.Handler):
 
         self._handler = logging.handlers.RotatingFileHandler(
             filename, maxBytes=max_bytes, backupCount=backup_count, encoding=enc, delay=delay)
-        self._handler.rotator = self.compressor  # Compress the old file in every rotation
-        self._handler.namer = self.namer  # Name the compressed file
+        self._handler.rotator = FileCompression.compressor  # Compress the old file in every rotation
+        self._handler.namer = FileCompression.namer  # Name the compressed file
 
     def setFormatter(self, fmt):
         """
@@ -144,30 +119,6 @@ class CustomLogRotationHandler(logging.Handler):
             self._handler.close()
         logging.Handler.close(self)
 
-    def compressor(self, source, dest):
-        """
-        Compress the file on every rotation
-
-        :param source: Source file name
-        :param dest: Destination file name
-        :return: Nothing
-        """
-        with open(source, "rb") as source_file:
-            data = source_file.read()  # Read the data from file and compress them
-            compressed = gzip.compress(data, 9)  # Get the compressed binary data
-            with open(dest, "wb") as dest_file:
-                dest_file.write(compressed)  # Save the compressed data to file
-        os.remove(source)  # Remove uncompressed file
-
-    def namer(self, name):
-        """
-        Append the appropriate suffix to the compressed file name
-
-        :param name: File name to append suffix
-        :return: Nothing
-        """
-        return name + ".gz"
-
 
 class StreamToLogger(object):
     """
@@ -176,7 +127,7 @@ class StreamToLogger(object):
     def __init__(self, logger, log_level=logging.INFO):
         self.logger = logger
         self.log_level = log_level
-        self.linebuf = ''
+        self.line_buffer = ''
 
     def write(self, buf):
         for line in buf.rstrip().splitlines():

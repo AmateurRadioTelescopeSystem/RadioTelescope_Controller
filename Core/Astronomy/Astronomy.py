@@ -178,6 +178,7 @@ class Calculations(QtCore.QObject):
         cur_ha = self.hour_angle(obj_ra, obj_dec, cur_time)  # Get the current object hour angle
         step_distance_ra = abs(stp_to_home_ra + cur_ha * MOTOR_RA_STEPS_PER_DEGREE)
         step_distance_dec = abs(stp_to_home_dec + obj_dec * MOTOR_DEC_STEPS_PER_DEGREE)
+        print(step_distance_ra, step_distance_dec)
 
         max_distance = max(step_distance_ra, step_distance_dec)  # Calculate the maximum distance, to calculate max time
         max_move_time = max_distance / MAX_STEP_FREQUENCY  # Maximum time required for any motor, calculated in seconds

@@ -8,7 +8,7 @@ from Core.Configuration import ConfigData
 
 class TestConversions(unittest.TestCase):
     def setUp(self):
-        cfgData = ConfigData.Confdata(os.path.abspath('Tests/Settings/settings.xml'))
+        cfgData = ConfigData.ConfData(os.path.abspath('Tests/Settings/settings.xml'))
         self.astronomy = Astronomy.Calculations(cfgData)
 
     def test_hour_angle(self):

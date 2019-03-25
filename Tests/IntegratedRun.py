@@ -79,7 +79,7 @@ def main():
 
     # Exception handling code for the XML file process
     try:
-        cfgData = ConfigData.Confdata(os.path.abspath('Tests/Settings/settings.xml'))
+        cfgData = ConfigData.ConfData(os.path.abspath('Tests/Settings/settings.xml'))
     except:
         logdata.exception("There is a problem with the XML file handling. Program terminates.")
         sys.exit(1)  # Terminate the script

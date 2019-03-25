@@ -2,7 +2,7 @@ import xml.etree.ElementTree as etree
 import logging
 
 
-class Confdata:
+class ConfData:
     # Class constructor
     def __init__(self, filename):
         self.filename = filename  # Create a variable with the given filename

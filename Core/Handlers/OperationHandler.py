@@ -110,8 +110,8 @@ class OpHandler(QtCore.QObject):
             tle_status_msg = ""
 
         if tle_status_msg != "":
-            self.ui.tleStatusInfoSig.emit(tle_status_msg)
-            while not self.ui.tleInfoMsgBox.clickedButton():
+            self.ui.tle_status_info_sig.emit(tle_status_msg)
+            while not self.ui.tle_info_msg_boxnfoMsgBox.clickedButton():
                 continue
 
         # If auto-connection is selected for thr TCP section, then do as requested
