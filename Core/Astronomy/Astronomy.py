@@ -1,10 +1,8 @@
-import logging
-# import urllib3
-# import certifi
 import os
 import math
 import time
 import datetime
+import logging
 import ephem
 import numpy as np
 from PyQt5 import QtCore
@@ -12,7 +10,6 @@ from pyorbital import tlefile
 from astropy.coordinates import SkyCoord, EarthLocation, FK5
 from astropy.time import Time
 from skyfield.api import load
-import astropy.units as units
 
 
 RAD_TO_DEG = 57.2957795131  # Radians to degrees conversion factor
@@ -137,7 +134,8 @@ class Calculations(QtCore.QObject):
 
         return round(ra.degree, 6)
 
-    def current_time(self, decimal_day=False):
+    @staticmethod
+    def current_time(decimal_day=False, dummy_time=None):
         """
         Get the current GMT time without daylight saving.
 
@@ -147,6 +145,9 @@ class Calculations(QtCore.QObject):
         Returns:
             tuple: A tuple containing the current year, month and decimal day
         """
+        if dummy_time is not None:
+            return dummy_time
+
         gmt = time.gmtime()  # Get the current time
         if decimal_day:
             decimal_day = float(gmt.tm_mday) + float(gmt.tm_hour)/24.0 + float(gmt.tm_min)/(24.0*60.0) + \
@@ -182,8 +183,6 @@ class Calculations(QtCore.QObject):
         max_move_time = max_distance / MAX_STEP_FREQUENCY  # Maximum time required for any motor, calculated in seconds
         target_time = (cur_time[0], cur_time[1], cur_time[2] + (max_move_time + transit_time) * SEC_TO_DAY)
         target_ha = self.hour_angle(obj_ra, obj_dec, target_time)  # Calculate the hour angle at the target location
-
-        # self.logD.debug("RA %f, DEC %f, time %f" % (target_ha, obj_dec, cur_time[1]))  # Debugging log
 
         return [target_ha, obj_dec]
 

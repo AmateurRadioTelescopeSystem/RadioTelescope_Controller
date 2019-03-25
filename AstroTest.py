@@ -10,9 +10,9 @@ from skyfield.api import load, Topos
 import datetime
 import numpy as np
 
-c = SkyCoord(ra="5h40m45.54s", dec="-1d56m33.2s", unit='deg', frame='icrs', equinox='J2000')
+c = SkyCoord(ra="5h40m45.54s", dec="-1d56m33.2s", unit='deg', frame=FK5, equinox='J2000')
 # c.transform_to(frame='what')
-loc = EarthLocation(lat="40.6436", lon="22.9308", height="50")
+loc = EarthLocation.from_geodetic(lat="40.6436", lon="22.9308")
 
 print(loc)
 print(float(loc.lon.to_string(decimal=True))/15)
@@ -20,21 +20,23 @@ print("   \n")
 
 datetime.datetime(2019, 3, 23, 22)
 t = Time(datetime.datetime(2019, 3, 23, 22), scale='utc', location=loc, format='datetime')
-print(c.ra)
-co = c.transform_to(FK5(equinox=t))
-print(co.ra)
 aa_frame = coord.AltAz(obstime=t, location=loc)
+print(c.ra.hms)
+print(c.dec.dms)
+co = c.transform_to(FK5(equinox=t))
+print(co.ra.hms)
+print(co.dec.dms)
 aa_coos = co.transform_to(aa_frame)
 
 print("AltAz")
 print(aa_coos.az, aa_coos.alt)
-
+'''
 print("\n\n\n")
 print(t)
 print("\n\n\n")
 FK5_Jnow = FK5(equinox=t)
-
-
+'''
+'''
 print(t.format)
 print(t.scale)
 print(t)
@@ -65,5 +67,6 @@ print(int(lst))
 print((lst - int(lst))*60)
 print((((lst - int(lst))*60) - int((lst - int(lst))*60))*60)
 print(tm.gast)
+'''
 
 

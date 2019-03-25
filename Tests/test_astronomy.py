@@ -22,11 +22,11 @@ class TestConversions(unittest.TestCase):
             Nothing
         """
         hour_angle = self.astronomy.hour_angle(85.18975, -1.9425, (2019, 3, 23.916667,))
-        self.assertEqual(88.622679, hour_angle, "The calculated hour angle is incorrect")
+        self.assertEqual(hour_angle, 88.622679, "The calculated hour angle is incorrect")
 
     def test_hour_angle_to_ra(self):
         right_ascension = self.astronomy.hour_angle_to_ra(88.622679, -1.9425, (2019, 3, 23, 22, 0, 0))
-        self.assertEqual(85.189772, right_ascension, "The calculated right ascension is incorrect")
+        self.assertEqual(right_ascension, 85.189772, "The calculated right ascension is incorrect")
 
     def test_current_time(self):
         current_time_test = self.astronomy.current_time()  # Get the current time under test
@@ -37,6 +37,16 @@ class TestConversions(unittest.TestCase):
         self.assertEqual(current_time_test[3], current_time.tm_hour, "Hours do not match")
         self.assertEqual(current_time_test[4], current_time.tm_min, "Minutes do not match")
         self.assertEqual(current_time_test[5], current_time.tm_sec, "Seconds do not match")
+
+    def test_transit(self):
+        """
+        Provide a dummy right ascension and declination, because it varies from different runs. The dummy right
+        ascension provided is the hour angle of the specified day.
+        """
+        current_ha = self.astronomy.hour_angle_to_ra(85.18975, -1.9425, (2019, 3, 23.916667,))
+        target_ha, object_dec = self.astronomy.transit(current_ha, -1.9425, 1900, -6789, 20)
+        self.assertEqual(object_dec, -1.9425, "Objects declinations do not match")
+        self.assertEqual(target_ha, 118.262936, "Hour angles do not match")
 
 
 if __name__ == "__main__":
