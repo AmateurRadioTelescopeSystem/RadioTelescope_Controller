@@ -43,10 +43,24 @@ class TestConversions(unittest.TestCase):
         Provide a dummy right ascension and declination, because it varies from different runs. The dummy right
         ascension provided is the hour angle of the specified day.
         """
-        current_ha = self.astronomy.hour_angle_to_ra(85.18975, -1.9425, (2019, 3, 23.916667,))
-        target_ha, object_dec = self.astronomy.transit(current_ha, -1.9425, 1900, -6789, 20)
+        target_ha, object_dec = self.astronomy.transit(85.18975, -1.9425, 1900, -6789, 20, (2019, 3, 23.916667,))
         self.assertEqual(object_dec, -1.9425, "Objects declinations do not match")
-        self.assertEqual(target_ha, 118.262936, "Hour angles do not match")
+        self.assertEqual(target_ha, 93.887052, "Hour angles do not match")
+
+    def test_transit_planetary(self):
+        """
+        Use mars as the testing object.
+        """
+        target_ha, object_dec = self.astronomy.transit_planetary('mars', 0, 0, 0, (2019, 3, 23.916667,))
+        self.assertEqual(target_ha, 125.22636, "Planet's right ascension mismatch")
+        self.assertEqual(object_dec, -19.880418, "Planet's declination mismatch")
+
+    def test_tracking_planetary(self):
+        target_ha, object_dec, roc_ra, roc_dec = self.astronomy.tracking_planetary('mars', 0, 0, (2019, 3, 23.916667,))
+        self.assertEqual(target_ha, 125.22636, "Planet's right ascension mismatch")
+        self.assertEqual(object_dec, -19.880418, "Planet's declination mismatch")
+        self.assertEqual(roc_ra, 0.000434, "The rate of change for the right ascension is not correct")
+        self.assertEqual(roc_dec, -0.000106, "The rate of change for the declination is not correct")
 
 
 if __name__ == "__main__":

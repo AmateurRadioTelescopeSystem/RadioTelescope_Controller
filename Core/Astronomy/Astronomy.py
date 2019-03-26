@@ -156,7 +156,8 @@ class Calculations(QtCore.QObject):
             return gmt.tm_year, gmt.tm_mon, decimal_day
         return gmt.tm_year, gmt.tm_mon, gmt.tm_mday, gmt.tm_hour, gmt.tm_min, gmt.tm_sec
 
-    def transit(self, obj_ra: float, obj_dec: float, stp_to_home_ra: int, stp_to_home_dec: int, transit_time: int):
+    def transit(self, obj_ra: float, obj_dec: float, stp_to_home_ra: int, stp_to_home_dec: int, transit_time: int,
+                custom_date=None):
         """
         Calculates the hour angle of the provided object, at the specified position provided by the step number.
         The final hour angle is calculated for a stationary object. We add the maximum time taken by any motor
@@ -169,16 +170,16 @@ class Calculations(QtCore.QObject):
             stp_to_home_ra (int): Number of steps away from home position for the right ascension motor
             stp_to_home_dec (int): Number of steps away from home for the declination motor
             transit_time (int): Time to transit position, provided in seconds
+            custom_date: Date provided, mainly for testing purposes
 
         Returns:
             A list containing the hour angle at the target location and the declination of the object
         """
         # TODO may be needed to add some "safety" seconds
-        cur_time = self.current_time()  # Get the current time in tuple
+        cur_time = self.current_time(dummy_time=custom_date)  # Get the current time in tuple
         cur_ha = self.hour_angle(obj_ra, obj_dec, cur_time)  # Get the current object hour angle
         step_distance_ra = abs(stp_to_home_ra + cur_ha * MOTOR_RA_STEPS_PER_DEGREE)
         step_distance_dec = abs(stp_to_home_dec + obj_dec * MOTOR_DEC_STEPS_PER_DEGREE)
-        print(step_distance_ra, step_distance_dec)
 
         max_distance = max(step_distance_ra, step_distance_dec)  # Calculate the maximum distance, to calculate max time
         max_move_time = max_distance / MAX_STEP_FREQUENCY  # Maximum time required for any motor, calculated in seconds
@@ -187,7 +188,8 @@ class Calculations(QtCore.QObject):
 
         return [target_ha, obj_dec]
 
-    def transit_planetary(self, objec: str, stp_to_home_ra: int, stp_to_home_dec: int, transit_time: int):
+    def transit_planetary(self, objec: str, stp_to_home_ra: int, stp_to_home_dec: int, transit_time: int,
+                          custom_date=None):
         """
         Calculate object's position when the dish arrives at position.
         This function calculates the coordinates of the requested object, taking into account the delay of the dish
@@ -202,6 +204,10 @@ class Calculations(QtCore.QObject):
             stp_to_home_ra (int): Number of steps from home position for the right ascension motor
             stp_to_home_dec (int): Number of steps from home position for the declination motor
             transit_time (int): Time to transit position, provided in seconds
+            custom_date:
+
+        Todo:
+            Clarify in the documentation what the direction of measurement for the different angles is
 
         Returns:
             A list containing the object's coordinates at the antenna's requested position
@@ -215,29 +221,33 @@ class Calculations(QtCore.QObject):
         place_on_earth = self.planets['earth'] + Topos(latitude_degrees=self.location.lat.degree,
                                                        longitude_degrees=self.location.lon.degree)
 
-        utc_time = self.time_scale.now()
+        utc_time = self.time_scale.utc(*self.current_time(decimal_day=True, dummy_time=custom_date))
         object_coordinates = planetary_object.at(utc_time).observe(place_on_earth).apparent()
 
         # Get the current coordinates for the planetary body
-        object_ra, object_dec = object_coordinates.radec(epoch=self.time_scale.J2000)
+        object_ra = object_coordinates.radec(epoch=utc_time)[0].hours * 15
+        object_dec = object_coordinates.radec(epoch=utc_time)[1].degrees
 
-        cur_ha = self.hour_angle(object_ra, object_dec)  # Get the current object hour angle
+        cur_ha = self.hour_angle(object_ra, object_dec, date=custom_date)  # Get the current object hour angle
         step_distance_ra = abs(stp_to_home_ra + cur_ha * MOTOR_RA_STEPS_PER_DEGREE)
         step_distance_dec = abs(stp_to_home_dec + object_dec * MOTOR_DEC_STEPS_PER_DEGREE)
 
         max_distance = max(step_distance_ra, step_distance_dec)  # Calculate the maximum distance, to calculate max time
         max_move_time = max_distance / MAX_STEP_FREQUENCY  # Maximum time required for any motor, calculated in seconds
 
-        current_time = self.current_time()
-        conditioned_time = (*current_time[:5], current_time[5] + max_move_time + transit_time, )
+        current_time = self.current_time(decimal_day=True, dummy_time=custom_date)
+        conditioned_time = (*current_time[:2], current_time[2] + (max_move_time + transit_time) * SEC_TO_DAY, )
 
         # Recalculate the coordinates for the new time
-        object_ra, object_dec = object_coordinates.radec(epoch=self.time_scale.utc(*conditioned_time))
-        target_ha = self.hour_angle(object_ra, object_dec, conditioned_time)  # Hour angle at the target location
+        object_coordinates = object_coordinates.radec(epoch=self.time_scale.utc(*conditioned_time))
+        target_ha = self.hour_angle(object_coordinates[0].hours * 15, object_coordinates[1].degrees, conditioned_time)
 
-        return [target_ha, object_dec]
+        if target_ha < 0:
+            target_ha += 180.0
 
-    def tracking_planetary(self, objec, stp_to_home_ra: int, stp_to_home_dec: int):
+        return [target_ha, round(object_dec, 6)]
+
+    def tracking_planetary(self, objec, stp_to_home_ra: int, stp_to_home_dec: int, custom_date=None):
         """
         Calculate the rate of change for the coordinates of different planetary bodies. The main calculations performed
         are the same as the transit functions. Knowing the rate of change allows for real time corrections of motor
@@ -250,14 +260,15 @@ class Calculations(QtCore.QObject):
             objec: pyephem object type, which is the object of interest (e.g. ephem.Jupiter())
             stp_to_home_ra (int): Number of steps from home position for the right ascension motor
             stp_to_home_dec (int): Number of steps from home position for the declination motor
+            custom_date:
 
         Returns:
             list: Contains the object's coordinates on transit and the rate of change for the coordinates
         """
         sum_ra = sum_dec = 0.0  # Variable to hold the sum for averaging
         prev_ra = prev_dec = 0.0  # Initialize the variables
-        count = 0  # Counting variable used in the loop and averaging
-        transit_coords = self.transit_planetary(objec, stp_to_home_ra, stp_to_home_dec, 0)  # Calculate transit first
+        time_increment = 0  # Counting variable used in the loop and averaging
+        transit_coords = self.transit_planetary(objec, stp_to_home_ra, stp_to_home_dec, 0, custom_date)
 
         try:
             planetary_object = self.planets[objec]
@@ -267,30 +278,26 @@ class Calculations(QtCore.QObject):
         place_on_earth = self.planets['earth'] + Topos(latitude_degrees=self.location.lat.degree,
                                                        longitude_degrees=self.location.lon.degree)
 
-        cur_time = self.current_time()  # Get the current time in tuple
-        epoch_date = "%.0f/%.0f/%.6f" % (cur_time[0], cur_time[1], cur_time[2])  # Get the current date
-        comp_date = epoch_date  # Set the dates to equal at first
-
-        utc_time = self.time_scale.now()
-        object_coordinates = planetary_object.at(utc_time).observe(place_on_earth).apparent()
-
         # Iterate for 24 hours to get enough points
-        for count in range(0, 24):
-            objec.compute(comp_date, epoch=epoch_date)
-            cur_ra = float(objec.a_ra)
-            cur_dec = float(objec.a_dec)
+        cur_time = self.current_time(decimal_day=True, dummy_time=custom_date)
+        utc_time = self.time_scale.utc(*cur_time)  # Get the current
+        # time
+        for time_increment in range(0, 24):
+            object_coordinates = planetary_object.at(utc_time).observe(place_on_earth).apparent().radec(epoch=utc_time)
+            cur_ra = object_coordinates[0].hours * 15
+            cur_dec = object_coordinates[1].degrees
 
-            if count > 0:
+            if time_increment > 0:
                 sum_ra += (cur_ra - prev_ra)
                 sum_dec += (cur_dec - prev_dec)
             prev_ra = cur_ra
             prev_dec = cur_dec
-            comp_date = "%.0f/%.0f/%.6f" % (cur_time[0], cur_time[1], cur_time[2] + 0.04166666667)  # One hour increment
+            utc_time = self.time_scale.utc(*cur_time[:2], cur_time[2] + time_increment/24.0)
 
-        roc_ra = ((sum_ra/count) * RAD_TO_DEG) / 3600.0  # Return degrees per second for the RA
-        roc_dec = ((sum_dec/count) * RAD_TO_DEG) / 3600.0  # Return degrees per second for the DEC
+        roc_ra = ((sum_ra/time_increment) * RAD_TO_DEG) / 3600.0  # Return degrees per second for the RA
+        roc_dec = ((sum_dec/time_increment) * RAD_TO_DEG) / 3600.0  # Return degrees per second for the DEC
 
-        return [transit_coords[0], transit_coords[1], roc_ra, roc_dec]
+        return [transit_coords[0], transit_coords[1], round(roc_ra, 6), round(roc_dec, 6)]
 
     def scanning_map_generator(self, points: tuple, step_size: tuple, direction: str):
         """
@@ -416,7 +423,7 @@ class Calculations(QtCore.QObject):
         return [map_points, raw_points]
 
     def scanning_point_calculator(self, map_points: tuple, init_steps: tuple, step_size: tuple,
-                                  int_time=0.0, objec=None):
+                                  int_time=0.0, objec: str = ""):
         """
         Generate the scanning map in HA and DEC, providing the integration and the initial steps.
 
@@ -430,7 +437,7 @@ class Calculations(QtCore.QObject):
         Returns:
             list: The calculated position of the points for scanning
         """
-        if objec is None:
+        if objec == "":
             first_point = self.transit(map_points[0][0], map_points[0][1], init_steps[0], init_steps[1], 0)
             roc_ra = roc_dec = 0  # Not rate of change for the non-planetary bodies
         else:
@@ -459,7 +466,7 @@ class Calculations(QtCore.QObject):
 
             # Account for planetary object coordinates
             # TODO Test how the planetary selection is functioning
-            if objec is None:
+            if objec == "":
                 transit_point = self.transit(map_points[i][0], map_points[i][1], step_incr[0], step_incr[1], tr_time)
             else:
                 transit_point = self.transit_planetary(objec, step_incr[0], step_incr[1], tr_time)

@@ -6,9 +6,11 @@ import astropy.units as units
 from astropy.time import Time
 import time
 import ephem
-from skyfield.api import load, Topos
+from skyfield.api import Topos, Loader
 import datetime
 import numpy as np
+
+load = Loader('Astronomy Database')
 
 c = SkyCoord(ra="5h40m45.54s", dec="-1d56m33.2s", unit='deg', frame=FK5, equinox='J2000')
 # c.transform_to(frame='what')
@@ -71,6 +73,7 @@ print(tm.gast)
 print("Planet section")
 ts = load.timescale()
 t = ts.now()
+print(ts.J2000)
 planets = load('de421.bsp')
 mars = planets['Moon']
 print(ts.now().tt + 20)
