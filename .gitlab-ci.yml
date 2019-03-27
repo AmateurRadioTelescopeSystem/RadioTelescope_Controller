@@ -26,7 +26,7 @@ cache:
     - chmod +x build_test.sh
   after_script:
     - ./configure.sh
-    - nohup python3 Tests/DummyTCPServer.py &
+    - nohup python3 Tests/TCPNetwork/DummyTCPServer.py &
     - python3 Tests/IntegratedRun.py
     - ./Tests/run_tests.sh
 
