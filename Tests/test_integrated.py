@@ -12,9 +12,7 @@ import Tests.DefaultData
 from PyQt5 import QtWidgets, QtCore, QtTest, QtNetwork
 from Core.GUI import UInterface
 from Core.Handlers import OperationHandler
-from Core.Client import ClientThread
-from Core.Server import RPiServerThread
-from Core.Stellarium import StellariumThread
+from Core.Networking import ClientThread, RPiServerThread, StellariumThread
 from Core.Configuration import ConfigData
 
 # Create a virtual display for testing
@@ -147,7 +145,7 @@ class TestIntegrated(unittest.TestCase):
 
         ui.show_application()  # Render and show the GUI main window and start the application
 
-        window_show = QtTest.QTest.qWaitForWindowExposed(ui.main_win)  # Wait until the main window is shown
+        window_shown = QtTest.QTest.qWaitForWindowExposed(ui.main_win)  # Wait until the main window is shown
 
         QtTest.QTest.qWait(2000)  # Wait for the retrieval of TLE file
 
@@ -172,7 +170,7 @@ class TestIntegrated(unittest.TestCase):
         oper_handler_thread.quit()
         oper_handler_thread.wait()
 
-        self.assertTrue(window_show, "Window was not able to start.")
+        self.assertTrue(window_shown, "Window was not able to start.")
         self.assertTrue(client_connected, "Client did not manage to connect to the server.")
 
 
