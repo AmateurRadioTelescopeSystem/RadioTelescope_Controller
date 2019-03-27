@@ -24,11 +24,8 @@ cache:
     - virtualenv venv  # Create the virtual environment directory
     - source venv/bin/activate  # Activate the virtual environment
   script:
-    - python3 -m pip install -r requirements.txt
-    - python3 -m pip install pyvirtualdisplay
-    - chmod +x build_test.sh
-  after_script:
     - ./configure.sh
+    - python3 -m pip install pyvirtualdisplay
     - nohup python3 Tests/TCPNetwork/DummyTCPServer.py &
     - python3 Tests/IntegratedRun.py
     - ./Tests/run_tests.sh
