@@ -49,7 +49,7 @@ commands.
 The versioning system that will be followed in this repo is the [SemVer](https://semver.org/).
 
 ## Documentation
-This project contains an auto generated code documentation using sphinx and the page is hosted on gitlab.  
+This project contains an auto generated code documentation using [sphinx](http://www.sphinx-doc.org/en/master/) and the page is hosted on gitlab.  
 [Here](https://artsystem.gitlab.io/main-controller/pc-gui-app) you can find the documentation page.
 
 ## Authors
