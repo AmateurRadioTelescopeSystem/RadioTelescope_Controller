@@ -22,12 +22,13 @@ cache:
     - virtualenv venv  # Create the virtual environment directory
     - source venv/bin/activate  # Activate the virtual environment
     - apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
+    - python3 -m pip install pyvirtualdisplay
     - chmod +x build_test.sh
   after_script:
-    - ./configure.sh 
-    - python3 -m pip install pyvirtualdisplay
+    - ./configure.sh
     - nohup python3 Tests/DummyTCPServer.py &
     - python3 Tests/IntegratedRun.py
+    - ./Tests/run_tests.sh
 
 # Define the stages of thi CI
 stages:
