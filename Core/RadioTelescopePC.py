@@ -4,7 +4,6 @@ import os
 import sys
 import logging
 import logging.config
-
 sys.path.append(os.path.abspath('.'))  # noqa
 
 # pylint: disable=wrong-import-position
@@ -13,9 +12,7 @@ import yaml
 from PyQt5 import QtWidgets, QtCore, QtGui
 from Core.GUI import UInterface
 from Core.Handlers import OperationHandler
-from Core.Client import ClientThread
-from Core.Server import RPiServerThread
-from Core.Stellarium import StellariumThread
+from Core.Networking import ClientThread, RPiServerThread, StellariumThread
 from Core.Configuration import ConfigData, DefaultData
 
 # Required for successful operation of the pyinstaller
