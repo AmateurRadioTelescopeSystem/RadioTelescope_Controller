@@ -21,6 +21,11 @@ class UIRadioTelescopeControl(QtCore.QObject):
     setTLEDataSig = QtCore.pyqtSignal(tuple, name='setTheGUIDataForTLESignal')
 
     def __init__(self, parent=None):
+        """
+        All signals need to be documented
+        Args:
+            parent: Parent class
+        """
         super(UIRadioTelescopeControl, self).__init__(parent)
         self.logger = logging.getLogger(__name__)  # Create the logger for the file
         self.motor_warn_msg_shown = False
@@ -105,13 +110,6 @@ class UIRadioTelescopeControl(QtCore.QObject):
 
     def setup_ui(self):
         # Make all the necessary connections
-        self.main_widget.clientRPiEnableLabel.stateChanged.connect(self.check_box_tcp_client)
-        self.main_widget.serverRPiEnableLabel.stateChanged.connect(self.check_box_tcp_rpi_server)
-        self.main_widget.tcpStelServChkBox.stateChanged.connect(self.check_box_tcp_stel)
-        self.main_widget.homePositioncheckBox.stateChanged.connect(self.check_box_return_home)
-        self.main_widget.dishHaultCommandCheckBox.stateChanged.connect(self.check_box_dish_hault)
-        self.main_widget.motorCommandCheckBox.stateChanged.connect(self.check_box_motors)
-
         self.main_widget.actionSettings.triggered.connect(self.tcp_widget.show)  # Show the TCP settings window
         self.main_widget.actionManual_Control.triggered.connect(self.man_cont_widget.show)  # Show manual control window
         self.main_widget.actionLocation.triggered.connect(self.location_widget.show)  # Show location settings dialog
@@ -216,46 +214,6 @@ class UIRadioTelescopeControl(QtCore.QObject):
         self.sky_scan_win.point4Coord_1Field.setValidator(double_validator)
         self.sky_scan_win.point4Coord_2Field.setValidator(double_validator)
 
-    # Function called every time the corresponding checkbox is selected
-    def check_box_tcp_client(self, state):
-        if state == QtCore.Qt.Checked:
-            self.main_widget.connectRadioTBtn.setEnabled(True)  # And also enable the button selection
-        else:
-            self.main_widget.connectRadioTBtn.setEnabled(False)  # And also disable the button selection
-
-    # Function called every time the corresponding checkbox is selected
-    def check_box_tcp_rpi_server(self, state):
-        if state == QtCore.Qt.Checked:
-            self.main_widget.serverRPiConnBtn.setEnabled(True)  # And also enable the button selection
-        else:
-            self.main_widget.serverRPiConnBtn.setEnabled(False)  # And also disable the button selection
-
-    # Function called every time the corresponding checkbox is selected
-    def check_box_tcp_stel(self, state):
-        if state == QtCore.Qt.Checked:
-            self.main_widget.connectStellariumBtn.setEnabled(True)
-        else:
-            self.main_widget.connectStellariumBtn.setEnabled(False)
-
-    # Function called when the enable/disable checkbox is pressed
-    def check_box_return_home(self, state):
-        if state == QtCore.Qt.Checked:
-            self.main_widget.homePositionButton.setEnabled(True)
-        else:
-            self.main_widget.homePositionButton.setEnabled(False)
-
-    def check_box_dish_hault(self, state):
-        if state == QtCore.Qt.Checked:
-            self.main_widget.stopMovingBtn.setEnabled(True)
-        else:
-            self.main_widget.stopMovingBtn.setEnabled(False)
-
-    def check_box_motors(self, state):
-        if state == QtCore.Qt.Checked:
-            self.main_widget.motorCommandButton.setEnabled(True)
-        else:
-            self.main_widget.motorCommandButton.setEnabled(False)
-
     def check_box_plan_tracking(self, state):
         if state is True:
             self.plan_obj_win.planObjectTransitGroupBox.setChecked(False)
@@ -318,8 +276,6 @@ class UIRadioTelescopeControl(QtCore.QObject):
                                                QtWidgets.QMessageBox.No)
         if choice == QtWidgets.QMessageBox.Yes:
             self.stopMovingRTSig.emit()  # Send the motion stop signal
-        else:
-            pass
 
     # Signal handler for GUI formatting used for the stellarium connection
     @QtCore.pyqtSlot(str, name='conStellStat')
@@ -740,5 +696,3 @@ class UIRadioTelescopeControl(QtCore.QObject):
                                                 QtWidgets.QMessageBox.No)
         if choice == QtWidgets.QMessageBox.Yes:
             QtCore.QCoreApplication.quit()  # If user selects "Yes", then exit from the application
-        else:
-            pass  # If user selects "No" then do not exit
