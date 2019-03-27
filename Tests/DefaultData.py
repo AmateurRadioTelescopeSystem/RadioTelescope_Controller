@@ -27,7 +27,7 @@ log_config_str = """Logging:
       backup_count: 7  # Keep 7 days old files and delete older
       enc: 'utf-8'  # Set the file encoding to utf-8
     radioTelescopeThread:
-      class: Handlers.CLogFileHandler.CustomLogTimedRotationHandler
+      class: Core.Handlers.CLogFileHandler.CustomLogTimedRotationHandler
       formatter: mainFile
       level: INFO
       filename: Tests/logs/RadioTelescope_Logger.log
