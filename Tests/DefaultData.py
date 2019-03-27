@@ -19,7 +19,7 @@ log_config_str = """Logging:
       level: DEBUG
       stream: ext://sys.stderr
     debugFile:
-      class: Handlers.CLogFileHandler.CustomLogRotationHandler
+      class: Core.Handlers.CLogFileHandler.CustomLogRotationHandler
       formatter: debugging
       level: DEBUG
       filename: Tests/logs/debugging_info.log
