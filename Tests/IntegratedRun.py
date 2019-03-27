@@ -22,6 +22,9 @@ from pyvirtualdisplay import Display
 display = Display(visible=False, size=(1024, 768), color_depth=24)
 display.start()
 
+# Required for successful operation of the pyinstaller
+from Core.Handlers import CLogFileHandler
+
 
 def parse_files():
     # Create the directory for the log files if it does not exist already
