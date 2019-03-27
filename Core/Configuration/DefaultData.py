@@ -19,7 +19,7 @@ LOG_CONFIG_DEFAULT = """Logging:
       level: DEBUG
       stream: ext://sys.stderr
     debugFile:
-      class: Handlers.CLogFileHandler.CustomLogRotationHandler
+      class: Core.Handlers.CLogFileHandler.CustomLogRotationHandler
       formatter: debugging
       level: DEBUG
       filename: logs/debugging_info.log
@@ -27,7 +27,7 @@ LOG_CONFIG_DEFAULT = """Logging:
       backup_count: 7  # Keep 7 days old files and delete older
       enc: 'utf-8'  # Set the file encoding to utf-8
     radioTelescopeThread:
-      class: Handlers.CLogFileHandler.CustomLogTimedRotationHandler
+      class: Core.Handlers.CLogFileHandler.CustomLogTimedRotationHandler
       formatter: mainFile
       level: INFO
       filename: logs/RadioTelescope_Logger.log
@@ -45,7 +45,6 @@ LOG_CONFIG_DEFAULT = """Logging:
   root:
     level: INFO
     handlers: [console, radioTelescopeThread]
-
 """
 
 SETTINGS_XML_DEFAULT = """<settings>
