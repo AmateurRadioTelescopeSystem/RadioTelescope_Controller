@@ -113,7 +113,7 @@ class OpHandler(QtCore.QObject):
 
         if tle_status_msg != "":
             self.ui.tleStatusInfoSig.emit(tle_status_msg)
-            while not self.ui.tle_info_msg_boxnfoMsgBox.clickedButton():
+            while not self.ui.tle_info_msg_box.clickedButton():
                 continue
 
         # todo: Add a user prompt to inform about upcoming download and download times
