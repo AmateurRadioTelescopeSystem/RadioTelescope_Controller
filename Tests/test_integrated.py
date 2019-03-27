@@ -28,7 +28,7 @@ class TestIntegrated(unittest.TestCase):
         server_address = ('127.0.0.1', 10001)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind(server_address)
-        self.sock.settimeout(10)  # Add a timeout timer for 10 seconds
+        self.sock.settimeout(60)  # Add a timeout timer for 60 seconds
         self.sock.listen(1)  # Set the socket to listen
 
     def tearDown(self) -> None:
