@@ -20,7 +20,7 @@ display.start()
 
 @pytest.fixture(scope="module")
 def server():
-    server_address = ('127.0.0.1', 10001)
+    server_address = ('localhost', 10001)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(server_address)
     sock.settimeout(60)  # Add a timeout timer for 60 seconds
@@ -31,8 +31,6 @@ def server():
 
 
 def test_integration(server):
-    rpi_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
     log_data = logging.getLogger(__name__)  # Create the logger for the program
     log_data.info("Main thread started")  # Use that in debugging
     QtCore.QThreadPool.globalInstance().setMaxThreadCount(8)  # Set the global thread pool count
@@ -117,12 +115,18 @@ def test_integration(server):
         pass
     QtTest.QTest.qWait(1000)  # Wait for the client thread to start
 
-    rpi_socket.connect(('localhost', 10003))
-    QtTest.QTest.qWait(500)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as rpi_socket:
+        rpi_socket.connect(('localhost', 10003))
+        QtTest.QTest.qWait(1000)  # Let the socket some time to connect
+        rpi_connected = (tcp_server.socket.state() == QtNetwork.QAbstractSocket.ConnectedState)
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp_stell_socket:
+        tcp_stell_socket.connect(('localhost', 10002))
+        QtTest.QTest.qWait(1000)  # Let the socket some time to connect
+        stellarium_connected = (tcp_stell.socket.state() == QtNetwork.QAbstractSocket.ConnectedState)
 
     # Get the connection status
     client_connected = (tcp_client.sock.state() == QtNetwork.QAbstractSocket.ConnectedState)
-    rpi_connected = (tcp_server.socket.state() == QtNetwork.QAbstractSocket.ConnectedState)
 
     # Close all the threads before exiting
     tcp_client_thread.quit()
@@ -137,3 +141,4 @@ def test_integration(server):
     assert window_shown
     assert client_connected
     assert rpi_connected
+    assert stellarium_connected
