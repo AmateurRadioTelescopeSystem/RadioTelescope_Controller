@@ -3,7 +3,6 @@ import sys
 import yaml
 import logging
 import logging.config
-import unittest
 sys.path.append(os.path.abspath('.'))  # noqa
 
 import Tests.DefaultData
@@ -53,13 +52,6 @@ def parse_files():
         logging.config.dictConfig(dictionary['Logging'])  # Select the logging settings from the dictionary
 
 
-def suite():
-    test_suite = unittest.TestSuite()
-    test_suite.addTests(unittest.TestLoader().discover('./Tests/', 'test_*.py'))
-
-    return test_suite
-
-
 if __name__ == "__main__":
     parse_files()  # Create the necessary files first
-    unittest.TextTestRunner(verbosity=2).run(suite())
+    os.system("pytest --cov-report=html --cov-report=term --junitxml=junit_tests.xml --cov=Core Tests/")

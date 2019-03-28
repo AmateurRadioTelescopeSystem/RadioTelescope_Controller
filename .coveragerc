@@ -1,6 +1,7 @@
 # Omit the following files from coverage reports
 [run]
 omit =
+    Core/RadioTelescopePC.py
     *__init__.py
     */site-packages/*
     */dist-packages/*
