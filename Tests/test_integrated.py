@@ -110,9 +110,6 @@ def test_integration(server, rpi_client):
     app.aboutToQuit.connect(oper_handler_thread.quit)
 
     # Test the triggered signals
-    # self.assertTrue(QtTest.QSignalSpy(tcp_client.conStatSigC).wait(), "Connection signal was not emitted")
-
-    server_connection, server_address = server.accept()
     ui.show_application()  # Render and show the GUI main window and start the application
 
     window_shown = QtTest.QTest.qWaitForWindowExposed(ui.main_win)  # Wait until the main window is shown
@@ -128,11 +125,6 @@ def test_integration(server, rpi_client):
 
     # Get the connection status
     client_connected = (tcp_client.sock.state() == QtNetwork.QAbstractSocket.ConnectedState)
-
-    # server_connection.send('DUMMY_DATA\n'.encode('utf-8'))
-    # client_received_data_sig = QtTest.QSignalSpy(tcp_client.dataRcvSigC)  # Signal emission, upon data arrival
-
-    # assert client_received_data_sig.wait()
 
     # Close all the threads before exiting
     tcp_client_thread.quit()
