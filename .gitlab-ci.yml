@@ -69,7 +69,7 @@ tests-python-latest:
       - .cache/pip
   script:
     - apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
-    - python3 -m pip install pyvirtualdisplay
+    - python3 -m pip install pyvirtualdisplay coverage
   after_script:
     - ./configure.sh
     - ./Tests/run_coverage.sh
