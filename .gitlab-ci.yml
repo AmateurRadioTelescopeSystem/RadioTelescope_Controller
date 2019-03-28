@@ -31,8 +31,8 @@ before_script:
     - apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
     - python3 -m pip install pyvirtualdisplay pytest-cov
   after_script:
-    - ./configure.sh
-    - ./Tests/run_tests.sh
+    - ./configure_linux.sh
+    - ./run_tests.sh
   artifacts:
     reports:
       junit: junit_tests.xml
