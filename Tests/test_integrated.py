@@ -1,6 +1,5 @@
 import os
 import sys
-import yaml
 import socket
 import unittest
 import logging
@@ -8,7 +7,6 @@ import logging.config
 sys.path.append(os.path.abspath('.'))  # noqa
 sys.path.append(os.path.abspath('../Core/'))  # noqa
 
-import Tests.DefaultData
 from PyQt5 import QtWidgets, QtCore, QtTest, QtNetwork
 from Core.GUI import UInterface
 from Core.Handlers import OperationHandler
@@ -33,49 +31,6 @@ class TestIntegrated(unittest.TestCase):
         self.sock.close()
 
     def test_integration(self):
-        # Create the directory for the log files if it does not exist already
-        try:
-            if not os.path.exists(os.path.abspath('Tests/logs')):
-                os.makedirs(os.path.abspath('Tests/logs'))
-            if not os.path.exists(os.path.abspath('Tests/Settings')):
-                os.makedirs(os.path.abspath('Tests/Settings'))
-            if not os.path.exists(os.path.abspath('TLE')):
-                os.makedirs(os.path.abspath('TLE'))  # Make the TLE saving directory
-            if not os.path.exists('Tests/Astronomy Database'):
-                os.makedirs('Tests/Astronomy Database')
-        except Exception as excep:
-            print("There is a problem with the log directory. See tracback: \n%s" % excep, file=sys.stderr)
-            sys.exit(-1)  # Exit the program if an error occurred
-
-        # Check if the logging configuration file exists
-        try:
-            if not os.path.exists(os.path.abspath('Tests/Settings/logging_settings.yaml')):
-                print("Logging configuration file not found. Creating the default.", file=sys.stderr)
-                log_file = open(os.path.abspath('Tests/Settings/logging_settings.yaml'),
-                                "w+")  # Open file in writing mode
-                log_file.write(Tests.DefaultData.log_config_str)  # Write the default dat to the file
-                log_file.close()  # Close the file, since no other operation required
-        except Exception as excep:
-            print("There is a problem creating the configuration file. See tracback: \n%s" % excep, file=sys.stderr)
-            sys.exit(-1)  # Exit the program if an error occurred
-
-        # Check if the settings XML file exists
-        try:
-            if not os.path.exists(os.path.abspath('Tests/Settings/settings.xml')):
-                print("Settings file not found. Creating the default.", file=sys.stderr)
-                setngs_file = open(os.path.abspath('Tests/Settings/settings.xml'),
-                                   "w+")  # Open the settings file in writing mode
-                setngs_file.write(Tests.DefaultData.settings_xml_str)  # Write the default dat to the file
-                setngs_file.close()  # Close the file, since no other operation required
-        except Exception as excep:
-            print("There is a problem creating the settings file. See tracback: \n%s" % excep, file=sys.stderr)
-            sys.exit(-1)  # Exit the program if an error occurred
-
-        # Open the configuration and apply it on the logging module
-        with open(os.path.abspath('Tests/Settings/logging_settings.yaml')) as config_file:
-            dictionary = yaml.safe_load(config_file)  # Load the dictionary configuration
-            logging.config.dictConfig(dictionary['Logging'])  # Select the logging settings from the dictionary
-
         log_data = logging.getLogger(__name__)  # Create the logger for the program
         log_data.info("Main thread started")  # Use that in debugging
         QtCore.QThreadPool.globalInstance().setMaxThreadCount(8)  # Set the global thread pool count
@@ -96,6 +51,7 @@ class TestIntegrated(unittest.TestCase):
         tcp_stell.moveToThread(tcp_stell_thread)  # Move the Stellarium server to a thread
         tcp_stell.conStatSigS.connect(ui.stell_tcp_gui_handle)  # Button handling signal for Stellarium
         tcp_stell.dataShowSigS.connect(ui.stell_data_show)  # Stellarium coordinate show signal
+
         # Connect the thread action signals
         tcp_stell_thread.started.connect(tcp_stell.start)  # Run the start code for the thread, once it starts
         tcp_stell_thread.finished.connect(tcp_stell.close)  # Run the stop code when a quit is requested
@@ -106,6 +62,7 @@ class TestIntegrated(unittest.TestCase):
         tcp_server = RPiServerThread.RPiServerThread(cfg_data)  # Create the instance of the TCP client
         tcp_server.moveToThread(tcp_server_thread)  # Move the server to a thread
         tcp_server.conStatSigR.connect(ui.rpi_tcp_gui_handle)  # Connection status signal for the server
+
         # Connect the thread action signals
         tcp_server_thread.started.connect(tcp_server.start)  # What to do upon thread start
         tcp_server_thread.finished.connect(tcp_server.close)  # What to do upon thread exit
@@ -115,6 +72,7 @@ class TestIntegrated(unittest.TestCase):
         tcp_client = ClientThread.ClientThread(cfg_data)  # Create the instance of the TCP client
         tcp_client.moveToThread(tcp_client_thread)  # Move the client to a thread
         tcp_client.conStatSigC.connect(ui.client_tcp_gui_handle)  # Connection status of the TCP client
+
         # Connect the thread action signals
         tcp_client_thread.started.connect(tcp_client.start)  # Connect with this function upon thread start
         tcp_client_thread.finished.connect(tcp_client.close)  # Connect with thsi function upon thread exit
@@ -149,7 +107,6 @@ class TestIntegrated(unittest.TestCase):
         ui.show_application()  # Render and show the GUI main window and start the application
 
         window_shown = QtTest.QTest.qWaitForWindowExposed(ui.main_win)  # Wait until the main window is shown
-
         QtTest.QTest.qWait(2000)  # Wait for the retrieval of TLE file
 
         try:
