@@ -27,7 +27,7 @@ def test_hour_angle(astro_object):
 
 
 def test_hour_angle_to_ra(astro_object):
-    right_ascension = astro_object.hour_angle_to_ra(88.622679, -1.9425, (2019, 3, 23, 22, 0, 0))
+    right_ascension = astro_object.hour_angle_to_ra(88.622679, -1.9425, (2019, 3, 23.916667,))
     assert right_ascension == 85.189772
 
 
@@ -60,6 +60,10 @@ def test_transit_planetary(astro_object):
     assert target_ha == 125.22636
     assert object_dec == -19.880418
 
+    # Check if providing a wrong object works as expected
+    no_coordinates = astro_object.transit_planetary('wrong_object', 0, 0, 0)
+    assert no_coordinates == []
+
 
 def test_tracking_planetary(astro_object):
     target_ha, object_dec, roc_ra, roc_dec = astro_object.tracking_planetary('mars', 0, 0, (2019, 3, 23.916667,))
@@ -67,3 +71,7 @@ def test_tracking_planetary(astro_object):
     assert object_dec == -19.880418
     assert roc_ra == 0.000434
     assert roc_dec == -0.000106
+
+    # Check if providing a wrong object works as expected
+    no_coordinates = astro_object.tracking_planetary('wrong_object', 0, 0)
+    assert no_coordinates == []

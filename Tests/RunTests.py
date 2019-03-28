@@ -56,4 +56,4 @@ def parse_files():
 
 if __name__ == "__main__":
     parse_files()  # Create the necessary files first
-    os.system("pytest --cov-report=html --cov-report=term --junitxml=junit_tests.xml --cov=Core Tests/")
+    os.system("pytest --cov-report=html --cov-report=term --junitxml=junit_tests.xml --cov=Core --color=yes Tests/")

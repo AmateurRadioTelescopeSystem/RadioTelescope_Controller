@@ -31,7 +31,7 @@ class OpHandler(QtCore.QObject):
         self.tcp_server = tcp_server  # TCP RPi server object
         self.tcp_stellarium = tcp_stellarium  # TCP Stellarium server object
 
-        # Create the thread varaible for the class
+        # Create the thread variable for the class
         self.tcp_client_thread = tcp_cl_thread
         self.tcp_server_thread = tcp_serv_thread
         self.tcp_stel_thread = tcp_stel_thread
