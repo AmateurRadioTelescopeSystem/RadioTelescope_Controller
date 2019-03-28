@@ -12,16 +12,17 @@ cache:
 # Define a template for Python testing
 .python_stack: &python_version_testing
   stage: test
+  coverage: '/TOTAL.*\s+(\d+%)$/'
   cache:
     key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths:
       - .cache/pip
   script:
     - apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
-    - python3 -m pip install pyvirtualdisplay
+    - python3 -m pip install pyvirtualdisplay coverage
   after_script:
     - ./configure.sh
-    - ./Tests/run_tests.sh
+    - ./Tests/run_coverage.sh
 
 # Define the stages of thi CI
 stages:
@@ -61,18 +62,7 @@ pylint:
 # Unit and integration testing
 tests-python-latest:
   image: python:latest
-  stage: test
-  coverage: '/TOTAL.*\s+(\d+%)$/'
-  cache:
-    key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
-    paths:
-      - .cache/pip
-  script:
-    - apt-get install -y -qq software-properties-common python3-dev xvfb qt5-default
-    - python3 -m pip install pyvirtualdisplay coverage
-  after_script:
-    - ./configure.sh
-    - ./Tests/run_coverage.sh
+  <<: *python_version_testing
 
 tests-python-3.6:
   image: python:3.6
