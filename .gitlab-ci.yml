@@ -69,7 +69,11 @@ tests-python-3.6:
 
 tests-python-3.5:
   image: python:3.5
-  <<: *python_version_testing  
+  <<: *python_version_testing
+
+tests-python-3.4:
+  image: python:3.4
+  <<: *python_version_testing
 
 # Deployment section
 pages:
