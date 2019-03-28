@@ -19,18 +19,14 @@ display.start()
 
 
 @pytest.fixture(scope="module")
-def server():
+def main_app():
+    # Create a server socket
     server_address = ('localhost', 10001)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(server_address)
     sock.settimeout(60)  # Add a timeout timer for 60 seconds
     sock.listen(1)  # Set the socket to listen
-    yield sock
 
-    sock.close()
-
-
-def test_integration(server):
     log_data = logging.getLogger(__name__)  # Create the logger for the program
     log_data.info("Main thread started")  # Use that in debugging
     QtCore.QThreadPool.globalInstance().setMaxThreadCount(8)  # Set the global thread pool count
@@ -104,31 +100,11 @@ def test_integration(server):
     # Test the triggered signals
     ui.show_application()  # Render and show the GUI main window and start the application
 
-    window_shown = QtTest.QTest.qWaitForWindowExposed(ui.main_win)  # Wait until the main window is shown
-    QtTest.QTest.qWait(2000)  # Wait for the retrieval of TLE file
+    yield {'ui': ui, 'tcp_stell': tcp_stell, 'tcp_server': tcp_server, 'tcp_client': tcp_client,
+           'oper_handle': oper_handle, 'tcp_stell_thread': tcp_stell_thread, 'tcp_server_thread': tcp_server_thread,
+           'tcp_client_thread': tcp_client_thread, 'oper_handler_thread': oper_handler_thread, 'sock': sock
+           }
 
-    try:
-        # Click the GUI button to proceed
-        QtTest.QTest.mouseClick(ui.tle_info_msg_box.buttons()[0], QtCore.Qt.LeftButton)
-    except IndexError:
-        print("\nPossibly the TLE file exists. \nDouble check to make sure that there is no other error.\n")
-        pass
-    QtTest.QTest.qWait(1000)  # Wait for the client thread to start
-
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as rpi_socket:
-        rpi_socket.connect(('localhost', 10003))
-        QtTest.QTest.qWait(1000)  # Let the socket some time to connect
-        rpi_connected = (tcp_server.socket.state() == QtNetwork.QAbstractSocket.ConnectedState)
-
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp_stell_socket:
-        tcp_stell_socket.connect(('localhost', 10002))
-        QtTest.QTest.qWait(1000)  # Let the socket some time to connect
-        stellarium_connected = (tcp_stell.socket.state() == QtNetwork.QAbstractSocket.ConnectedState)
-
-    # Get the connection status
-    client_connected = (tcp_client.sock.state() == QtNetwork.QAbstractSocket.ConnectedState)
-
-    # Close all the threads before exiting
     tcp_client_thread.quit()
     tcp_client_thread.wait()
     tcp_server_thread.quit()
@@ -137,8 +113,93 @@ def test_integration(server):
     tcp_stell_thread.wait()
     oper_handler_thread.quit()
     oper_handler_thread.wait()
+    sock.close()
+
+
+def test_gui_shown(main_app):
+    window_shown = QtTest.QTest.qWaitForWindowExposed(main_app['ui'].main_win)  # Wait until the main window is
+    # shown
+    QtTest.QTest.qWait(2000)  # Wait for the retrieval of TLE file
+
+    try:
+        # Click the GUI button to proceed
+        QtTest.QTest.mouseClick(main_app['ui'].tle_info_msg_box.buttons()[0], QtCore.Qt.LeftButton)
+    except IndexError:
+        print("\nPossibly the TLE file exists. \nDouble check to make sure that there is no other error.\n")
+        pass
+    QtTest.QTest.qWait(1000)  # Wait for the client thread to start
 
     assert window_shown
+
+
+def test_tcp_rpi_client_connection(main_app):
+    # Get the connection status
+    client_connected = (main_app['tcp_client'].sock.state() == QtNetwork.QAbstractSocket.ConnectedState)
     assert client_connected
+
+
+def test_tcp_rpi_server_connection(main_app):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as rpi_socket:
+        rpi_socket.connect(('localhost', 10003))
+        QtTest.QTest.qWait(50)  # Let the socket some time to connect
+        rpi_connected = (main_app['tcp_server'].socket.state() == QtNetwork.QAbstractSocket.ConnectedState)
     assert rpi_connected
+
+
+def test_tcp_stell_server_connection(main_app):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp_stell_socket:
+        tcp_stell_socket.connect(('localhost', 10002))
+        QtTest.QTest.qWait(50)  # Let the socket some time to connect
+        stellarium_connected = (main_app['tcp_stell'].socket.state() == QtNetwork.QAbstractSocket.ConnectedState)
     assert stellarium_connected
+
+
+def test_op_handler_connect_button_client(main_app):
+    thread_status_before = main_app['tcp_client_thread'].isFinished()
+    button_message_before = main_app['ui'].main_widget.connectRadioTBtn.text()
+
+    main_app['oper_handle'].connect_button_client()  # Attempt to toggle connection
+    QtTest.QTest.qWait(50)
+
+    assert main_app['tcp_client_thread'].isFinished() != thread_status_before
+    assert main_app['ui'].main_widget.connectRadioTBtn.text() != button_message_before
+
+    main_app['oper_handle'].connect_button_client()  # Attempt to toggle connection
+    QtTest.QTest.qWait(50)
+
+    assert main_app['tcp_client_thread'].isFinished() == thread_status_before
+    assert main_app['ui'].main_widget.connectRadioTBtn.text() == button_message_before
+
+
+def test_op_handler_connect_button_stell(main_app):
+    thread_status_before = main_app['tcp_stell_thread'].isFinished()
+    button_message_before = main_app['ui'].main_widget.connectStellariumBtn.text()
+
+    main_app['oper_handle'].connect_button_stell()  # Attempt to toggle connection
+    QtTest.QTest.qWait(50)
+
+    assert main_app['tcp_stell_thread'].isFinished() != thread_status_before
+    assert main_app['ui'].main_widget.connectStellariumBtn.text() != button_message_before
+
+    main_app['oper_handle'].connect_button_stell()  # Attempt to toggle connection
+    QtTest.QTest.qWait(50)
+
+    assert main_app['tcp_stell_thread'].isFinished() == thread_status_before
+    assert main_app['ui'].main_widget.connectStellariumBtn.text() == button_message_before
+
+
+def test_op_handler_connect_button_rpi(main_app):
+    thread_status_before = main_app['tcp_server_thread'].isFinished()
+    button_message_before = main_app['ui'].main_widget.serverRPiConnBtn.text()
+
+    main_app['oper_handle'].connect_button_rpi()  # Attempt to toggle connection
+    QtTest.QTest.qWait(50)
+
+    assert main_app['tcp_server_thread'].isFinished() != thread_status_before
+    assert main_app['ui'].main_widget.serverRPiConnBtn.text() != button_message_before
+
+    main_app['oper_handle'].connect_button_rpi()  # Attempt to toggle connection
+    QtTest.QTest.qWait(50)
+
+    assert main_app['tcp_server_thread'].isFinished() == thread_status_before
+    assert main_app['ui'].main_widget.serverRPiConnBtn.text() == button_message_before
