@@ -18,7 +18,7 @@ class StellariumData:
         data = struct.unpack("3iIi", data)  # Unpack the data as we know the format from the link provided above
         ra_real = data[3]*(12.0/2147483648.0)  # Calculate the true value of the right ascension
         dec_real = data[4]*(90.0/1073741824.0)  # and the true value of the declination
-        return [ra_real, dec_real]
+        return [round(ra_real, 6), round(dec_real, 6)]
 
     @staticmethod
     def encode(ra_real, dec_real):
