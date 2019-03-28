@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import socket
 import logging
 import logging.config
@@ -29,7 +30,15 @@ def server():
     sock.close()
 
 
-def test_integration(server):
+@pytest.fixture(scope="module")
+def rpi_client():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    yield sock
+
+    sock.close()
+
+
+def test_integration(server, rpi_client):
     log_data = logging.getLogger(__name__)  # Create the logger for the program
     log_data.info("Main thread started")  # Use that in debugging
     QtCore.QThreadPool.globalInstance().setMaxThreadCount(8)  # Set the global thread pool count
@@ -103,6 +112,7 @@ def test_integration(server):
     # Test the triggered signals
     # self.assertTrue(QtTest.QSignalSpy(tcp_client.conStatSigC).wait(), "Connection signal was not emitted")
 
+    server_connection, server_address = server.accept()
     ui.show_application()  # Render and show the GUI main window and start the application
 
     window_shown = QtTest.QTest.qWaitForWindowExposed(ui.main_win)  # Wait until the main window is shown
@@ -116,8 +126,17 @@ def test_integration(server):
         pass
     QtTest.QTest.qWait(1000)  # Wait for the client thread to start
 
+    rpi_client.connect(('127.0.0.1', 10003))
+    QtTest.QTest.qWait(1000)  # Wait for the RPi dummy server to connect
+
     # Get the connection status
     client_connected = (tcp_client.sock.state() == QtNetwork.QAbstractSocket.ConnectedState)
+    rpi_connected = (tcp_server.socket.state() == QtNetwork.QAbstractSocket.ConnectedState)
+
+    server_connection.send('DUMMY_DATA\n'.encode('utf-8'))
+    client_received_data_sig = QtTest.QSignalSpy(tcp_client.dataRcvSigC)  # Signal emission, upon data arrival
+
+    assert client_received_data_sig.wait()
 
     # Close all the threads before exiting
     tcp_client_thread.quit()
@@ -131,3 +150,4 @@ def test_integration(server):
 
     assert window_shown
     assert client_connected
+    assert rpi_connected
