@@ -30,15 +30,9 @@ def server():
     sock.close()
 
 
-@pytest.fixture(scope="module")
-def rpi_client():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    yield sock
+def test_integration(server):
+    rpi_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    sock.close()
-
-
-def test_integration(server, rpi_client):
     log_data = logging.getLogger(__name__)  # Create the logger for the program
     log_data.info("Main thread started")  # Use that in debugging
     QtCore.QThreadPool.globalInstance().setMaxThreadCount(8)  # Set the global thread pool count
@@ -123,8 +117,12 @@ def test_integration(server, rpi_client):
         pass
     QtTest.QTest.qWait(1000)  # Wait for the client thread to start
 
+    rpi_socket.connect(('localhost', 10003))
+    QtTest.QTest.qWait(500)
+
     # Get the connection status
     client_connected = (tcp_client.sock.state() == QtNetwork.QAbstractSocket.ConnectedState)
+    rpi_connected = (tcp_server.socket.state() == QtNetwork.QAbstractSocket.ConnectedState)
 
     # Close all the threads before exiting
     tcp_client_thread.quit()
@@ -138,3 +136,4 @@ def test_integration(server, rpi_client):
 
     assert window_shown
     assert client_connected
+    assert rpi_connected
