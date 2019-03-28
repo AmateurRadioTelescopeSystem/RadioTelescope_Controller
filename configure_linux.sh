@@ -2,7 +2,7 @@
 
 set -e  # Stop if any command fails
 
-chmod +x run.sh  # Change execution permissions for the file
+chmod +x run_linux.sh  # Change execution permissions for the file
 pip3 install -r requirements.txt  # Install the necessary python packages
 
 echo "Creating the resources file....."
