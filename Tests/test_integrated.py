@@ -143,6 +143,9 @@ class TestIntegrated(unittest.TestCase):
         # We quit from the operation handle thread and then we exit. All handling is done there
         app.aboutToQuit.connect(oper_handler_thread.quit)
 
+        # Test the triggered signals
+        self.assertTrue(QtTest.QSignalSpy(tcp_client.conStatSigC).wait(), "Connection signal was not emitted")
+
         ui.show_application()  # Render and show the GUI main window and start the application
 
         window_shown = QtTest.QTest.qWaitForWindowExposed(ui.main_win)  # Wait until the main window is shown
@@ -153,7 +156,7 @@ class TestIntegrated(unittest.TestCase):
             # Click the GUI button to proceed
             QtTest.QTest.mouseClick(ui.tle_info_msg_box.buttons()[0], QtCore.Qt.LeftButton)
         except IndexError:
-            print("Possibly the file exists. \nDouble check to make sure that there is no other error.")
+            print("\nPossibly the TLE file exists. \nDouble check to make sure that there is no other error.\n")
             pass
         QtTest.QTest.qWait(1000)  # Wait for the client thread to start
 
