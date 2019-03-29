@@ -1,3 +1,4 @@
+import sys
 import logging
 import logging.handlers
 from Core.Utilities.FileCompression import FileCompression
@@ -25,10 +26,14 @@ class CustomLogTimedRotationHandler(logging.Handler):
         """
         logging.Handler.__init__(self)
 
-        self._handler = logging.handlers.TimedRotatingFileHandler(
-            filename, when, backupCount=backup_count, encoding=enc, utc=utc)
-        self._handler.rotator = FileCompression.compressor  # Compress the old file in every rotation
-        self._handler.namer = FileCompression.namer  # Name the compressed file
+        try:
+            self._handler = logging.handlers.TimedRotatingFileHandler(
+                filename, when, backupCount=backup_count, encoding=enc, utc=utc)
+            self._handler.rotator = FileCompression.compressor  # Compress the old file in every rotation
+            self._handler.namer = FileCompression.namer  # Name the compressed file
+        except PermissionError as permission_exception:
+            print("Log files permission error. See tracback: \n%s" % permission_exception, file=sys.stderr)
+            sys.exit(-1)  # Exit the program if an error occurred
 
     def setFormatter(self, fmt):
         """
