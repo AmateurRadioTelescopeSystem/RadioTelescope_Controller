@@ -1,22 +1,23 @@
-import logging
-import time
 import os
+import time
+import logging
 import urllib3
 import certifi
 from PyQt5 import QtCore
 
 
 class TLEHandler(QtCore.QObject):
-    def __init__(self, cfg_data, parent=None):
+    def __init__(self, cfg_data, main_folder="TLE/", parent=None):
         super(TLEHandler, self).__init__(parent)
         self.logger = logging.getLogger(__name__)  # Create the logger for the file
         self.cfg_data = cfg_data
+        self.main_folder = main_folder
 
     def tle_expiry_checker(self):
         expiration = False  # Set the variable initially
         try:
             url = self.cfg_data.get_tle_url()  # Get the URL from the settings file
-            file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
+            file_dir = os.path.abspath(self.main_folder + url.split("/")[-1])  # Directory for the saved file
 
             tle_mod_date = os.path.getmtime(file_dir)  # Get the last modified time in seconds
             cur_time = time.time()  # Get the current time in seconds
@@ -42,15 +43,14 @@ class TLEHandler(QtCore.QObject):
         # TODO improve the function
         # TODO Add exception handling code in case of empty URL string
         url = self.cfg_data.get_tle_url()  # Get the URL from the settings file
-        file_dir = os.path.abspath("TLE/" + url.split("/")[-1])  # Directory for the saved file
+        file_dir = os.path.abspath(self.main_folder + url.split("/")[-1])  # Directory for the saved file
         http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())  # Create the HTTP pool manager
 
         try:
             tle = http.request('GET', url)  # Try to retrieve the file
 
-            with open(file_dir, 'wb') as tle_file:
+            with open(file_dir, 'wb+') as tle_file:
                 tle_file.write(tle.data)  # Save the TLE file contents
-                tle_file.close()
             error_details = ""
             exit_code = True
         except Exception as exception:

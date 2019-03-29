@@ -17,8 +17,8 @@ def parse_files():
             os.makedirs(os.path.abspath('Tests/logs'))
         if not os.path.exists(os.path.abspath('Tests/Settings')):
             os.makedirs(os.path.abspath('Tests/Settings'))
-        if not os.path.exists(os.path.abspath('TLE')):
-            os.makedirs(os.path.abspath('TLE'))  # Make the TLE saving directory
+        if not os.path.exists(os.path.abspath('Tests/TLE')):
+            os.makedirs(os.path.abspath('Tests/TLE'))  # Make the TLE saving directory
         if not os.path.exists('Tests/Astronomy Database'):
             os.makedirs('Tests/Astronomy Database')
     except Exception as excep:

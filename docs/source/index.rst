@@ -17,11 +17,11 @@ Welcome to Radio Telescope Main Controller's documentation!
    :caption: Contents:
 
    rst/GUI/modules
+   rst/Utilities/modules
    rst/Astronomy/modules
    rst/Configuration/modules
    rst/Stellarium/modules
-   rst/Server/modules
-   rst/Client/modules
+   rst/Networking/modules
    rst/Handlers/modules
    
 .. PYTHON_MODULES_LIST_END
