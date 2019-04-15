@@ -39,7 +39,7 @@ class UIRadioTelescopeControl(QtCore.QObject):
 
         # Create the main GUI window and the other windows
         self.main_win = QtWidgets.QMainWindow()  # Create the main window of the GUI
-        self.ui_man_cont_win = QtWidgets.QMainWindow(parent=self.main_win)  # Create the Manual control window
+        self.ui_man_cont_win = QtWidgets.QMainWindow(parent=self.main_win)  # Crea the Manual control window
         self.ui_tcp_win = QtWidgets.QMainWindow(parent=self.main_win)  # Create the TCP settings window object
         self.ui_location_win = QtWidgets.QDialog(parent=self.main_win)  # Create the location settings window object
         self.ui_calibration_win = QtWidgets.QMainWindow(parent=self.main_win)  # Create the calibration window object

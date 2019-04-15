@@ -50,7 +50,7 @@ setup(
     version=Core.__version__,
     description="Control software for a radio telescope installation. It is used with a Raspberry Pi, "
                 "controlling the antenna motors.",
-    author="Dimitrios Stoupis",
+    author=Core.__author__,
     author_email="dstoupis@auth.gr",
     maintainer="Dimitrios Stoupis",
     maintainer_email="dstoupis@auth.gr",

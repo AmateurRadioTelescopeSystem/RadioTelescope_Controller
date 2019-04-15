@@ -437,7 +437,7 @@ class Calculations(QtCore.QObject):
         Returns:
             list: The calculated position of the points for scanning
         """
-        if objec == "":
+        if objec is None:
             first_point = self.transit(map_points[0][0], map_points[0][1], init_steps[0], init_steps[1], 0)
             roc_ra = roc_dec = 0  # Not rate of change for the non-planetary bodies
         else:
@@ -466,7 +466,7 @@ class Calculations(QtCore.QObject):
 
             # Account for planetary object coordinates
             # TODO Test how the planetary selection is functioning
-            if objec == "":
+            if objec is None:
                 transit_point = self.transit(map_points[i][0], map_points[i][1], step_incr[0], step_incr[1], tr_time)
             else:
                 transit_point = self.transit_planetary(objec, step_incr[0], step_incr[1], tr_time)

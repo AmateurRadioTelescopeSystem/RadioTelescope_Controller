@@ -203,3 +203,11 @@ def test_op_handler_connect_button_rpi(main_app):
 
     assert main_app['tcp_server_thread'].isFinished() == thread_status_before
     assert main_app['ui'].main_widget.serverRPiConnBtn.text() == button_message_before
+
+
+def test_motors_enable_button(main_app):
+    sig_spy = QtTest.QSignalSpy(main_app['tcp_client'].sendData).wait()
+    main_app['oper_handle'].motors_enable_button()
+    QtTest.QTest.qWait(50)
+    assert sig_spy
+
