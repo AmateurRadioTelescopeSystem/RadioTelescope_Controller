@@ -4,6 +4,7 @@ import os
 import sys
 import logging
 import logging.config
+import xml.etree.ElementTree
 sys.path.append(os.path.abspath('.'))  # noqa
 
 # pylint: disable=wrong-import-position
@@ -32,30 +33,29 @@ def parse_files():
             os.makedirs('TLE')  # Make the TLE saving directory
         if not os.path.exists('Astronomy Database'):
             os.makedirs('Astronomy Database')
-    except Exception as exception:
-        print("There is a problem creating directories. See tracback: \n%s" % exception, file=sys.stderr)
+    except (OSError, PermissionError):
+        print("There is a problem creating directories. See tracback: \n%s" % sys.exc_info()[0], file=sys.stderr)
         sys.exit(-1)  # Exit the program if an error occurred
 
     # Check if the logging configuration file exists
     try:
         if not os.path.exists(os.path.abspath('Settings/logging_settings.yaml')):
             print("Logging configuration file not found. Creating the default.", file=sys.stderr)
-            log_file = open(os.path.abspath('Settings/logging_settings.yaml'), "w+")  # Open file in writing mode
-            log_file.write(DefaultData.LOG_CONFIG_DEFAULT)  # Write the default dat to the file
-            log_file.close()  # Close the file, since no other operation required
-    except Exception as exception:
-        print("There is a problem creating the configuration file. See tracback: \n%s" % exception, file=sys.stderr)
+            with open(os.path.abspath('Settings/logging_settings.yaml'), "w+") as log_file:  # Open file in writing mode
+                log_file.write(DefaultData.LOG_CONFIG_DEFAULT)  # Write the default dat to the file
+    except (OSError, PermissionError):
+        print("There is a problem creating the configuration file. See tracback: \n%s" % sys.exc_info()[0],
+              file=sys.stderr)
         sys.exit(-1)  # Exit the program if an error occurred
 
     # Check if the settings XML file exists
     try:
         if not os.path.exists(os.path.abspath('Settings/settings.xml')):
             print("Settings file not found. Creating the default.", file=sys.stderr)
-            setngs_file = open(os.path.abspath('Settings/settings.xml'), "w+")  # Open the settings file in writing mode
-            setngs_file.write(DefaultData.SETTINGS_XML_DEFAULT)  # Write the default dat to the file
-            setngs_file.close()  # Close the file, since no other operation required
-    except Exception as exception:
-        print("There is a problem creating the settings file. See tracback: \n%s" % exception, file=sys.stderr)
+            with open(os.path.abspath('Settings/settings.xml'), "w+") as settings_file: # Open the settings file
+                settings_file.write(DefaultData.SETTINGS_XML_DEFAULT)  # Write the default dat to the file
+    except (OSError, PermissionError):
+        print("There is a problem creating the settings file. See tracback: \n%s" % sys.exc_info()[0], file=sys.stderr)
         sys.exit(-1)  # Exit the program if an error occurred
 
     # Open the configuration and apply it on the logging module
@@ -88,7 +88,7 @@ def main():
     # Exception handling code for the XML file process
     try:
         configuration = ConfigData.ConfData(os.path.abspath('Settings/settings.xml'))
-    except Exception:
+    except (xml.etree.ElementTree.ParseError, TypeError):
         log_data.exception("There is a problem with the XML file handling. Program terminates.")
         sys.exit(1)  # Terminate the script
 

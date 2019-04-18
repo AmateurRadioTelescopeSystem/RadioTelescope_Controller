@@ -10,14 +10,14 @@ class ConfData:
         try:
             self.tree = etree.parse(self.filename)  # Try to parse the given file
             self.root = self.tree.getroot()  # Get the root from the XML file
-        except Exception:
+        except etree.ParseError:
             self.logger.exception("There is an issue with the XML settings file. See traceback below.")
 
     def parse(self):
         try:
             self.tree = etree.parse(self.filename)  # Try to parse the given file
             self.root = self.tree.getroot()  # Get the root from the XML file
-        except Exception:
+        except etree.ParseError:
             self.logger.exception("There is an issue with the XML settings file. See traceback below.")
 
     def get_config(self, child, sub_child):

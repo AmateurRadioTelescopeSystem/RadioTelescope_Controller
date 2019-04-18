@@ -3,6 +3,14 @@
  <author>Dimitrios Stoupis</author>
  <class>RadioTelescopeControl</class>
  <widget class="QMainWindow" name="RadioTelescopeControl">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>530</width>
+    <height>614</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>Radio Telescope Control</string>
   </property>
@@ -166,7 +174,7 @@
               <enum>Qt::Vertical</enum>
              </property>
              <property name="sizeType">
-              <enum>QSizePolicy::Minimum</enum>
+              <enum>QSizePolicy::Expanding</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -1115,7 +1123,7 @@
  <connections>
   <connection>
    <sender>clientRPiEnableLabel</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>connectRadioTBtn</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
@@ -1131,7 +1139,7 @@
   </connection>
   <connection>
    <sender>serverRPiEnableLabel</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>serverRPiConnBtn</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
@@ -1147,7 +1155,7 @@
   </connection>
   <connection>
    <sender>tcpStelServChkBox</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>connectStellariumBtn</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
@@ -1163,7 +1171,7 @@
   </connection>
   <connection>
    <sender>homePositioncheckBox</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>homePositionButton</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
@@ -1179,7 +1187,7 @@
   </connection>
   <connection>
    <sender>dishHaultCommandCheckBox</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>stopMovingBtn</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
@@ -1195,7 +1203,7 @@
   </connection>
   <connection>
    <sender>motorCommandCheckBox</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>motorCommandButton</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
