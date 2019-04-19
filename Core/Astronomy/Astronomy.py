@@ -10,6 +10,7 @@ from pyorbital import tlefile
 from astropy.coordinates import SkyCoord, EarthLocation, FK5
 from astropy.time import Time
 from skyfield.api import Loader, Topos
+from Core.Configuration import ConfigData
 
 
 RAD_TO_DEG = 57.2957795131  # Radians to degrees conversion factor
@@ -29,7 +30,7 @@ class Calculations(QtCore.QObject):
     Todo:
         Replace deprecated PyEphem with astropy and skyfield
     """
-    def __init__(self, cfg_data, parent=None):
+    def __init__(self, cfg_data: ConfigData.ConfData, parent=None):
         """
         Calculations class constructor to initialize the required variables. Also the logger object is created.
 

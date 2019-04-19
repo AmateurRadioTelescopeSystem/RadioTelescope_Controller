@@ -1,12 +1,13 @@
 import logging
 from PyQt5 import QtCore
+from Core.Networking import StellariumThread
 
 
 class SimulHandler(QtCore.QObject):
     simStartSig = QtCore.pyqtSignal(tuple, float, name='simulationStarter')
     simStopSig = QtCore.pyqtSignal(name='stopCurrentSimulation')
 
-    def __init__(self, tcp_stellarium, parent=None):
+    def __init__(self, tcp_stellarium: StellariumThread.StellThread, parent=None):
         super(SimulHandler, self).__init__(parent)
         self.tcp_stell = tcp_stellarium
         self.logger = logging.getLogger(__name__)

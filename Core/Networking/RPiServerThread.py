@@ -1,5 +1,6 @@
 import logging
 from PyQt5 import QtCore, QtNetwork
+from Core.Configuration import ConfigData
 
 
 class RPiServerThread(QtCore.QObject):
@@ -10,7 +11,7 @@ class RPiServerThread(QtCore.QObject):
     clientNotice = QtCore.pyqtSignal(name='clientNotice')  # Notify the client that we have a connection
     sendDataBack = QtCore.pyqtSignal(str, name='sendDtaBack')  # Send data to the RPi from the server
 
-    def __init__(self, cfg_data, parent=None):
+    def __init__(self, cfg_data: ConfigData.ConfData, parent=None):
         super(RPiServerThread, self).__init__(parent)  # Get the parent of the class
         self.cfg_data = cfg_data  # Create the configuration file object
         self.logger = logging.getLogger(__name__)  # Create the logger

@@ -4,10 +4,11 @@ import logging
 import urllib3
 import certifi
 from PyQt5 import QtCore
+from Core.Configuration import ConfigData
 
 
 class TLEHandler(QtCore.QObject):
-    def __init__(self, cfg_data, main_folder="TLE/", parent=None):
+    def __init__(self, cfg_data: ConfigData.ConfData, main_folder="TLE/", parent=None):
         super(TLEHandler, self).__init__(parent)
         self.logger = logging.getLogger(__name__)  # Create the logger for the file
         self.cfg_data = cfg_data

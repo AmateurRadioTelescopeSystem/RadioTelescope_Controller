@@ -1,5 +1,6 @@
 import logging
 from PyQt5 import QtCore, QtNetwork
+from Core.Configuration import ConfigData
 
 
 class ClientThread(QtCore.QObject):
@@ -10,7 +11,7 @@ class ClientThread(QtCore.QObject):
     reConnectSigC = QtCore.pyqtSignal(name='reConnectClient')  # A reconnection signal originating from a button press
     newConInitComms = QtCore.pyqtSignal(name='sendNewConCommands')  # Send the initial commands on each new connection
 
-    def __init__(self, cfg_data, parent=None):
+    def __init__(self, cfg_data: ConfigData.ConfData, parent=None):
         super(ClientThread, self).__init__(parent)  # Get the parent of the class
         self.cfg_data = cfg_data  # Create a variable for the cfg file
         self.logger = logging.getLogger(__name__)  # Create the logger

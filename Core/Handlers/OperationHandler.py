@@ -7,12 +7,18 @@ from Core.Astronomy import Astronomy
 from Core.Handlers import SimulationHandler
 from Core.Handlers import TLEHandler
 
+from Core.GUI import UInterface
+from Core.Networking import ClientThread, RPiServerThread, StellariumThread
+from Core.Configuration import ConfigData
+
 
 class OpHandler(QtCore.QObject):
     posDataShow = QtCore.pyqtSignal(float, float, name='pos_data_show')
 
-    def __init__(self, tcp_client, tcp_server, tcp_stellarium, tcp_cl_thread, tcp_serv_thread, tcp_stel_thread, ui,
-                 cfg_data, parent=None):
+    def __init__(self, tcp_client: ClientThread.ClientThread, tcp_server: RPiServerThread.RPiServerThread,
+                 tcp_stellarium: StellariumThread.StellThread, tcp_cl_thread: QtCore.QThread,
+                 tcp_serv_thread: QtCore.QThread, tcp_stel_thread: QtCore.QThread,
+                 ui: UInterface.UIRadioTelescopeControl, cfg_data: ConfigData.ConfData, parent=None):
         """
         Operations handler class constructor.
 

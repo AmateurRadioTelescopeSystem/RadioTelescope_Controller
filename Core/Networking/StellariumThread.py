@@ -1,6 +1,7 @@
 import logging
 from PyQt5 import QtCore, QtNetwork
 from Core.Stellarium import StellariumDataHandling
+from Core.Configuration import ConfigData
 
 
 class StellThread(QtCore.QObject):
@@ -11,7 +12,7 @@ class StellThread(QtCore.QObject):
     sendDataStell = QtCore.pyqtSignal(float, float, name='stellariumDataSend')  # Send the data to Stellarium
     reConnectSigS = QtCore.pyqtSignal(name='reConnectStell')  # A reconnection signal originating from a button press
 
-    def __init__(self, cfg_data, parent=None):
+    def __init__(self, cfg_data: ConfigData.ConfData, parent=None):
         super(StellThread, self).__init__(parent)  # Get the parent of the class
         self.cfg_data = cfg_data  # Settings file object
         self.logger = logging.getLogger(__name__)  # Create the logger

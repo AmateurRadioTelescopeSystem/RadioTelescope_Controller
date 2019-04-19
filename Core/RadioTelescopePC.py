@@ -52,7 +52,7 @@ def parse_files():
     try:
         if not os.path.exists(os.path.abspath('Settings/settings.xml')):
             print("Settings file not found. Creating the default.", file=sys.stderr)
-            with open(os.path.abspath('Settings/settings.xml'), "w+") as settings_file: # Open the settings file
+            with open(os.path.abspath('Settings/settings.xml'), "w+") as settings_file:  # Open the settings file
                 settings_file.write(DefaultData.SETTINGS_XML_DEFAULT)  # Write the default dat to the file
     except (OSError, PermissionError):
         print("There is a problem creating the settings file. See tracback: \n%s" % sys.exc_info()[0], file=sys.stderr)

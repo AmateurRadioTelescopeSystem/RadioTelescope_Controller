@@ -7,7 +7,7 @@ class FileCompression:
     A helper class used in the custom logger to compress and save the past logs
     """
     @staticmethod
-    def compressor(source, destination):
+    def compressor(source: str, destination: str):
         """
         Compress the file on every rotation
 
@@ -26,7 +26,7 @@ class FileCompression:
         os.remove(source)  # Remove uncompressed file
 
     @staticmethod
-    def namer(name):
+    def namer(name: str):
         """
         Append the appropriate suffix to the compressed file name
 

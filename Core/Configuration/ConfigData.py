@@ -4,7 +4,7 @@ import logging
 
 class ConfData:
     # Class constructor
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         self.filename = filename  # Create a variable with the given filename
         self.logger = logging.getLogger(__name__)  # Create the logger for this module
         try:
