@@ -9,3 +9,4 @@
 ### Move to PySide ###
 This branch most probably does not work well. There is an ongoing effort to move from
 PyQt5 to PySide. When this finishes the branch will be merged to master.
+
