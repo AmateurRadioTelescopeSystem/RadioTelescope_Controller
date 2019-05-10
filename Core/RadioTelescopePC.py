@@ -79,6 +79,9 @@ def main():
     elif sys.platform.startswith('win32'):
         font.setFamily("Segoe UI")  # Set the font for Windows
         font.setPointSize(8)
+    elif sys.platform.startswith('darwin'):
+        font.setFamily("San Francisco")
+        font.setPointSize(13)
 
     # Create a Qt application instance
     app = QtWidgets.QApplication(sys.argv)
